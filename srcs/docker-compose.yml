@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+
+  postgres:
+    image: postgres:latest
+    env_file:
+      - .env
+    restart: always
+    #networks:
+    #  - backend
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./db-data:/var/db-data"
+  #nestjs:
+  #  restart: always
+  #  env_file:
+  #    - .env
+  #  networks:
+  #    - backend
+  #reactjs:
+  #  restart: always
+  #  env_file:
+  #    - .env
+  #  networks:
+  #    - frontend
+
+#networks:
+#  frontend:
+#  backend:
