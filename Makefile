@@ -5,6 +5,9 @@ ${NAME}:	build up
 up: build
 		docker-compose -f srcs/docker-compose.yml up
 
+install:
+		npm install
+
 build:
 		docker-compose -f srcs/docker-compose.yml build
 connect:
