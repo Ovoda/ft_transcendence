@@ -1,7 +1,6 @@
-import React from 'react';
-
 import './App.css';
 import Game from './components/game/game';
+import 'style/global.scss';
 
 function App() {
 
