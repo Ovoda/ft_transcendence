@@ -4,14 +4,11 @@ import startPlayers from './player/player';
 import startBall from './ball/ball';
 import './game.scss';
 
-const canvas = document.querySelector('canvas')
-const c = canvas?.getContext('2d')
+export const canvas = document.querySelector('canvas')
+export const c = canvas?.getContext('2d')
 
-//canvas.width = window.innerWidth / 1.5
-//canvas.height = window.innerHeight / 1.5
-
-console.log(canvas?.width)
-console.log(canvas?.height)
+export var canvas_h = canvas?.height || 0
+export var canvas_w = canvas?.width || 0
 
 function Game() {
 	startBall();

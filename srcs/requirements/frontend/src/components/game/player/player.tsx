@@ -1,6 +1,6 @@
+import { canvas_h, canvas_w, c } from '../game';
 
-const canvas = document.querySelector('canvas')
-const c = canvas?.getContext('2d')
+console.log(canvas_w)
 
 class Player {
 	width;

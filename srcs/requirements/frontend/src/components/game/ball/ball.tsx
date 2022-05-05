@@ -1,9 +1,8 @@
 import React from 'react';
 import { convertTypeAcquisitionFromJson } from 'typescript';
 import drawPlayers from '../player/player';
-
-const canvas = document.querySelector('canvas')
-const c = canvas?.getContext('2d')
+import './game.scss';
+import { canvas_h, canvas_w, canvas, c  } from '../game';
 
 class Ball {
 	radius;
@@ -22,7 +21,8 @@ class Ball {
 	}
 	draw() {
 		c?.beginPath()
-		c?.arc(this.position.x, this.position.y, 10, 0, 2 * Math.PI)
+		c?.arc(this.position.x, this.position.y, (canvas_h * canvas_w) * ( 1 / 15000), 0, 2 * Math.PI)
+		c?.fill();
 		c?.stroke()
 	}
 	update() {
@@ -39,7 +39,7 @@ const ball = new Ball();
 
 function animate() {
 	requestAnimationFrame(animate)
-	c?.clearRect(0, 0, 900, 600)
+	c?.clearRect(0, 0, canvas_w, canvas_h)
 	ball.update()
 	drawPlayers()
 }
