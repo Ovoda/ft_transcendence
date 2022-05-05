@@ -19,11 +19,8 @@ class Player {
 	}
 }
 
-
-
-const player1 = new Player(0,  10);
-const player2 = new Player(20, 1000 / 2);
-
+const player1 = new Player(0,  50);
+const player2 = new Player(290, 50);
 
 export default function drawPlayers() {
 	player1.draw()

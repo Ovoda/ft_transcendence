@@ -1,4 +1,5 @@
 import React from 'react';
+import { convertTypeAcquisitionFromJson } from 'typescript';
 import drawPlayers from '../player/player';
 
 const canvas = document.querySelector('canvas')
