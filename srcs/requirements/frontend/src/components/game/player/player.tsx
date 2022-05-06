@@ -1,5 +1,6 @@
 export const canvas = document.querySelector('canvas')
 export const c = canvas?.getContext('2d')
+
 const keys = {
 	up: {
 		pressed: false
@@ -23,7 +24,7 @@ class Player {
 		this.height = 40
 		this.velocity = {
 			x: 0,
-			y: 3
+			y: 2
 		}
 	}
 	draw() {
