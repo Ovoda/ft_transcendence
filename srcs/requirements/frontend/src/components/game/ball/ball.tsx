@@ -1,8 +1,7 @@
-import React from 'react';
-import { convertTypeAcquisitionFromJson } from 'typescript';
 import drawPlayers from '../player/player';
-import './game.scss';
-import { canvas_h, canvas_w, canvas, c  } from '../game';
+
+export const canvas = document.querySelector('canvas')
+export const c = canvas?.getContext('2d')
 
 class Ball {
 	radius;
@@ -11,7 +10,7 @@ class Ball {
 	constructor() {
 		this.position = {
 			x: 150,
-			y: 69
+			y: 70
 		}
 		this.radius = 10
 		this.velocity = {
@@ -20,10 +19,7 @@ class Ball {
 		}
 	}
 	draw() {
-		c?.beginPath()
-		c?.arc(this.position.x, this.position.y, (canvas_h * canvas_w) * ( 1 / 15000), 0, 2 * Math.PI)
-		c?.fill();
-		c?.stroke()
+		c?.fillRect(this.position.x, this.position.y, this.radius, this.radius)
 	}
 	update() {
 		this.draw()
@@ -37,14 +33,9 @@ class Ball {
 
 const ball = new Ball();
 
-function animate() {
+export default function animate() {
 	requestAnimationFrame(animate)
-	c?.clearRect(0, 0, canvas_w, canvas_h)
+	c?.clearRect(0, 0, 1000, 700)
 	ball.update()
 	drawPlayers()
-}
-
-
-export default function startBall() {
-	animate()
 }
