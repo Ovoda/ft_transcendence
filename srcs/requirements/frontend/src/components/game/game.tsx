@@ -1,9 +1,6 @@
 import animate from './ball/ball';
 import './game.scss';
-
-export const canvas = document.querySelector('canvas')
-export const c = canvas?.getContext('2d')
-
+import React, { useEffect } from 'react';
 
 class Score {
 	player1;
@@ -17,12 +14,15 @@ class Score {
 const score = new Score()
 
 function Game() {
-	animate();
+	//useEffect(() => {
+	//	animate()
+	//	console.error("called")
+	//});
 	return (
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
-			<p>Score</p>
 			<p id="output"></p>
+			<button onClick={() => animate()}>Start Game</button>
 			<canvas id="canvas"></canvas>
 		</div>
 	);

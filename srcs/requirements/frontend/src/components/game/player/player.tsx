@@ -1,5 +1,5 @@
-export const canvas = document.querySelector('canvas')
-export const c = canvas?.getContext('2d')
+export let canvas = document.querySelector('canvas')
+export let c = canvas?.getContext('2d')
 
 const keys = {
 	up: {
@@ -24,19 +24,18 @@ class Player {
 		this.height = 40
 		this.velocity = {
 			x: 0,
-			y: 2
+			y: 5
 		}
 	}
-	draw() {
+	draw(c: CanvasRenderingContext2D | null | undefined) {
 		c?.fillRect(this.position.x, this.position.y, this.width, this.height)
 	}
-	update() {
-		this.draw()
+	update(c: CanvasRenderingContext2D | null | undefined) {
+		this.draw(c)
 		if (this.position.y + this.height + 3 <= 150) // add height of canvas later
 			if (keys.down.pressed == true)
 				this.position.y += 3
 				keys.down.pressed = false
-				console.log(this.position.y)
 		if (this.position.y + 3 >= 0)
 			if (keys.up.pressed == true)
 				this.position.y -= 3
@@ -47,22 +46,20 @@ class Player {
 const player1 = new Player(0,  50);
 const player2 = new Player(290, 50);
 
-export default function drawPlayers() {
-	player1.update()
-	player2.draw()
+export default function drawPlayers(c: CanvasRenderingContext2D | null | undefined) {
+	player1.update(c)
+	player2.draw(c)
 }
 
 window.addEventListener("keydown", function (event) {
 	switch (event.key) {
 		case "ArrowDown":
-		console.log(event.key)
 			keys.down.pressed = true
-			player1.update()
+			player1.update(c)
 			break
 		case "ArrowUp":
-			console.log(event.key)
 			keys.up.pressed = true
-			player1.update()
+			player1.update(c)
 			break
 		default:
 			return ;
