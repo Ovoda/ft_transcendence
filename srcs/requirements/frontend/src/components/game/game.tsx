@@ -25,8 +25,8 @@ function initGame(oldjson : CanvasInterface) {
 
 		//proteger contre type undefined or Null
 		const ball = new Ball(c!, canvas!);
-		const player1 = new Player(0, canvas!.height / 2);
-		const player2 = new Player(canvas!.width - 10, canvas!.height / 2);
+		const player1 = new Player(0, canvas!.width, canvas!.height);
+		const player2 = new Player(canvas!.width - (canvas!.width / 50), canvas!.width, canvas!.height);
 		const keys = new Keys();
 		json = {
 			"canvas": canvas,

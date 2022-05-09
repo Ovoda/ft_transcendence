@@ -13,17 +13,18 @@ export class Player {
 	position;
 	velocity;
 	score;
-	constructor( new_x : number, new_y : number) {
-		this.position = {
-			x : new_x,
-			y : new_y
-		}
+	constructor( pos : number, width : number, height : number) {
+
 		this.score = 0
-		this.width = 10
-		this.height = 40
+		this.width = width / 50
+		this.height = height / 3
 		this.velocity = {
 			x: 0,
-			y: 5
+			y: 3
+		}
+		this.position = {
+			x : pos,
+			y : (height / 2) - (this.height / 2)
 		}
 	}
 	draw(c: CanvasRenderingContext2D) {
@@ -31,17 +32,17 @@ export class Player {
 	}
 	update(c: CanvasRenderingContext2D, keys : Keys, canvas: HTMLCanvasElement) {
 		this.draw(c)
-		if (this.position.y + this.height + 3 <= canvas.height) {
+		if (this.position.y + this.height <= canvas.height) {
 			if (keys.down === true) {
 				console.log(keys.down)
-				this.position.y += 3
+				this.position.y += this.velocity.y
 				keys.down = false
 			}
 		}
-		if (this.position.y + 3 >= 0) {
+		if (this.position.y + this.velocity.y > 0) {
 			if (keys.up === true) {
 				console.log(keys.up)
-				this.position.y -= 3
+				this.position.y -= this.velocity.y
 				keys.up = false;
 			}
 		}
