@@ -31,14 +31,19 @@ export class Player {
 	}
 	update(c: CanvasRenderingContext2D, keys : Keys) {
 		this.draw(c)
-		if (this.position.y + this.height + 3 <= 150) // add height of canvas later
-			if (keys.down === true)
+		if (this.position.y + this.height + 3 <= 150) {
+			if (keys.down === true) {
+				console.log(keys.down)
 				this.position.y += 3
 				keys.down = false
-		if (this.position.y + 3 >= 0)
-			if (keys.up === true)
+			}
+		}
+		if (this.position.y + 3 >= 0) {
+			if (keys.up === true) {
 				this.position.y -= 3
 				keys.up = false;
+			}
+		}
 	}
 }
 
@@ -51,4 +56,3 @@ export function drawPlayers(c: CanvasRenderingContext2D, keys : Keys) {
 		player2.draw(c)
 	}
 }
-

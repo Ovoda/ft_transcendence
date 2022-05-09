@@ -1,10 +1,8 @@
-import { setTextRange } from 'typescript';
 import { Player } from '../player/player';
-
 
 function updateScore(c: CanvasRenderingContext2D, canvas : HTMLCanvasElement, player1 : Player, player2 : Player)
 {
-	let str : string = player1.toString() + " : " + player2.toString()
+	let str : string = player1.score.toString() + " : " + player2.score.toString()
 	c.font = "10px Arial"
 	c.fillText(str, canvas.width / 2, 10)
 }
@@ -17,19 +15,19 @@ function playerColision(ball : Ball, player1: Player, player2: Player) {
 	else if (ball.position.x >= player2.position.x
 		&& ball.position.y >= player2.position.y
 		&& ball.position.y <= player2.position.y + player2.height)
-			return (2)
+			return (1)
 	else
 		return (0)
 }
 
-export default class Ball {
+export class Ball {
 	radius;
 	position;
 	velocity;
 	constructor(c : CanvasRenderingContext2D, canvas : HTMLCanvasElement) {
 		this.position = {
-			x: canvas.width / 2,
-			y: canvas.height / 2
+			x: canvas?.width / 2,
+			y: canvas?.height / 2
 		}
 		this.radius = 10;
 		this.velocity = {

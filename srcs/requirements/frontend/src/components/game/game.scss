@@ -1,14 +1,11 @@
-
-//.main {
-//	width: 100%;
-//	height: 100%;
-//}
+.main {
+	width: 100%;
+	height: 100%;
+}
 
 canvas {
-	//width: 70%;
-	//height: 70%;
-	width: 1000px;
-	height: 700px;
+	width: 70%;
+	height: 70%;
 	background-color: white;
 	border-style: solid;
 	border-radius: 15px;
@@ -16,21 +13,20 @@ canvas {
 	border-color:  rgb(0, 157, 255);
 }
 
-/* ============== MEDIA QUERIES: MEDIUM DEVICES =============== */
+///* ============== MEDIA QUERIES: MEDIUM DEVICES =============== */
 
-@media screen and (max-width: 1024px) {
-	canvas {
-		width: 600px;
-		height: 400px;
-	}
-}
+//@media screen and (max-width: 1024px) {
+//	canvas {
+//		width: 600px;
+//		height: 400px;
+//	}
+//}
 
-///* ============== MEDIA QUERIES: SMALL DEVICES =============== */
+/////* ============== MEDIA QUERIES: SMALL DEVICES =============== */
 
-@media screen and (max-width: 650px) {
-	canvas {
-		width: 400px;
-		height: 600px;
-	}
-}
-	
+//@media screen and (max-width: 650px) {
+//	canvas {
+//		width: 400px;
+//		height: 600px;
+//	}
+//}
