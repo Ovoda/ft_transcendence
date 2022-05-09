@@ -21,16 +21,12 @@ function Game() {
 	return (
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
+			<p>{score.player1} : {score.player2}</p>
 			<p id="output"></p>
 			<button onClick={() => animate()}>Start Game</button>
 			<canvas id="canvas"></canvas>
 		</div>
 	);
 }
-
-const app = document.getElementById("output");
-const p = document.createElement("p");
-p.textContent = score.player1.toString() + " : " + score.player2.toString();
-app?.appendChild(p);
 
 export default Game;
