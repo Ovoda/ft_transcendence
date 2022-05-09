@@ -54,40 +54,6 @@ function animate() {
 		json.c.clearRect(0, 0, json.canvas.width, json.canvas.height)
 		drawPlayers(json.canvas, json.c, json.keys, json.player1, json.player2);
 		json.ball.update(json.c, json.canvas, json.player1, json.player2);
-		window.addEventListener("keydown", function (event) {
-		switch (event.key) {
-			case "ArrowDown":
-				json.keys.down = true
-				if (json.c && json.canvas)
-					json.player1.update(json.c, json.keys, json.canvas)
-				break
-			case "ArrowUp":
-				json.keys.up = true
-				if (json.c && json.canvas)
-					json.player1.update(json.c, json.keys, json.canvas)
-				break
-			default:
-				return ;
-			}
-			event.preventDefault();
-		}, true);
-		window.addEventListener("keyup", function (event) {
-			switch (event.key) {
-				case "ArrowDown":
-					json.keys.down = false
-					if (json.c && json.canvas)
-						json.player1.update(json.c, json.keys, json.canvas)
-					break
-				case "ArrowUp":
-					json.keys.up = false
-					if (json.c && json.canvas)
-						json.player1.update(json.c, json.keys, json.canvas)
-					break
-				default:
-					return ;
-				}
-				event.preventDefault();
-			}, true);
 	}
 }
 
@@ -104,5 +70,23 @@ function Game() {
 		</div>
 	);
 }
+
+window.addEventListener("keydown", function (event) {
+	switch (event.key) {
+		case "ArrowDown":
+			json.keys.down = true
+			if (json.c && json.canvas)
+				json.player1.update(json.c, json.keys, json.canvas)
+			break
+		case "ArrowUp":
+			json.keys.up = true
+			if (json.c && json.canvas)
+				json.player1.update(json.c, json.keys, json.canvas)
+			break
+		default:
+			return ;
+		}
+		event.preventDefault();
+	}, true);
 
 export default Game;

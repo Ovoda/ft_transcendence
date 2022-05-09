@@ -31,17 +31,17 @@ export class Player {
 	}
 	update(c: CanvasRenderingContext2D, keys : Keys, canvas: HTMLCanvasElement) {
 		this.draw(c)
-		if (this.position.y + this.height + 1 <= canvas.height) {
+		if (this.position.y + this.height + 3 <= canvas.height) {
 			if (keys.down === true) {
 				console.log(keys.down)
-				this.position.y += 1
+				this.position.y += 3
 				keys.down = false
 			}
 		}
-		if (this.position.y + 1 >= 0) {
+		if (this.position.y + 3 >= 0) {
 			if (keys.up === true) {
 				console.log(keys.up)
-				this.position.y -= 1
+				this.position.y -= 3
 				keys.up = false;
 			}
 		}
@@ -52,5 +52,6 @@ export function drawPlayers(canvas: HTMLCanvasElement, c: CanvasRenderingContext
 	if (c) {
 		player1.update(c, keys, canvas)
 		player2.draw(c)
+
 	}
 }

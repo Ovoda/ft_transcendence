@@ -34,7 +34,7 @@ export class Ball {
 		}
 		this.radius = 5;
 		this.velocity = {
-			x: 1.5,
+			x: 2,
 			y: 0
 		}
 	}
