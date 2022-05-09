@@ -1,9 +1,13 @@
 import { setTextRange } from 'typescript';
-import drawPlayers from '../player/player';
 import { Player } from '../player/player';
-import player1 from '../player/player';
-import player2 from '../player/player';
 
+
+function updateScore(c: CanvasRenderingContext2D, canvas : HTMLCanvasElement, player1 : Player, player2 : Player)
+{
+	let str : string = player1.toString() + " : " + player2.toString()
+	c.font = "10px Arial"
+	c.fillText(str, canvas.width / 2, 10)
+}
 
 function playerColision(ball : Ball, player1: Player, player2: Player) {
 	if (ball.position.x <= player1.position.x + player1.width
@@ -16,32 +20,16 @@ function playerColision(ball : Ball, player1: Player, player2: Player) {
 			return (2)
 	else
 		return (0)
-	}
-
-class Score {
-	player1;
-	player2;
-	constructor() {
-		this.player1 = 0
-		this.player2 = 0
-	}
-	update(c: CanvasRenderingContext2D) {
-		let str : string = this.player1.toString() + " : " + this.player2.toString()
-		c.font = "10px Arial"
-		c.fillText(str, 140, 10)
-	}
 }
-
-export const score = new Score()
 
 export default class Ball {
 	radius;
 	position;
 	velocity;
-	constructor(c : CanvasRenderingContext2D) {
+	constructor(c : CanvasRenderingContext2D, canvas : HTMLCanvasElement) {
 		this.position = {
-			x: 150,
-			y: 70
+			x: canvas.width / 2,
+			y: canvas.height / 2
 		}
 		this.radius = 10;
 		this.velocity = {
@@ -55,56 +43,31 @@ export default class Ball {
 		c?.fill();
 		c?.stroke();
 	}
-<<<<<<< HEAD
-	update(c : CanvasRenderingContext2D) {
-		this.draw(c)
-		this.position.x += this.velocity.x
-		if (this.position.x + this.radius + this.velocity.x > 300)
-			this.velocity.x = -(this.velocity.x);
-		else if (this.position.x === 0)
-=======
-	reset(velocity : number) {
-		this.position.x = 150;
-		this.position.y = 70;
-		this.velocity.x = velocity
+	reset(v : number, canvas : HTMLCanvasElement) {
+		this.position.x = canvas.width / 2;
+		this.position.y = canvas.height / 2;
+		this.velocity.x = v
 	}
 	endofGame() {
 
 	}
-	update(c: CanvasRenderingContext2D) {
+	update(c: CanvasRenderingContext2D, canvas :  HTMLCanvasElement, player1 : Player, player2 : Player) {
 		this.draw(c);
+		updateScore(c, canvas, player1, player2)
 		this.position.x += this.velocity.x;
 		if (playerColision(this, player1, player2))
->>>>>>> 7094a7a (Implement scores for players)
 			this.velocity.x = -(this.velocity.x);
-		if (this.position.x === 0) {
-			score.player2 += 1
-			if (score.player2 >= 10)
+		else if (this.position.x == 0) {
+			player2.score += 1
+			if (player2.score >= 10)
 				this.endofGame();
-			this.reset(1.5)
+			this.reset(1.5, canvas)
 		}
-		else if (this.position.x >= 300) {
-			score.player2 +=1
-			if (score.player2 >= 10)
+		else if (this.position.x >= canvas.width) {
+			player1.score +=1
+			if (player1.score >= 10)
 				this.endofGame();
-			this.reset(-1.5)
+			this.reset(-1.5, canvas)
 		}
 	}
 }
-<<<<<<< HEAD
-=======
-
-const ball = new Ball();
-
-export default function animate() {
-	let canvas = document.querySelector('canvas');
-	let c = canvas?.getContext('2d');
-	requestAnimationFrame(animate);
-	c?.clearRect(0, 0, 1000, 700);
-	if (c) {
-		ball.update(c);
-		drawPlayers(c);
-		score.update(c);
-	}
-}
->>>>>>> 7094a7a (Implement scores for players)
