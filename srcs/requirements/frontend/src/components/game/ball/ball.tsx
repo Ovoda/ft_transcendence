@@ -57,7 +57,7 @@ export default class Ball {
 		this.position.x += this.velocity.x;
 		if (playerColision(this, player1, player2))
 			this.velocity.x = -(this.velocity.x);
-		else if (this.position.x == 0) {
+		else if (this.position.x <= 0) {
 			player2.score += 1
 			if (player2.score >= 10)
 				this.endofGame();
