@@ -32,16 +32,12 @@ function animate() {
 }
 
 function Game() {
-	//useEffect(() => {
-	//	animate()
-	//	console.error("called")
-	//});
 	return (
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
-			<p>{score.player1} : {score.player2}</p>
 			<p id="output"></p>
 			<button onClick={() => animate()}>Start Game</button>
+			<p></p>
 			<canvas id="canvas"></canvas>
 		</div>
 	);
