@@ -10,14 +10,17 @@ function updateScore(c: CanvasRenderingContext2D, canvas : HTMLCanvasElement, pl
 function playerColision(ball : Ball, player1: Player, player2: Player) {
 	if (ball.position.x <= player1.position.x + player1.width
 		&& ball.position.y >= player1.position.y
-		&& ball.position.y <= player1.position.y + player1.height)
+		&& ball.position.y <= player1.position.y + player1.height) {
 			return (1)
+	}
 	else if (ball.position.x >= player2.position.x
 		&& ball.position.y >= player2.position.y
-		&& ball.position.y <= player2.position.y + player2.height)
+		&& ball.position.y <= player2.position.y + player2.height) {
 			return (1)
-	else
+	}
+	else {
 		return (0)
+	}
 }
 
 export class Ball {
@@ -29,7 +32,7 @@ export class Ball {
 			x: canvas?.width / 2,
 			y: canvas?.height / 2
 		}
-		this.radius = 10;
+		this.radius = 5;
 		this.velocity = {
 			x: 1.5,
 			y: 0
@@ -37,7 +40,7 @@ export class Ball {
 	}
 	draw(c : CanvasRenderingContext2D) {
 		c?.beginPath();
-		c?.arc(this.position.x, this.position.y, 10, 0, 2 * Math.PI);
+		c?.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
 		c?.fill();
 		c?.stroke();
 	}
