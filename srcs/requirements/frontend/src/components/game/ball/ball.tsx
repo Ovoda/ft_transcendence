@@ -4,7 +4,7 @@ function updateScore(c: CanvasRenderingContext2D, canvas : HTMLCanvasElement, pl
 {
 	let str : string = player1.score.toString() + " : " + player2.score.toString()
 	c.font = "10px Arial"
-	c.fillText(str, canvas.width / 2, 10)
+	c.fillText(str, (canvas.width / 2) - 10, 10)
 }
 
 function playerColision(ball : Ball, player1: Player, player2: Player) {
