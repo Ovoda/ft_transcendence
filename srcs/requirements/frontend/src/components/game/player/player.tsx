@@ -15,9 +15,9 @@ export class Player {
 	score;
 	constructor( pos : number, width : number, height : number) {
 
-		this.score = 0
-		this.width = width / 50
-		this.height = height / 3
+		this.score = 0;
+		this.width = width / 50;
+		this.height = height / 3;
 		this.velocity = {
 			x: 0,
 			y: 3
@@ -31,28 +31,26 @@ export class Player {
 		c?.fillRect(this.position.x, this.position.y, this.width, this.height)
 	}
 	update(c: CanvasRenderingContext2D, keys : Keys, canvas: HTMLCanvasElement) {
-		this.draw(c)
 		if (this.position.y + this.height <= canvas.height) {
 			if (keys.down === true) {
-				console.log(keys.down)
 				this.position.y += this.velocity.y
 				keys.down = false
 			}
 		}
 		if (this.position.y + this.velocity.y > 0) {
 			if (keys.up === true) {
-				console.log(keys.up)
 				this.position.y -= this.velocity.y
 				keys.up = false;
 			}
 		}
+		console.log(this.position.y);
+		this.draw(c)
 	}
 }
 
-export function drawPlayers(canvas: HTMLCanvasElement, c: CanvasRenderingContext2D, keys : Keys, player1 : Player, player2 : Player) {
+export async function drawPlayers(canvas: HTMLCanvasElement, c: CanvasRenderingContext2D, keys : Keys, player1 : Player, player2 : Player) {
 	if (c) {
+		player2.update(c, keys, canvas)
 		player1.update(c, keys, canvas)
-		player2.draw(c)
-
 	}
 }

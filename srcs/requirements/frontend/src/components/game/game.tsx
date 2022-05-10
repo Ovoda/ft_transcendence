@@ -3,7 +3,6 @@ import { Player } from './player/player';
 import { Keys } from './player/player';
 import { drawPlayers } from './player/player';
 import './game.scss';
-import { useEffect } from 'react';
 
 interface CanvasInterface {
 	canvas: HTMLCanvasElement | null | undefined,
@@ -23,7 +22,6 @@ function initGame(oldjson : CanvasInterface) {
 		let canvas = document.querySelector('canvas');
 		let c = canvas?.getContext('2d');
 
-		//proteger contre type undefined or Null
 		const ball = new Ball(c!, canvas!);
 		const player1 = new Player(0, canvas!.width, canvas!.height);
 		const player2 = new Player(canvas!.width - (canvas!.width / 50), canvas!.width, canvas!.height);
@@ -36,10 +34,10 @@ function initGame(oldjson : CanvasInterface) {
 			"player2": player2,
 			"keys": keys
 		};
-		start = 1
+		start = 1;
 	}
 	else {
-		json = oldjson
+		json = oldjson;
 	}
 	return json;
 }
@@ -51,16 +49,13 @@ function animate() {
 	requestAnimationFrame(animate)
 	if (json?.c && json?.canvas)
 	{
-		json.c.clearRect(0, 0, json.canvas.width, json.canvas.height)
+		json.c.clearRect(0, 0, json.canvas.width, json.canvas.height);
 		drawPlayers(json.canvas, json.c, json.keys, json.player1, json.player2);
 		json.ball.update(json.c, json.canvas, json.player1, json.player2);
 	}
 }
 
 function Game() {
-	useEffect(()=>{
-		animate()
-	})
 	return (
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
@@ -74,15 +69,15 @@ function Game() {
 window.addEventListener("keydown", function (event) {
 	switch (event.key) {
 		case "ArrowDown":
-			json.keys.down = true
+			json.keys.down = true;
 			if (json.c && json.canvas)
-				json.player1.update(json.c, json.keys, json.canvas)
-			break
+				json.player1.update(json.c, json.keys, json.canvas);
+			break ;
 		case "ArrowUp":
-			json.keys.up = true
+			json.keys.up = true;
 			if (json.c && json.canvas)
-				json.player1.update(json.c, json.keys, json.canvas)
-			break
+				json.player1.update(json.c, json.keys, json.canvas);
+			break ;
 		default:
 			return ;
 		}

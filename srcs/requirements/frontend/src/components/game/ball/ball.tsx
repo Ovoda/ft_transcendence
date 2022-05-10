@@ -14,19 +14,63 @@ function hitWall(ball: Ball, canvas : HTMLCanvasElement) {
 	return (0);
 }
 
-function playerColision(ball : Ball, player1: Player, player2: Player) {
+function playerColisionfront(ball : Ball, player1: Player, player2: Player) {
 	if (ball.position.x <= player1.position.x + player1.width
 		&& ball.position.y >= player1.position.y
 		&& ball.position.y <= player1.position.y + player1.height) {
+			console.log("Front Colison");
 			return (1);
 	}
 	else if (ball.position.x >= player2.position.x
 		&& ball.position.y >= player2.position.y
 		&& ball.position.y <= player2.position.y + player2.height) {
+			console.log("Front Colison");
 			return (1);
 	}
 	else {
 		return (0);
+	}
+}
+
+function playerColisionSides(ball : Ball, player1: Player, player2 : Player){
+	let player : Player;
+	let sign : number = 1;
+	let coeff : number = 0;
+	if (ball.velocity.x > 0)
+		player = player2;
+	else
+	{
+		player = player1;
+		coeff = 1;
+		sign = -1;
+	}
+	if (ball.position.y <= player.position.y)
+	{
+		if (ball.position.y + ball.radius >= player.position.y 
+			&& (sign * (ball.position.x + (ball.radius * sign))) >= player.position.x + (player.width * coeff)) {
+				console.log("Side Colison Up");
+				return (1);
+		}
+		else
+			return (0);
+	}
+	else if (ball.position.y >= player.position.y + player.height) {
+		if (ball.position.y - ball.radius <= player.position.y + player.height
+			&& (sign * (ball.position.x + (ball.radius * sign))) >= player.position.x + (player.width * coeff)
+			&& (ball.position.x * sign) <= (player.position.x + (coeff * player.width)))
+		{
+				//console.log("Player");
+				//console.log(player.position.x);
+				//console.log(player.position.y + player.height);
+				//console.log("Ball");
+				//console.log(ball.position.x);
+				//console.log(ball.position.y - ball.radius);
+				return (1);
+		}
+		else
+		{
+			return (0);
+		}
 	}
 }
 
@@ -39,9 +83,9 @@ export class Ball {
 			x: canvas?.width / 2,
 			y: canvas?.height / 2
 		}
-		this.radius = 5;
+		this.radius = Math.sqrt(((0.2 * canvas.width * canvas.height) / 100) / Math.PI);
 		this.velocity = {
-			x: 3,
+			x: 2,
 			y: 0
 		}
 	}
@@ -54,36 +98,35 @@ export class Ball {
 	reset(v : number, canvas : HTMLCanvasElement) {
 		this.position.x = canvas.width / 2;
 		this.position.y = canvas.height / 2;
-		this.velocity.x = v
+		this.velocity.x = v;
 	}
 	endofGame() {
 
 	}
 	update(c: CanvasRenderingContext2D, canvas :  HTMLCanvasElement, player1 : Player, player2 : Player) {
 		this.draw(c);
-		updateScore(c, canvas, player1, player2)
+		updateScore(c, canvas, player1, player2);
 		this.position.x += this.velocity.x;
 		this.position.y += this.velocity.y;
-		if (playerColision(this, player1, player2))
+		if (playerColisionfront(this, player1, player2) || playerColisionSides(this, player1, player2))
 		{
 			this.velocity.x = -(this.velocity.x);
 			this.velocity.y = 1;
 		}
 		else if (hitWall(this, canvas)) {
 			this.velocity.y = -(this.velocity.y);
-
 		}
-		else if (this.position.x <= 0) {
-			player2.score += 1
+		else if (this.position.x + (this.radius * 2) <= 0) {
+			player2.score += 1;
 			if (player2.score >= 10)
 				this.endofGame();
-			this.reset(1.5, canvas)
+			this.reset(1.5, canvas);
 		}
-		else if (this.position.x >= canvas.width) {
-			player1.score +=1
+		else if (this.position.x - (this.radius * 2) >= canvas.width) {
+			player1.score += 1;
 			if (player1.score >= 10)
 				this.endofGame();
-			this.reset(-1.5, canvas)
+			this.reset(-1.5, canvas);
 		}
 	}
 }
