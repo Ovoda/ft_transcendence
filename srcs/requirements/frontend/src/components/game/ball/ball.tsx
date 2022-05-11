@@ -59,12 +59,6 @@ function playerColisionSides(ball : Ball, player1: Player, player2 : Player){
 			&& (sign * (ball.position.x + (ball.radius * sign))) >= player.position.x + (player.width * coeff)
 			&& (ball.position.x * sign) <= (player.position.x + (coeff * player.width)))
 		{
-				//console.log("Player");
-				//console.log(player.position.x);
-				//console.log(player.position.y + player.height);
-				//console.log("Ball");
-				//console.log(ball.position.x);
-				//console.log(ball.position.y - ball.radius);
 				return (1);
 		}
 		else
@@ -72,6 +66,13 @@ function playerColisionSides(ball : Ball, player1: Player, player2 : Player){
 			return (0);
 		}
 	}
+}
+
+function ball_player_ratio ( player : Player, ball : Ball ) : number 
+{
+	let percent;
+	percent = ((ball.position.x - player.position.x) * 100) / (player.height - player.position.x);
+	return ((percent - 50) / 100);
 }
 
 export class Ball {
@@ -89,20 +90,45 @@ export class Ball {
 			y: 0
 		}
 	}
+
 	draw(c : CanvasRenderingContext2D) {
 		c?.beginPath();
 		c?.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
 		c?.fill();
 		c?.stroke();
 	}
+
 	reset(v : number, canvas : HTMLCanvasElement) {
 		this.position.x = canvas.width / 2;
 		this.position.y = canvas.height / 2;
 		this.velocity.x = v;
 	}
+
 	endofGame() {
 
 	}
+
+	hitPlayer(player1 : Player, player2 : Player){
+		let player : Player;
+		let ratio : number;
+		let angle : number;
+		let k : number;
+
+		if (this.velocity.x > 0)
+		{
+			player = player2;
+			k = 2 * (Math.PI / 3);
+		}
+		else
+		{
+			player = player1;
+			k = (Math.PI / 3);
+		}
+		ratio = ball_player_ratio(player, this);
+		angle = ratio * k;
+		this.velocity.x *= -1;
+	}
+
 	update(c: CanvasRenderingContext2D, canvas :  HTMLCanvasElement, player1 : Player, player2 : Player) {
 		this.draw(c);
 		updateScore(c, canvas, player1, player2);
@@ -110,6 +136,7 @@ export class Ball {
 		this.position.y += this.velocity.y;
 		if (playerColisionfront(this, player1, player2) || playerColisionSides(this, player1, player2))
 		{
+			//this.hitPlayer(player1, player2);
 			this.velocity.x = -(this.velocity.x);
 			this.velocity.y = 1;
 		}
