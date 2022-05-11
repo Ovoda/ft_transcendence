@@ -10,7 +10,8 @@ interface CanvasInterface {
 	ball: Ball,
 	player1: Player,
 	player2 : Player,
-	keys: Keys
+	keys_1 : Keys,
+	keys_2: Keys
 }
 
 var start = 0
@@ -25,14 +26,16 @@ function initGame(oldjson : CanvasInterface) {
 		const ball = new Ball(c!, canvas!);
 		const player1 = new Player(0, canvas!.width, canvas!.height);
 		const player2 = new Player(canvas!.width - (canvas!.width / 50), canvas!.width, canvas!.height);
-		const keys = new Keys();
+		const keys_1 = new Keys();
+		const keys_2 = new Keys();
 		json = {
 			"canvas": canvas,
 			"c": c,
 			"ball": ball,
 			"player1": player1,
 			"player2": player2,
-			"keys": keys
+			"keys_1": keys_1,
+			"keys_2": keys_2
 		};
 		start = 1;
 	}
@@ -50,7 +53,7 @@ function animate() {
 	if (json?.c && json?.canvas)
 	{
 		json.c.clearRect(0, 0, json.canvas.width, json.canvas.height);
-		drawPlayers(json.canvas, json.c, json.keys, json.player1, json.player2);
+		drawPlayers(json.canvas, json.c, json.keys_1, json.player1, json.keys_2, json.player2);
 		json.ball.update(json.c, json.canvas, json.player1, json.player2);
 	}
 }
@@ -69,14 +72,18 @@ function Game() {
 window.addEventListener("keydown", function (event) {
 	switch (event.key) {
 		case "ArrowDown":
-			json.keys.down = true;
+			json.keys_1.down = true;
+			json.keys_2.down = true;
 			if (json.c && json.canvas)
-				json.player1.update(json.c, json.keys, json.canvas);
+				{json.player1.update(json.c, json.keys_1, json.canvas);
+				json.player2.update(json.c, json.keys_2, json.canvas);}
 			break ;
 		case "ArrowUp":
-			json.keys.up = true;
+			json.keys_1.up = true;
+			json.keys_2.up = true;
 			if (json.c && json.canvas)
-				json.player1.update(json.c, json.keys, json.canvas);
+				{json.player1.update(json.c, json.keys_1, json.canvas);
+				json.player2.update(json.c, json.keys_2, json.canvas);}
 			break ;
 		default:
 			return ;
