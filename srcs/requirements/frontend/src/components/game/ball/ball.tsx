@@ -9,7 +9,7 @@ function updateScore(c: CanvasRenderingContext2D, canvas : HTMLCanvasElement, pl
 }
 
 function hitWall(ball: Ball, canvas : HTMLCanvasElement) {
-	if (ball.position.y === 0 || ball.position.y === canvas.height)
+	if (ball.position.y - ball.radius <= 0 || ball.position.y + ball.radius >= canvas.height)
 		return (1);
 	return (0);
 }
@@ -71,8 +71,8 @@ function playerColisionSides(ball : Ball, player1: Player, player2 : Player){
 function ball_player_ratio ( player : Player, ball : Ball ) : number 
 {
 	let percent;
-	percent = ((ball.position.x - player.position.x) * 100) / (player.height - player.position.x);
-	return ((percent - 50) / 100);
+	percent = ((ball.position.y - player.position.y) * 2) / (player.height);
+	return (percent - 1);
 }
 
 export class Ball {
@@ -117,16 +117,26 @@ export class Ball {
 		if (this.velocity.x > 0)
 		{
 			player = player2;
-			k = 2 * (Math.PI / 3);
+			k = 2 * (Math.PI / 6);
 		}
 		else
 		{
 			player = player1;
-			k = (Math.PI / 3);
+			k = (Math.PI / 6);
 		}
+		console.log("k is ", k);
 		ratio = ball_player_ratio(player, this);
 		angle = ratio * k;
-		this.velocity.x *= -1;
+		let x  = this.position.x + (1 * Math.cos(angle));
+		let y  = this.position.y + (1 * Math.sin(angle));
+		this.velocity.x = this.position.x - x;
+		this.velocity.x *= 2
+		if (player === player1)
+			this.velocity.x *= -1
+		console.log("x.velocity = ", this.velocity.x )
+		this.velocity.y = this.position.y - y;
+		this.velocity.y *= -2
+
 	}
 
 	update(c: CanvasRenderingContext2D, canvas :  HTMLCanvasElement, player1 : Player, player2 : Player) {
@@ -136,9 +146,7 @@ export class Ball {
 		this.position.y += this.velocity.y;
 		if (playerColisionfront(this, player1, player2) || playerColisionSides(this, player1, player2))
 		{
-			//this.hitPlayer(player1, player2);
-			this.velocity.x = -(this.velocity.x);
-			this.velocity.y = 1;
+			this.hitPlayer(player1, player2);
 		}
 		else if (hitWall(this, canvas)) {
 			this.velocity.y = -(this.velocity.y);

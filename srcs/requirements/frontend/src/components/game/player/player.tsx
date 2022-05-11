@@ -43,7 +43,6 @@ export class Player {
 				keys.up = false;
 			}
 		}
-		console.log(this.position.y);
 		this.draw(c)
 	}
 }
