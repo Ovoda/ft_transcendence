@@ -1,11 +1,15 @@
-import 'style/global.scss';
+import React from 'react';
+import './App.css';
+import Game from './components/game/game';
 
 function App() {
 
   return (
-    <h1>
-      welcome to transcendence
-    </h1>
+    <div className="App">
+      <header className="App-header">
+		<Game></Game>
+      </header>
+    </div>
   );
 }
 
