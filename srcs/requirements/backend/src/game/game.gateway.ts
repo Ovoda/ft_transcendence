@@ -20,6 +20,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@WebSocketServer() server: Server;
 	private logger: Logger = new Logger('GameGateway')
 
+	handleNewGame(client: Socket, data: any): void {
+		this.logger.log(`New Game Request from: ${client.id}`);
+	}
+
 	@SubscribeMessage('msgToServer')
 	handleMessage(client: Socket, data: any): void {
 		this.logger.log(`Client sent: ${data}`);
