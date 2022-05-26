@@ -18,13 +18,13 @@ function playerColisionfront(ball : Ball, player1: Player, player2: Player) {
 	if (ball.position.x <= player1.position.x + player1.width
 		&& ball.position.y >= player1.position.y
 		&& ball.position.y <= player1.position.y + player1.height) {
-			console.log("Front Colison");
+			//console.log("Front Colison");
 			return (1);
 	}
 	else if (ball.position.x >= player2.position.x
 		&& ball.position.y >= player2.position.y
 		&& ball.position.y <= player2.position.y + player2.height) {
-			console.log("Front Colison");
+			//console.log("Front Colison");
 			return (1);
 	}
 	else {
@@ -48,7 +48,7 @@ function playerColisionSides(ball : Ball, player1: Player, player2 : Player){
 	{
 		if (ball.position.y + ball.radius >= player.position.y 
 			&& (sign * (ball.position.x + (ball.radius * sign))) >= player.position.x + (player.width * coeff)) {
-				console.log("Side Colison Up");
+				//console.log("Side Colison Up");
 				return (1);
 		}
 		else
@@ -124,7 +124,7 @@ export class Ball {
 			player = player1;
 			k = (Math.PI / 6);
 		}
-		console.log("k is ", k);
+		//console.log("k is ", k);
 		ratio = ball_player_ratio(player, this);
 		angle = ratio * k;
 		let x  = this.position.x + (1 * Math.cos(angle));
@@ -133,7 +133,7 @@ export class Ball {
 		this.velocity.x *= 2
 		if (player === player1)
 			this.velocity.x *= -1
-		console.log("x.velocity = ", this.velocity.x )
+		//console.log("x.velocity = ", this.velocity.x )
 		this.velocity.y = this.position.y - y;
 		this.velocity.y *= -2
 

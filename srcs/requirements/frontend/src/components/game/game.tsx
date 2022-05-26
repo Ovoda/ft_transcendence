@@ -2,7 +2,11 @@ import { Ball } from './ball/ball';
 import { Player } from './player/player';
 import { Keys } from './player/player';
 import { drawPlayers } from './player/player';
+import { io, Socket } from "socket.io-client";
+import { useEffect, useState } from "react";
 import './game.scss';
+
+const socket : Socket = io("ws://localhost:3001");
 
 interface CanvasInterface {
 	canvas: HTMLCanvasElement | null | undefined,
@@ -47,6 +51,8 @@ function initGame(oldjson : CanvasInterface) {
 
 let json : CanvasInterface
 
+let room : number = 0;
+
 function animate() {
 	json = initGame(json);
 	requestAnimationFrame(animate)
@@ -58,11 +64,17 @@ function animate() {
 	}
 }
 
+
+const launch = () => {
+	socket.emit("newGame")
+}
+
 function Game() {
 	return (
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
-			<button onClick={() => animate()}>Start Game</button>
+			<button onClick={() => launch()}>Start Game</button>
+			{/*<button onClick={() => animate()}>Start Game</button>*/}
 			<p></p>
 			<canvas id="canvas"></canvas>
 		</div>

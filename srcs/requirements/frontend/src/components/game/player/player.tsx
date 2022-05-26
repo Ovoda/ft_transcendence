@@ -13,11 +13,13 @@ export class Player {
 	position;
 	velocity;
 	score;
+	first;
 	constructor( pos : number, width : number, height : number) {
 
 		this.score = 0;
 		this.width = width / 50;
 		this.height = height / 3;
+		this.first = 0;
 		this.velocity = {
 			x: 0,
 			y: 3
