@@ -20,7 +20,6 @@ export class ConfigService {
         ]
     }
 
-
     private ensureValues(keys: string[]) {
         keys.forEach((key) => this.getValue(key));
         return this;

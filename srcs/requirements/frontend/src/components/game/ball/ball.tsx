@@ -79,7 +79,7 @@ export class Ball {
 	radius;
 	position;
 	velocity;
-	constructor(c : CanvasRenderingContext2D, canvas : HTMLCanvasElement) {
+	constructor(canvas : HTMLCanvasElement) {
 		this.position = {
 			x: canvas?.width / 2,
 			y: canvas?.height / 2

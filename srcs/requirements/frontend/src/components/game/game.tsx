@@ -3,7 +3,7 @@ import { Player } from './player/player';
 import { Keys } from './player/player';
 import { drawPlayers } from './player/player';
 import { io, Socket } from "socket.io-client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import './game.scss';
 
 const socket : Socket = io("ws://localhost:3001");
@@ -18,7 +18,7 @@ interface CanvasInterface {
 	keys_2: Keys
 }
 
-var start = 0
+var start = 0;
 
 function initGame(oldjson : CanvasInterface) {
 	let json: CanvasInterface;
@@ -27,7 +27,8 @@ function initGame(oldjson : CanvasInterface) {
 		let canvas = document.querySelector('canvas');
 		let c = canvas?.getContext('2d');
 
-		const ball = new Ball(c!, canvas!);
+		console.log(canvas);
+		const ball = new Ball(canvas!);
 		const player1 = new Player(0, canvas!.width, canvas!.height);
 		const player2 = new Player(canvas!.width - (canvas!.width / 50), canvas!.width, canvas!.height);
 		const keys_1 = new Keys();
@@ -51,32 +52,80 @@ function initGame(oldjson : CanvasInterface) {
 
 let json : CanvasInterface
 
-let room : number = 0;
-
 function animate() {
+	console.log("animate");
 	json = initGame(json);
+	console.log("init done");
 	requestAnimationFrame(animate)
 	if (json?.c && json?.canvas)
 	{
+		console.log("canvas");
 		json.c.clearRect(0, 0, json.canvas.width, json.canvas.height);
 		drawPlayers(json.canvas, json.c, json.keys_1, json.player1, json.keys_2, json.player2);
 		json.ball.update(json.c, json.canvas, json.player1, json.player2);
 	}
 }
 
+function launch(Start: any, Ready: any) {
+	Start(false);
+	socket.emit("joinGame");
+	socket.on("gameStatus", (data: any) => {
+		console.log("Status of the game room" , data);
+		Ready(data);
+		if (data == true) {
+			animate();
+		}
+	})
+}
 
-const launch = () => {
-	socket.emit("newGame")
+function leave(Start: any) {
+	Start(true);
 }
 
 function Game() {
+
+	const [start, setStart] = useState(true);
+	const [ready, setReady] = useState(false);
+	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+	const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+	const [canvasWidth, setCanvasWidth] = useState(0);
+	const [canvasHeight, setCanvasHeight] = useState(0);
+
+	const canvaRef = useRef<HTMLCanvasElement>(null);
+
+	useEffect(() => {
+		window.addEventListener("resize", () => {
+			setWindowWidth(window.innerWidth);
+		});
+	}, []);
+
+	useEffect(() => {
+		setCanvasWidth(windowWidth * 0.7);
+		setCanvasHeight(windowHeight * 0.7);
+	
+
+		//Ball.update(canvaRef.current);
+	}, [windowWidth]);
+
 	return (
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
-			<button onClick={() => launch()}>Start Game</button>
-			{/*<button onClick={() => animate()}>Start Game</button>*/}
+			{start ? (
+        		<button onClick={() => launch(setStart, setReady) }>Start Game</button>
+      		) : (
+        		<button onClick={() => leave(setStart)}>Stop Game</button>
+      		)}
 			<p></p>
-			<canvas id="canvas"></canvas>
+			{!start && ready ? (
+				<canvas  ref={canvaRef} height={canvasHeight} width={canvasWidth} id="canvas"></canvas>
+			) : (
+				<p></p>
+			)}
+			{!start && !ready ? (
+				<p>Waiting for another player...</p>
+			) : (
+				<p></p>
+			)}
 		</div>
 	);
 }
