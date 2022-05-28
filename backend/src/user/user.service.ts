@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserEntity } from './entities/user.entity';
 
-
 @Injectable()
 export class UserService extends CrudService<UserEntity> {
     constructor(

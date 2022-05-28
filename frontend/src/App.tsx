@@ -13,7 +13,7 @@ function App() {
     <div className="App">
       <Navbar />
       <header className="App-header">
-        {/* <Game></Game> */}
+        <Game></Game>
       </header>
     </div >
   );
