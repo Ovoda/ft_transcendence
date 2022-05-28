@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
+import { JwtPayload } from './interfaces/jwtPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -11,14 +12,12 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) { }
 
-    async ftLogin(user: any) {
-        if (!user) {
-            return "No such 42 user";
-        }
 
-        return {
-            message: "User infos from 42",
-            user: user,
-        }
+    login(user: any): { accessToken: string } {
+        const payload: JwtPayload = { username: user.username, sub: user.id };
+
+        return ({
+            accessToken: this.jwtService.sign(payload),
+        });
     }
 }

@@ -15,11 +15,16 @@ export class FtStrategy extends PassportStrategy(Strategy, "user-ft") {
     }
 
     public validate(accessToken: string, refreshToken: string, profile: any) {
-        const { username } = profile;
+        console.log(accessToken);
+        console.log(refreshToken);
 
         const user = {
-            username
-        }
+            id: profile._json.id,
+            email: profile._json.email,
+            login: profile._json.login,
+        };
+
+        console.log(user);
 
         return user;
     }
