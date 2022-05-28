@@ -8,8 +8,9 @@ import {
 } from "@nestjs/websockets";
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import { Game, Games } from '../types/game.interface'
+import { Game} from '../types/game.interface'
 import { rootCertificates } from "tls";
+import { throws } from "assert";
 
 
 @WebSocketGateway({
@@ -18,54 +19,48 @@ import { rootCertificates } from "tls";
 	},
 })
 
-
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-	private games: Games = {
-		size: 0,
-		rooms: [],
-	}
+	private games: Game[] = [];
 
 	@WebSocketServer() server: Server;
 	private logger: Logger = new Logger('GameGateway')
 
-	@SubscribeMessage('newGame')
-	handleNewGame(client: Socket, message: { sender: string, room: string, message: string }): void {
-		this.logger.log(`New Game Request from: ${client.id}`);
-		this.server.to(message.room).emit('startingGame', "message");
-		// client.join()
-	}
 
 	@SubscribeMessage('joinGame')
-	handleJoinGame(client: Socket) {
+	handleJoinGame(client: Socket, message: string) {
 		this.logger.log(`New Game Request from: ${client.id}`);
-		this.logger.log(`Current: ${this.games.size}`);
+		this.logger.log(`Current: ${this.games.length}`);
 		let status: boolean;
-		if (!this.games.size || this.games.rooms[this.games.size - 1].status === true) {
+		if (!this.games.length|| this.games[this.games.length - 1].status === true) {
 			const newGame: Game = {
 				id: client.id,
 				status: false,
 				player1: client.id,
 				player2: null,
 			}
-			this.games.rooms.push(newGame);
+			this.games.push(newGame);
 			client.join(client.id);
 			status = false;
-			this.games.size++;
 		}
-		else if (this.games.rooms[this.games.size - 1].status === false) {
-			this.games.rooms[this.games.size - 1].player2 = client.id;
-			this.games.rooms[this.games.size - 1].status = true;
-			client.join(this.games.rooms[this.games.size - 1].id);
+		else if (this.games[this.games.length - 1].status === false) {
+			this.games[this.games.length - 1].player2 = client.id;
+			this.games[this.games.length - 1].status = true;
+			client.join(this.games[this.games.length - 1].id);
 			status = true;
 		}
 		this.server.emit('gameStatus', status);
 	}
 
-	@SubscribeMessage('leave')
-	handleLeaveGame(client: Socket, room: string) {
-		client.leave(room);
-		client.emit('leavedRoom', room);
+	@SubscribeMessage('leaveGame')
+	handleLeaveGame(client: Socket) {
+		console.log(this.games.length);
+		const index = this.games.findIndex((game: Game) => {
+			return game.player1 === client.id || game.player2 === client.id;
+		})
+		this.server.to(this.games[index].id).emit('gameStop');
+		this.games = [...this.games.slice(0, index), ...this.games.slice(index + 1)];
+		//(this.games[index].player2).leave(this.games[index].id);
 	}
 
 

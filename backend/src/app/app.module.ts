@@ -8,12 +8,12 @@ import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
 	imports: [
-		TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
+		//TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
 		GameModule,
-		UserModule,
-		AuthModule
+		//UserModule,
+		//AuthModule
 	],
 	controllers: [AppController],
-	exports: [TypeOrmModule],
+	//exports: [TypeOrmModule],
 })
 export class AppModule { }
