@@ -18,7 +18,6 @@ import { rootCertificates } from "tls";
 	},
 })
 
-
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
 	private games: Games = {
