@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import 'dotenv/config';
+import { UserEntity } from "src/user/entities/user.entity";
 
 export class ConfigService {
 
@@ -13,11 +14,10 @@ export class ConfigService {
                 "POSTGRES_DB",
                 "POSTGRES_USER",
                 "POSTGRES_PASSWORD",
+                "JWT_SECRET"
             ]
         )
-        this.database_entities = [
-
-        ]
+        this.database_entities = [UserEntity]
     }
 
     private ensureValues(keys: string[]) {
@@ -31,6 +31,10 @@ export class ConfigService {
             throw new Error(`Error ${key} is missing in your environment`);
         }
         return value;
+    }
+
+    public getJwtTokenSecret() {
+        return this.getValue("JWT_SECRET");
     }
 
     public getTypeOrmConfig(): TypeOrmModuleOptions {

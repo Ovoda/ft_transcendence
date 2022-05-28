@@ -1,6 +1,9 @@
+import { Exclude } from "class-transformer";
 
 
 export class CreateUserDto {
-    name: string;
+    username: string;
+
+    @Exclude()
     password: string;
 }

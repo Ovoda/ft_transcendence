@@ -1,4 +1,4 @@
-import { 
+import {
 	SubscribeMessage,
 	WebSocketGateway,
 	OnGatewayInit,
@@ -8,7 +8,7 @@ import {
 } from "@nestjs/websockets";
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import { Game, Games }  from '../types/game.interface'
+import { Game, Games } from '../types/game.interface'
 import { rootCertificates } from "tls";
 
 
@@ -30,10 +30,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private logger: Logger = new Logger('GameGateway')
 
 	@SubscribeMessage('newGame')
-	handleNewGame(client: Socket, message: {sender: string, room: string, message: string}): void {
+	handleNewGame(client: Socket, message: { sender: string, room: string, message: string }): void {
 		this.logger.log(`New Game Request from: ${client.id}`);
 		this.server.to(message.room).emit('startingGame', "message");
-		client.join()
+		// client.join()
 	}
 
 	@SubscribeMessage('joinGame')
@@ -41,9 +41,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.logger.log(`New Game Request from: ${client.id}`);
 		this.logger.log(`Current: ${this.games.size}`);
 		let status: boolean;
-		if (!this.games.size || this.games.rooms[this.games.size - 1].status === true)
-		{
-			const newGame : Game = {
+		if (!this.games.size || this.games.rooms[this.games.size - 1].status === true) {
+			const newGame: Game = {
 				id: client.id,
 				status: false,
 				player1: client.id,
@@ -54,8 +53,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			status = false;
 			this.games.size++;
 		}
-		else if (this.games.rooms[this.games.size - 1].status === false)
-		{
+		else if (this.games.rooms[this.games.size - 1].status === false) {
 			this.games.rooms[this.games.size - 1].player2 = client.id;
 			this.games.rooms[this.games.size - 1].status = true;
 			client.join(this.games.rooms[this.games.size - 1].id);
