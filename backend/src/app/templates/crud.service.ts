@@ -36,7 +36,7 @@ export abstract class CrudService<T> {
         }
 
         try {
-            const entity = this.repository.findOneOrFail(options);
+            const entity = await this.repository.findOneOrFail(options);
             return entity;
         } catch (error: any) {
             throw new NotFoundException({

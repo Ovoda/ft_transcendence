@@ -1,23 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { CreateUserDto } from 'src/user/dtos/createUser.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtPayload } from './interfaces/jwtPayload.interface';
 
 @Injectable()
 export class AuthService {
-
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
     ) { }
 
+    async login(user: CreateUserDto) {
 
-    login(user: any): { accessToken: string } {
-        const payload: JwtPayload = { username: user.username, sub: user.id };
+        const entity = await this.userService.findOrCreate(user);
 
-        return ({
-            accessToken: this.jwtService.sign(payload),
-        });
+        const payload: JwtPayload = { id: entity.id };
+
+        const accessToken = this.jwtService.sign(payload);
+
+        return ({ access_token: accessToken });
     }
 }

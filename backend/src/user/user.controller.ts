@@ -8,8 +8,8 @@ export class UserController {
         private readonly userService: UserService
     ) { }
 
-    @UseGuards(JwtAuthGuard)
     @Get()
+    @UseGuards(JwtAuthGuard)
     getCurrentUser(@Request() req) {
         return req.user;
     }

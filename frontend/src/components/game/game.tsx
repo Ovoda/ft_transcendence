@@ -6,24 +6,23 @@ import { io, Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import './game.scss';
 
-const socket : Socket = io("ws://localhost:3001");
+const socket: Socket = io("ws://localhost:3001");
 
 interface CanvasInterface {
 	canvas: HTMLCanvasElement | null | undefined,
-	c : CanvasRenderingContext2D | null | undefined,
+	c: CanvasRenderingContext2D | null | undefined,
 	ball: Ball,
 	player1: Player,
-	player2 : Player,
-	keys_1 : Keys,
+	player2: Player,
+	keys_1: Keys,
 	keys_2: Keys
 }
 
 var start = 0;
 
-function initGame(oldjson : CanvasInterface) {
+function initGame(oldjson: CanvasInterface) {
 	let json: CanvasInterface;
-	if (start === 0)
-	{
+	if (start === 0) {
 		let canvas = document.querySelector('canvas');
 		let c = canvas?.getContext('2d');
 
@@ -50,15 +49,14 @@ function initGame(oldjson : CanvasInterface) {
 	return json;
 }
 
-let json : CanvasInterface
+let json: CanvasInterface
 
 function animate() {
 	console.log("animate");
 	json = initGame(json);
 	console.log("init done");
 	requestAnimationFrame(animate)
-	if (json?.c && json?.canvas)
-	{
+	if (json?.c && json?.canvas) {
 		console.log("canvas");
 		json.c.clearRect(0, 0, json.canvas.width, json.canvas.height);
 		drawPlayers(json.canvas, json.c, json.keys_1, json.player1, json.keys_2, json.player2);
@@ -70,7 +68,7 @@ function launch(Start: any, Ready: any) {
 	Start(false);
 	socket.emit("joinGame");
 	socket.on("gameStatus", (data: any) => {
-		console.log("Status of the game room" , data);
+		console.log("Status of the game room", data);
 		Ready(data);
 		if (data == true) {
 			animate();
@@ -102,7 +100,7 @@ function Game() {
 	useEffect(() => {
 		setCanvasWidth(windowWidth * 0.7);
 		setCanvasHeight(windowHeight * 0.7);
-	
+
 
 		//Ball.update(canvaRef.current);
 	}, [windowWidth]);
@@ -111,13 +109,13 @@ function Game() {
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
 			{start ? (
-        		<button onClick={() => launch(setStart, setReady) }>Start Game</button>
-      		) : (
-        		<button onClick={() => leave(setStart)}>Stop Game</button>
-      		)}
+				<button onClick={() => launch(setStart, setReady)}>Start Game</button>
+			) : (
+				<button onClick={() => leave(setStart)}>Stop Game</button>
+			)}
 			<p></p>
 			{!start && ready ? (
-				<canvas  ref={canvaRef} height={canvasHeight} width={canvasWidth} id="canvas"></canvas>
+				<canvas ref={canvaRef} height={canvasHeight} width={canvasWidth} id="canvas"></canvas>
 			) : (
 				<p></p>
 			)}
@@ -135,21 +133,23 @@ window.addEventListener("keydown", function (event) {
 		case "ArrowDown":
 			json.keys_1.down = true;
 			json.keys_2.down = true;
-			if (json.c && json.canvas)
-				{json.player1.update(json.c, json.keys_1, json.canvas);
-				json.player2.update(json.c, json.keys_2, json.canvas);}
-			break ;
+			if (json.c && json.canvas) {
+				json.player1.update(json.c, json.keys_1, json.canvas);
+				json.player2.update(json.c, json.keys_2, json.canvas);
+			}
+			break;
 		case "ArrowUp":
 			json.keys_1.up = true;
 			json.keys_2.up = true;
-			if (json.c && json.canvas)
-				{json.player1.update(json.c, json.keys_1, json.canvas);
-				json.player2.update(json.c, json.keys_2, json.canvas);}
-			break ;
+			if (json.c && json.canvas) {
+				json.player1.update(json.c, json.keys_1, json.canvas);
+				json.player2.update(json.c, json.keys_2, json.canvas);
+			}
+			break;
 		default:
-			return ;
-		}
-		event.preventDefault();
-	}, true);
+			return;
+	}
+	event.preventDefault();
+}, true);
 
 export default Game;

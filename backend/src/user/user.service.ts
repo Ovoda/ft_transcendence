@@ -1,10 +1,9 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CrudService } from 'src/app/templates/crud.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserEntity } from './entities/user.entity';
-import * as bcrypt from 'bcrypt';
 
 
 @Injectable()
@@ -19,19 +18,14 @@ export class UserService extends CrudService<UserEntity> {
 
 
     async findOrCreate(createUserDto: CreateUserDto) {
-        let user = await this.findOne({
+        let user = await this._repository.findOne({
             where: {
-                username: createUserDto.username,
+                login: createUserDto.login,
             }
         });
-
         if (!user) {
-            user = await this._repository.save({
-                username: createUserDto.username,
-                password: await bcrypt.hash(createUserDto.password, 10)
-            });
+            user = await this._repository.save(createUserDto);
         }
         return user;
-
     }
 }

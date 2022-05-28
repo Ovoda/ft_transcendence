@@ -1,17 +1,21 @@
-import './App.css';
 import 'style/global.scss';
-import './App.css';
+import './App.scss';
 import Game from './components/game/game';
-import HomePage from './pages/HomePage/HomePage';
+import useFetchSession from './hooks/useFetchSession';
+import Navbar from './components/navbar';
+import "style/button.scss";
 
 function App() {
+
+  useFetchSession();
+
   return (
     <div className="App">
+      <Navbar />
       <header className="App-header">
-        <HomePage />
         {/* <Game></Game> */}
       </header>
-    </div>
+    </div >
   );
 }
 
