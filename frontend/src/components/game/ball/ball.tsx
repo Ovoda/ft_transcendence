@@ -1,18 +1,5 @@
-import { Player } from '../player/player';
 
-function updateScore(c: CanvasRenderingContext2D, canvas : HTMLCanvasElement, player1 : Player, player2 : Player)
-{
-	let str : string = player1.score.toString() + "   " + player2.score.toString()
-	c.font = "10px Arial"
-	c.fillText(str, (canvas.width / 2) - 10, 10)
-	c?.fillRect((canvas.width / 2) - 1, 0, 1, canvas.height)
-}
 
-function hitWall(ball: Ball, canvas : HTMLCanvasElement) {
-	if (ball.position.y - ball.radius <= 0 || ball.position.y + ball.radius >= canvas.height)
-		return (1);
-	return (0);
-}
 
 function playerColisionfront(ball : Ball, player1: Player, player2: Player) {
 	if (ball.position.x <= player1.position.x + player1.width
