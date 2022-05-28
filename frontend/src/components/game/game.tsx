@@ -1,6 +1,6 @@
 import Player from './interfaces/player.interface';
 import Ball from './interfaces/ball.interface';
-import Game from './interfaces/game.interface';
+import FixedGame from './interfaces/game.interface';
 import { io, Socket } from "socket.io-client";
 import React, { useEffect, useRef, useState } from "react";
 import './game.scss';
@@ -35,10 +35,11 @@ function launch(Start: any, Ready: any) {
 
 function leave(Start: any) {
 	Start(true);
+	socket.emit("leaveGame");
 }
 
 function Game() {
-	const game: Game = {
+	const gameRef: FixedGame = {
 		width: 1000,
 		height: 600,
 	}
@@ -47,8 +48,8 @@ function Game() {
 	const [ready, setReady] = useState(false);
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-	const [canvasWidth, setCanvasWidth] = useState(game.width);
-	const [canvasHeight, setCanvasHeight] = useState(game.height);
+	const [canvasWidth, setCanvasWidth] = useState(gameRef.width);
+	const [canvasHeight, setCanvasHeight] = useState(gameRef.height);
 	const [canvasContext, setContext] = useState(canvaRef.current?.getContext('2d'));
 	const [ball, setBall] = useState<Ball>({
 		velocity: {

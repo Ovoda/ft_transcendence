@@ -1,9 +1,9 @@
 import Ball from './ball.interface'
 import Player from './player.interface'
 
-interface Game {
+interface FixedGame {
 	width: number;
 	height: number;
 }
 
-export default Game;
+export default FixedGame;
