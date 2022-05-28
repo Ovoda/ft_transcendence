@@ -6,7 +6,6 @@ import { CreateUserDto } from './dtos/createUser.dto';
 import { UserEntity } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
-
 @Injectable()
 export class UserService extends CrudService<UserEntity> {
     constructor(
