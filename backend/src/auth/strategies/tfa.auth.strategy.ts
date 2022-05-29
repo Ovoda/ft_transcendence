@@ -2,13 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { configService } from "src/app/config/config.service";
-import { UserEntity } from "src/user/entities/user.entity";
 import { UserService } from "src/user/user.service";
 import { InvalidTokenException } from "../exceptions/InvalidToken.exception";
 import { JwtPayload } from "../interfaces/jwtPayload.interface";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, "user-jwt") {
+export class TfaStrategy extends PassportStrategy(Strategy, "user-tfa") {
     constructor(
         private readonly userService: UserService,
     ) {
@@ -26,6 +25,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, "user-jwt") {
             .catch(() => {
                 throw new InvalidTokenException("User not found");
             })
-        return (user);
+        if (!user.tfaEnabled) {
+            return user;
+        }
+        if (payload.isTfa) {
+            return user;
+        }
     }
 }

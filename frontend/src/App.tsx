@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Store } from './app/store';
 import { closeSettingWindow, updateUiState } from './features/uiState/uiState.slice';
 import TfaRegistration from './components/auth/TfaRegistration';
+import TfaLogin from './components/auth/TfaLogin';
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
     <div className="App">
       <Navbar />
       <TfaRegistration />
+      <TfaLogin />
       <UserSettings
         settingsWindowState={uiState.openedSettings}
         setSettingsWindowAction={() => dispatch(closeSettingWindow())} />

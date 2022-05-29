@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { FtStrategy } from './strategies/ft.auth.strategy';
 import { JwtStrategy } from './strategies/jwt.auth.strategy';
+import { TfaStrategy } from './strategies/tfa.auth.strategy';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { JwtStrategy } from './strategies/jwt.auth.strategy';
       signOptions: { expiresIn: '15min' },
     })
   ],
-  providers: [AuthService, JwtStrategy, FtStrategy],
+  providers: [AuthService, JwtStrategy, FtStrategy, TfaStrategy],
   controllers: [AuthController],
   exports: [AuthService]
 })

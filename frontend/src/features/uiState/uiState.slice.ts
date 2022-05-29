@@ -5,6 +5,7 @@ const initialState: UiState = {
     openedSettings: false,
     logged: false,
     showTfaRegistration: false,
+    showTfaLogin: false,
 }
 
 const uiState = createSlice({
@@ -26,6 +27,12 @@ const uiState = createSlice({
         closeTfaRegistration(state) {
             return { ...state, showTfaRegistration: false };
         },
+        openTfaLogin(state) {
+            return { ...state, showTfaLogin: true };
+        },
+        closeTfaLogin(state) {
+            return { ...state, showTfaLogin: false };
+        },
     }
 })
 
@@ -34,7 +41,9 @@ export const {
     closeSettingWindow,
     openSettingWindow,
     openTfaRegistration,
-    closeTfaRegistration
+    closeTfaRegistration,
+    openTfaLogin,
+    closeTfaLogin
 } = uiState.actions;
 
 export default uiState.reducer;

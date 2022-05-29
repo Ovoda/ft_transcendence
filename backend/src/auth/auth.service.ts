@@ -17,13 +17,13 @@ export class AuthService {
 
     async login(user: CreateUserDto) {
         const entity = await this.userService.findOrCreate(user);
-        return await this.getJwtAccessToken(entity.id);
+        return await this.getJwtAccessToken(entity.id, entity.tfaEnabled);
     }
 
     async getJwtAccessToken(userID: string, isTfa: boolean = false) {
         const payload: JwtPayload = { id: userID, isTfa };
         const accessToken = this.jwtService.sign(payload);
-        return ({ access_token: accessToken });
+        return ({ access_token: accessToken, needsTfa: isTfa });
     }
 
     async generateTfaSecret(user: UserEntity): Promise<{ secret: string, otpAuthUrl: string }> {

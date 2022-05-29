@@ -5,6 +5,7 @@ import { AuthService } from "./auth.service";
 import { EnableTfaDto } from "./dtos/enableTFA.dto";
 import { FtAuthGuard } from "./guards/ft.auth.guard";
 import { JwtAuthGuard } from "./guards/jwt.auth.guard";
+import { TfaGuard } from "./guards/tfa.auth.guard";
 import { JwtRequest } from "./interfaces/jwtRequest.interface";
 
 @Controller("/auth")
@@ -21,8 +22,11 @@ export class AuthController {
     @Get("42/callback")
     @UseGuards(FtAuthGuard)
     async ftCallback(@Query("code") code: string, @Req() req: any, @Res() res: Response) {
-        const accessToken = await this.authService.login(req.user);
-        res.cookie("access_token", accessToken.access_token);
+        const authInfos = await this.authService.login(req.user);
+        res.cookie("access_token", authInfos.access_token);
+        if (authInfos.needsTfa) {
+            res.cookie("needs_tfa", "true");
+        }
         res.status(302).redirect("http://localhost:3000");
     }
 
@@ -49,7 +53,7 @@ export class AuthController {
 
     @Get("tfa/disable")
     @HttpCode(200)
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(TfaGuard)
     async disableTfa(@Req() req: JwtRequest) {
         await this.userService.turnTfaOff(req.user.id);
     }

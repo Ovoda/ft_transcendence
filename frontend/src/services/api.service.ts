@@ -1,5 +1,6 @@
 import axios from "axios";
 import { AxiosRequestConfig } from "axios";
+import Cookies from "js-cookie";
 import UserData from "../features/user/interfaces/user.interface";
 
 
@@ -10,7 +11,7 @@ export const api = axios.create({
 api.interceptors.request.use(
     (config: AxiosRequestConfig) => {
 
-        const token = localStorage.getItem("access_token");
+        const token = Cookies.get("access_token");
 
         if (token && config.headers) {
             config.headers["Authorization"] = "Bearer " + token;
@@ -24,7 +25,8 @@ api.interceptors.request.use(
 
 export async function getUserData(): Promise<UserData | null | undefined> {
     try {
-        if (localStorage.getItem("access_token") === null) return null;
+        if (Cookies.get("access_token") === null) return null;
+
         const response = await api.get("/user");
         return response.data as UserData;
     } catch (error: any) {
