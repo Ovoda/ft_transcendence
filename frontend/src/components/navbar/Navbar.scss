@@ -26,16 +26,17 @@
 
         gap: 1rem;
         margin: 0.6rem;
-        font-size: 1.4rem;
+        font-size: 2rem;
         color: white;
 
         img {
-            max-width: 50px;
-            max-height: 50px;
+            max-width: 60px;
+            max-height: 60px;
             height: 100%;
             width: 100%;
             aspect-ratio: 1;
             border-radius: 100%;
+            cursor: pointer;
         }
 
         #navbar_infos {
@@ -67,7 +68,7 @@
         background-color: transparent;
 
         color: white;
-        font-size: 1.2rem;
+        font-size: 1.8rem;
     }
 }
 

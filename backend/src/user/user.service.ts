@@ -15,7 +15,6 @@ export class UserService extends CrudService<UserEntity> {
         super(_repository, _log);
     }
 
-
     async findOrCreate(createUserDto: CreateUserDto) {
         let user = await this._repository.findOne({
             where: {
@@ -26,5 +25,23 @@ export class UserService extends CrudService<UserEntity> {
             user = await this._repository.save(createUserDto);
         }
         return user;
+    }
+
+    async setTfaSecret(secret: string, userId: string) {
+        return await this._repository.update(userId, {
+            tfaSecret: secret,
+        });
+    }
+
+    async turnTfaOn(userId: string) {
+        return await this._repository.update(userId, {
+            tfaEnabled: true,
+        })
+    }
+
+    async turnTfaOff(userId: string) {
+        return await this._repository.update(userId, {
+            tfaEnabled: false,
+        })
     }
 }

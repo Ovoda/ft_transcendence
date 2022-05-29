@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import UserData from "src/features/user/interfaces/user.interface";
-import { updateUser } from "../features/user/userSlice";
+import { updateUser } from "../features/user/user.slice";
 import { getUserData } from "../services/api.service";
 
 
@@ -19,7 +19,6 @@ export default function useFetchSession() {
 
         async function fetchUserData() {
             const userData = await getUserData();
-            console.log(userData);
 
             if (userData) {
                 dispatch(updateUser(userData));

@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import UserData from "src/features/user/interfaces/user.interface";
+import { openSettingWindow } from "../../features/uiState/uiState.slice";
 import LoggedInMenu from "./LoggedInMenu";
 import LoggedOutMenu from "./LoggedOutMenu";
 import './Navbar.scss';
@@ -9,16 +9,23 @@ import './Navbar.scss';
 export default function Navbar() {
 
     /** Global Data */
-    const userData: UserData = useSelector((store: Store) => store.user);
+    const store: Store = useSelector((store: Store) => store);
+    const userData = store.user;
+    const uiState = store.uiState;
 
-    useEffect(() => {
-        console.log(userData);
-    }, [userData])
+    /** Tools */
+    const dispatch = useDispatch();
 
     return (
         <nav id="navbar">
             {
-                userData.login === "" ? <LoggedOutMenu /> : <LoggedInMenu userData={userData} />
+                userData.login === ""
+                    ?
+                    <LoggedOutMenu />
+                    :
+                    <LoggedInMenu
+                        userData={userData}
+                        openSettingsWindow={() => dispatch(openSettingWindow())} />
             }
         </nav>
     )
