@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { api } from "./api.service";
+import { api, getUserData } from "./api.service";
 
 export function login() {
     window.location.href = `http://localhost:3001/auth/user`;
@@ -7,7 +7,6 @@ export function login() {
 
 export function logout() {
     Cookies.remove("access_token");
-    localStorage.removeItem("access_token");
     window.location.reload();
 }
 
@@ -16,7 +15,12 @@ export async function loginTfa(code: string) {
         const res = await api.post("/auth/tfa/authenticate", {
             tfaCode: code,
         });
-        Cookies.remove("needs_tfa");
+        if (res) {
+            console.log(res.data);
+
+            Cookies.remove("needs_tfa");
+            Cookies.set("access_token", res.data.access_token);
+        }
         return true;
     } catch (error: any) {
         console.log(error.response);

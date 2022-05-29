@@ -24,9 +24,17 @@ export class AuthController {
     async ftCallback(@Query("code") code: string, @Req() req: any, @Res() res: Response) {
         const authInfos = await this.authService.login(req.user);
         res.cookie("access_token", authInfos.access_token);
-        if (authInfos.needsTfa) {
+
+        const user = await this.userService.findOne({
+            where: {
+                login: req.user.login,
+            }
+        });
+        if (user.tfaEnabled) {
             res.cookie("needs_tfa", "true");
         }
+
+
         res.status(302).redirect("http://localhost:3000");
     }
 
@@ -69,6 +77,6 @@ export class AuthController {
         if (!codeIsValid) {
             throw new UnauthorizedException("Wrong authentification code");
         }
-        return await this.authService.getJwtAccessToken(req.user.id);
+        return await this.authService.getJwtAccessToken(req.user.id, true);
     }
 }

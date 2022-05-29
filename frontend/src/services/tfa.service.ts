@@ -6,6 +6,7 @@ import { api } from "./api.service";
 import { DisableTfaProps } from "./interfaces/DisableTfaProps.interface";
 import { GenerateTfaProps } from "./interfaces/GenerateTfaProps.interface";
 import { ToggleTfaProps } from "./interfaces/ToggleTfaProps.interface";
+import Cookies from "js-cookie";
 
 
 export async function enableTfa(tfaCode: string): Promise<boolean> {
@@ -28,7 +29,7 @@ export async function toggleTfa({ dispatch, uiTfaEnabled }: ToggleTfaProps) {
 }
 
 export async function generateTfa({ dispatch }: GenerateTfaProps) {
-    const token = localStorage.getItem("access_token");
+    const token = Cookies.get("access_token");
     if (!token) return;
 
     const res = await axios.get("http://localhost:3001/auth/tfa/generate", {

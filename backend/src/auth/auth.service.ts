@@ -17,7 +17,7 @@ export class AuthService {
 
     async login(user: CreateUserDto) {
         const entity = await this.userService.findOrCreate(user);
-        return await this.getJwtAccessToken(entity.id, entity.tfaEnabled);
+        return await this.getJwtAccessToken(entity.id, false);
     }
 
     async getJwtAccessToken(userID: string, isTfa: boolean = false) {

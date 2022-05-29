@@ -34,6 +34,7 @@ export default function UserSettings({ settingsWindowState, setSettingsWindowAct
     }, [settingsWindowState]);
 
     useEffect(() => {
+
         if (userData.tfaEnabled !== tfaEnabled) {
             toggleTfa({
                 dispatch,

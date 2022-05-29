@@ -9,9 +9,10 @@ import useDigitInput from 'react-digit-input';
 import UiState from "../../features/uiState/interfaces/UiState";
 import { closeTfaLogin, closeTfaRegistration, updateUiState } from "../../features/uiState/uiState.slice";
 import { enableTfa } from "../../services/tfa.service";
-import { updateTfaEnabled } from "../../features/user/user.slice";
+import { updateTfaEnabled, updateUser } from "../../features/user/user.slice";
 import UserData from "../../features/user/interfaces/user.interface";
 import { loginTfa } from "../../services/auth.service";
+import { getUserData } from "../../services/api.service";
 
 
 export default function TfaLogin() {
@@ -41,6 +42,10 @@ export default function TfaLogin() {
             const res = await loginTfa(code);
 
             if (res) {
+                const userData = await getUserData();
+                if (userData) {
+                    dispatch(updateUser(userData));
+                }
                 setCode("");
                 dispatch(closeTfaLogin());
             } else {

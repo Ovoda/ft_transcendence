@@ -21,10 +21,8 @@ export default function useFetchSession() {
             }
             else if (needsTfa) {
                 dispatch(openTfaLogin());
-                fetchUserData();
             }
         }
-
 
         async function fetchUserData() {
             const userData = await getUserData();

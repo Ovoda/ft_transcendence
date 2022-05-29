@@ -18,9 +18,11 @@ export class TfaStrategy extends PassportStrategy(Strategy, "user-tfa") {
     }
 
     async validate(payload: JwtPayload) {
+        console.log(payload);
         if (!payload) {
             throw new InvalidTokenException();
         }
+
         const user = await this.userService.findOneById(payload.id)
             .catch(() => {
                 throw new InvalidTokenException("User not found");
