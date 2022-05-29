@@ -1,5 +1,6 @@
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Exclude } from "class-transformer";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { ChatEntity } from "src/chat/entities/chat.entity";
 
 @Entity()
 export class UserEntity {
@@ -18,4 +19,8 @@ export class UserEntity {
 
     @Column({ default: false })
     tfaEnabled: boolean;
+
+	@ManyToMany(()=> ChatEntity, chatroom => chatroom.users)
+	@JoinTable()
+	chatroom: ChatEntity[];
 }
