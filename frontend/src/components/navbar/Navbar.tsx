@@ -18,7 +18,7 @@ export default function Navbar() {
     const dispatch = useDispatch();
 
     return (
-        <nav id="navbar">
+        <nav id="navbar" className={userData.login === "" ? "logged_out_nav" : ""}>
 			{
 				userData.login !== "" &&
 				<ChatButton />

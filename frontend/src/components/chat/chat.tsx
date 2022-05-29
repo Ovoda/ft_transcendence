@@ -10,17 +10,14 @@ export default function Chat(){
 	// GLOBAL DATA.
 	const store: Store = useSelector((store: Store) => store);
     const chatData: ChatData = store.chat;
+	const uiState = store.uiState;
 
 	// Tools
 	const dispatch = useDispatch();
 
-	if (!chatData.chatSelector){
+	if (!uiState.showChat){
 		return (
-			<>
-				<div>
-					<button onClick={()=>dispatch(updateChatSelector(true))}>Chat</button>
-				</div>
-			</>
+			<></>
 		);
 	} else {
 		return (
