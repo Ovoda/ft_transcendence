@@ -31,13 +31,13 @@ function App() {
       <Navbar />
       <TfaRegistration />
       <TfaLogin />
+	  <Chat />
       <UserSettings
         settingsWindowState={uiState.openedSettings}
         setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
       <header className="App-header">
         <Game></Game>
       </header>
-	<Chat />
     </div >
   );
 }

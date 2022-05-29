@@ -27,13 +27,12 @@ const usersDM = [
 
 export default function DmPicker(){
 	//const [usrs, setUsrs] = useState(usersDM);
+	
 	return (
 	<>
 		<div>
 		{usersDM.map((user)=>{
-			//return <DmElement key={user.id} picture={ user.picture } login={ user.login } openChat={} />
 			return <DmElement key={user.id} picture={ user.picture } login={ user.login } />
-			//return <DmElement {...user}/>
 		})}
 		</div>
 	</>

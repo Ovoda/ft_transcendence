@@ -1,35 +1,35 @@
 import ChatData from '../../features/chat/interfaces/chat.interface'
 import { Store } from "../../app/store";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatSelector from "./chatSelector/chatSelector";
+import { updateChatSelector } from '../../features/chat/chat.slice';
+import ChatBox from './chatBox/chatBox';
 
 export default function Chat(){
 	// GLOBAL DATA.
 	const store: Store = useSelector((store: Store) => store);
     const chatData: ChatData = store.chat;
 
-	const [chatSel, setChatSel] = useState(false);
-
 	// Tools
 	const dispatch = useDispatch();
-	
-	return (
-	<>
-		{
-			!chatSel &&
+
+	if (!chatData.chatSelector){
+		return (
+			<>
+				<div>
+					<button onClick={()=>dispatch(updateChatSelector(true))}>Chat</button>
+				</div>
+			</>
+		);
+	} else {
+		return (
+		<>
 			<div>
-				<button onClick={()=>setChatSel(true)}>Chat</button>
+				<ChatSelector />
 			</div>
-		}
-		{
-			chatSel &&
-			<div>
-				<ChatSelector stateChanger={setChatSel}/>
-				{/* <button onClick={()=>setChatSel(false)}>Close</button> */}
-			</div>
-			
-		}
-	</>
-	);
+			{chatData.displayChat && <ChatBox />}
+		</>
+		);
+	}
 }

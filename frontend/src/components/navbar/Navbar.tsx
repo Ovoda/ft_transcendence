@@ -2,6 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import { openSettingWindow } from "../../features/uiState/uiState.slice";
+import ChatButton from "./ChatButton";
 import LoggedInMenu from "./LoggedInMenu";
 import LoggedOutMenu from "./LoggedOutMenu";
 import './Navbar.scss';
@@ -18,6 +19,10 @@ export default function Navbar() {
 
     return (
         <nav id="navbar">
+			{
+				userData.login !== "" &&
+				<ChatButton />
+			}
             {
                 userData.login === ""
                     ?
