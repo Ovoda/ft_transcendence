@@ -5,13 +5,15 @@ import { GameModule } from '../game/game.module';
 import { configService } from './config/config.service';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { ChatModule } from 'src/chat/chat.module';
 
 @Module({
 	imports: [
 		TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
 		GameModule,
 		UserModule,
-		AuthModule
+		AuthModule,
+		ChatModule,
 	],
 	controllers: [AppController],
 	exports: [TypeOrmModule],

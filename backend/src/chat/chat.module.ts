@@ -6,11 +6,12 @@ import { ChatRoleEntity } from './entities/chatRole.entity';
 import { ChatRoleService } from './services/chatRole.service';
 import { ChatMessageService } from './services/chatMessage.service';
 import { ChatRoomService } from './services/chatRoom.service';
+import { ChatMessageEntity } from './entities/chatMessage.entity';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([ChatRoomEntity, ChatRoleEntity])],
+	imports: [TypeOrmModule.forFeature([ChatRoomEntity, ChatRoleEntity, ChatMessageEntity])],
 	providers: [ChatRoomService, ChatRoleService, ChatMessageService, Logger],
 	controllers: [ChatController],
 	exports: [ChatRoomService, ChatRoleService, ChatMessageService],
   })
-  export class UserModule { }
+  export class ChatModule { }

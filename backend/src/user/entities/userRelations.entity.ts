@@ -11,10 +11,10 @@ export class UserRelationsEntity{
 	status: e_userRelations;
 
 	@Column()
-	created_at: Timestamp;
+	created_at: string;
 
 	@Column({nullable: true})
-	updated_at: Timestamp;
+	updated_at: string;
 
 	@ManyToMany(()=> UserEntity, user => user.relations)
 	users: UserEntity[];
