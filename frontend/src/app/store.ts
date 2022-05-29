@@ -6,11 +6,14 @@ import UiStateReducer from "../features/uiState/uiState.slice";
 import UiState from "src/features/uiState/interfaces/UiState";
 import AuthReducer from "../features/auth/auth.slice";
 import Auth from "src/features/auth/interfaces/auth.interface";
+import ChatReducer from "../features/chat/chat.slice"
+import Chat from "src/features/chat/interfaces/chat.interface";
 
 export interface Store {
     user: UserData;
     uiState: UiState;
     auth: Auth;
+	chat: Chat;
 }
 
 export default configureStore({
@@ -18,6 +21,7 @@ export default configureStore({
         user: UserDataReducer,
         uiState: UiStateReducer,
         auth: AuthReducer,
+		chat: ChatReducer,
     }
 })
 

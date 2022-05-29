@@ -12,6 +12,8 @@ import { Store } from './app/store';
 import { closeSettingWindow, updateUiState } from './features/uiState/uiState.slice';
 import TfaRegistration from './components/auth/TfaRegistration';
 import TfaLogin from './components/auth/TfaLogin';
+import Chat from './components/chat/chat';
+
 
 function App() {
 
@@ -35,6 +37,7 @@ function App() {
       <header className="App-header">
         <Game></Game>
       </header>
+	<Chat />
     </div >
   );
 }
