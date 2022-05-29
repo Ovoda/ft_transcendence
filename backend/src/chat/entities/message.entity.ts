@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class MessageEntity {
+export class ChatMessageEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -11,5 +11,4 @@ export class MessageEntity {
 	@Column()
 	prev_message: string;
 
-	
 }

@@ -1,4 +1,4 @@
-export enum e_roomType {
+export enum e_roleType {
 	LAMBDA = 'LAMBDA',
-	ROOM = 'ROOM',
+	OWNER = 'OWNER',
 }

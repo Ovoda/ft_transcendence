@@ -1,6 +1,10 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import 'dotenv/config';
+import { ChatEntity } from "src/chat/entities/chatroom.entity";
+import { MessageEntity } from "src/chat/entities/message.entity";
+import { RoleEntity } from "src/chat/entities/chatrole.entity";
 import { UserEntity } from "src/user/entities/user.entity";
+import { UserRelationsEntity } from "src/user/entities/userRelations.entity";
 
 export class ConfigService {
 
@@ -17,7 +21,13 @@ export class ConfigService {
                 "JWT_SECRET"
             ]
         )
-        this.database_entities = [UserEntity]
+        this.database_entities = [
+			UserEntity,
+			UserRelationsEntity,
+			RoleEntity,
+			ChatEntity,
+			MessageEntity,
+		]
     }
 
     private ensureValues(keys: string[]) {
