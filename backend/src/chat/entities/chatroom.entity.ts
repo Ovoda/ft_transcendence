@@ -2,10 +2,10 @@ import { Exclude } from "class-transformer";
 import { UserEntity } from "src/user/entities/user.entity";
 import { Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { e_roomType } from "../types/room.type";
-import { ChatroleEntity } from "./chatrole.entity";
+import { ChatRoleEntity } from "./chatRole.entity";
 
 @Entity()
-export class ChatroomEntity {
+export class ChatRoomEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -18,7 +18,7 @@ export class ChatroomEntity {
     @Exclude()
 	password: string; // TO BE ENCRYPTED. (DECORATOR ?)
 
-	@OneToMany(()=> ChatroleEntity, role => role.chatroom)
+	@OneToMany(()=> ChatRoleEntity, role => role.chatroom)
 	@JoinTable()
-	users: ChatroleEntity[];
+	users: ChatRoleEntity[];
 }

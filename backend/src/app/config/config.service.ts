@@ -1,8 +1,8 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import 'dotenv/config';
-import { ChatEntity } from "src/chat/entities/chatroom.entity";
-import { MessageEntity } from "src/chat/entities/message.entity";
-import { RoleEntity } from "src/chat/entities/chatrole.entity";
+import { ChatRoomEntity } from "src/chat/entities/chatRoom.entity";
+import { ChatMessageEntity } from "src/chat/entities/chatMessage.entity";
+import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
 import { UserEntity } from "src/user/entities/user.entity";
 import { UserRelationsEntity } from "src/user/entities/userRelations.entity";
 
@@ -24,9 +24,9 @@ export class ConfigService {
         this.database_entities = [
 			UserEntity,
 			UserRelationsEntity,
-			RoleEntity,
-			ChatEntity,
-			MessageEntity,
+			ChatRoleEntity,
+			ChatRoomEntity,
+			ChatMessageEntity,
 		]
     }
 

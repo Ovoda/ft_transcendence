@@ -1,10 +1,10 @@
 import { UserEntity } from "src/user/entities/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { e_roleType } from "../types/role.type";
-import { ChatroomEntity } from "./chatroom.entity";
+import { ChatRoomEntity } from "./chatRoom.entity";
 
 @Entity()
-export class ChatroleEntity {
+export class ChatRoleEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
@@ -14,6 +14,6 @@ export class ChatroleEntity {
 	@ManyToOne(()=> UserEntity, user => user.roles)
 	user: UserEntity;
 
-	@ManyToOne(()=> ChatroomEntity)
-	chatroom: ChatroomEntity;
+	@ManyToOne(()=> ChatRoomEntity)
+	chatroom: ChatRoomEntity;
 }

@@ -10,5 +10,4 @@ export class ChatMessageEntity {
 
 	@Column()
 	prev_message: string;
-
 }

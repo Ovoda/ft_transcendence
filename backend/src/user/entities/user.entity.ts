@@ -1,5 +1,5 @@
 import { Exclude } from "class-transformer";
-import { ChatroleEntity } from "src/chat/entities/chatrole.entity";
+import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
 import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserRelationsEntity } from "./userRelations.entity";
 
@@ -28,6 +28,6 @@ export class UserEntity {
 	@ManyToMany(() => UserRelationsEntity , relations => relations.users)
 	relations: UserRelationsEntity[];
 
-	@OneToMany(()=> ChatroleEntity, role => role.user)
-	roles: ChatroleEntity[];
+	@OneToMany(()=> ChatRoleEntity, role => role.user)
+	roles: ChatRoleEntity[];
 }
