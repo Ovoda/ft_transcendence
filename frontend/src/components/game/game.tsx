@@ -21,22 +21,9 @@ const socket: Socket = io("ws://localhost:3001");
 //	}
 //}
 
-function launch(Start: any, Ready: any) {
-	Start(false);
-	socket.emit("joinGame");
-	socket.on("gameStatus", (data: any) => {
-		console.log("Status of the game room", data);
-		Ready(data);
-		if (data == true) {
-			//animate();
-		}
-	})
-}
 
-function leave(Start: any) {
-	Start(true);
-	socket.emit("leaveGame");
-}
+
+
 
 function Game() {
 	const gameRef: FixedGame = {
@@ -46,6 +33,7 @@ function Game() {
 	const canvaRef = useRef<HTMLCanvasElement>(null);
 	const [start, setStart] = useState(true);
 	const [ready, setReady] = useState(false);
+	const [win, setWin] = useState("");
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 	const [canvasWidth, setCanvasWidth] = useState(gameRef.width);
@@ -94,6 +82,36 @@ function Game() {
 	//const [keyOne, setKeyOne] = useState(0);
 	//const [keyTwo, setKeyTwo] = useState(0);
 
+	socket.on("gameStop", (stopclient: string) => {
+		console.log("Stopping the game");
+		setStart(true);
+		if (stopclient === socket.id) {
+			setWin("You Lost!");
+		}
+		else {
+			setWin("You Won!");
+		}
+		socket.emit("deleteRoom");
+	})
+
+	function leave() {
+		socket.emit("leaveGame");
+	}
+
+	function launch() {
+		console.log("Launching game for: ", socket.id);
+		setStart(false);
+		setWin("");
+		socket.emit("joinGame");
+		socket.on("gameStatus", (data: any) => {
+			console.log("Status of the game room", data);
+			setReady(data);
+			if (data == true) {
+				//animate();
+			}
+		})
+	}
+
 	useEffect(() => {
 		window.addEventListener("resize", () => {
 			setWindowWidth(window.innerWidth);
@@ -131,9 +149,9 @@ function Game() {
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
 			{start ? (
-				<button onClick={() => launch(setStart, setReady)}>Start Game</button>
+				<button onClick={() => launch()}>Start Game</button>
 			) : (
-				<button onClick={() => leave(setStart)}>Stop Game</button>
+				<button onClick={() => leave()}>Stop Game</button>
 			)}
 			<p></p>
 			{!start && ready ? (
@@ -141,11 +159,12 @@ function Game() {
 			) : (
 				<p></p>
 			)}
-			{!start && !ready ? (
+			{!start && !ready ?(
 				<p>Waiting for another player...</p>
 			) : (
 				<p></p>
 			)}
+			{start && win != "" ? (<p>{win}</p>):(<p></p>)}
 		</div>
 	);
 }
