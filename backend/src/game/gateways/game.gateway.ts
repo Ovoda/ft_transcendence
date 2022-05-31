@@ -11,6 +11,7 @@ import { Socket, Server } from 'socket.io';
 import { Game} from '../types/game.interface'
 import { rootCertificates } from "tls";
 import { throws } from "assert";
+import { emit } from "process";
 
 
 @WebSocketGateway({
@@ -81,6 +82,37 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			if (this.games[index].player1 === null && this.games[index].player2 === null) {
 				console.log("Room: ", this.games[index].id, " deleted.");
 				this.games = [...this.games.slice(0, index), ...this.games.slice(index + 1)];
+			}
+		}
+	}
+
+	@SubscribeMessage('arrowDown')
+	handleArrowDown(client: Socket): void {
+		const index = this.games.findIndex((game: Game) => {
+			return (game.player1 === client.id || game.player2 === client.id);
+		})
+		if (index >= 0) {
+			if (this.games[index].player1 === client.id) {
+				this.server.to(this.games[index].id).emit('updateLeftPlayer', 3);
+				console.log("Updated Room: ", this.games[index]);
+			}
+			else if (this.games[index].player2 === client.id) {
+				this.server.to(this.games[index].id).emit('updateRightPlayer', 3);
+			}
+		}
+	}
+
+	@SubscribeMessage('arrowUp')
+	handleArrowUp(client: Socket): void {
+		const index = this.games.findIndex((game: Game) => {
+			return (game.player1 === client.id || game.player2 === client.id);
+		})
+		if (index >= 0) {
+			if (this.games[index].player1 === client.id) {
+				this.server.to(this.games[index].id).emit('updateLeftPlayer', -3);
+			}
+			else if (this.games[index].player2 === client.id) {
+				this.server.to(this.games[index].id).emit('updateRightPlayer', -3);
 			}
 		}
 	}

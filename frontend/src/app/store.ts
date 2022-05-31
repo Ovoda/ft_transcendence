@@ -14,6 +14,7 @@ export interface Store {
     uiState: UiState;
     auth: Auth;
 	chat: Chat;
+	//game: Game;
 }
 
 export default configureStore({
@@ -22,6 +23,7 @@ export default configureStore({
         uiState: UiStateReducer,
         auth: AuthReducer,
 		chat: ChatReducer,
+		//game: GameReducer,
     }
 })
 
