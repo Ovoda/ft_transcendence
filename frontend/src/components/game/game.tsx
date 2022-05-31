@@ -101,6 +101,7 @@ function Game() {
 
 	function handleKeyPressed(event: KeyboardEvent) {
 		if (event.key === "ArrowDown") {
+			console.log("Arrow Down");
 			setArrowDown(true);
 		}
 		else if (event.key === "ArrowUp") {
@@ -157,13 +158,13 @@ function Game() {
 		if (arrowDown) {
 			socket.emit("arrowDown");
 		}
-	}, [arrowDown]);
+	});
 
 	useEffect(() => {
 		if (arrowUp) {
 			socket.emit("arrowUp");
 		}
-	}, [arrowUp]);
+	});
 
 	function animate() {
 		gameRef.context = canvaRef.current?.getContext('2d');
