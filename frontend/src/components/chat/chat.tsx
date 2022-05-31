@@ -1,10 +1,10 @@
 import ChatData from '../../features/chat/interfaces/chat.interface'
 import { Store } from "../../app/store";
-import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatSelector from "./chatSelector/chatSelector";
-import { updateChatSelector } from '../../features/chat/chat.slice';
 import ChatBox from './chatBox/chatBox';
+import "./Chat.scss";
+import ChatOptions from './chatOptions/chatOptions';
 
 export default function Chat(){
 	// GLOBAL DATA.
@@ -22,10 +22,11 @@ export default function Chat(){
 	} else {
 		return (
 		<>
-			<div>
-				<ChatSelector />
+			<div id='chat'>
+				<ChatSelector/>
+				{chatData.displayChat && <ChatBox />}
+				{chatData.displayOptions && <ChatOptions />}
 			</div>
-			{chatData.displayChat && <ChatBox />}
 		</>
 		);
 	}

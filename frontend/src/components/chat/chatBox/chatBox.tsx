@@ -6,6 +6,10 @@ import TextBox from './textBox'
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import CloseChat from "./closeChat";
+import OpenChatOptions from "./openChatOptions";
+import '../Chat.scss';
+import ChatOptions from "../chatOptions/chatOptions";
+import SubmitPassword from "./submitPassword";
 
 export default function ChatBox(){
 	const store: Store = useSelector((store: Store) => store);
@@ -16,7 +20,9 @@ export default function ChatBox(){
 	return (
 		<>
 			<div className='chat_window'>
+				<SubmitPassword />
 				<CloseChat />
+				<OpenChatOptions />
 				<MessageWrapper />
 				<TextBox />
 				<SendButton />

@@ -9,11 +9,10 @@ import UserSettings from './components/user/UserSettings';
 import UiState from './features/uiState/interfaces/UiState';
 import { useDispatch, useSelector } from 'react-redux';
 import { Store } from './app/store';
-import { closeSettingWindow, updateUiState } from './features/uiState/uiState.slice';
+import { closeChat, closeSettingWindow, updateUiState } from './features/uiState/uiState.slice';
 import TfaRegistration from './components/auth/TfaRegistration';
 import TfaLogin from './components/auth/TfaLogin';
 import Chat from './components/chat/chat';
-
 
 function App() {
 

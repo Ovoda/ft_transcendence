@@ -7,4 +7,5 @@ export default interface Chat {
 	chatSelector: boolean;
 	roomtype: e_roomtype;
 	displayChat: boolean;
+	displayOptions: boolean;
 }

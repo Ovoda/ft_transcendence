@@ -12,8 +12,8 @@ export default function CloseChat(){
 	
 	return (
 		<>
-			<div className="close_message" onClick={()=>dispatch(updateDisplayChat(false))}>
-				<div className="text">close</div>
+			<div>
+				<button onClick={()=>dispatch(updateDisplayChat(false))}>close chat</button>
 			</div>
 		</>
 	)

@@ -5,6 +5,7 @@ const initialState: Chat = {
 	chatSelector: false,
 	roomtype: e_roomtype.DM,
 	displayChat: false,
+	displayOptions: false,
 };
 
 const chat = createSlice({
@@ -20,12 +21,16 @@ const chat = createSlice({
 		updateDisplayChat(state, action){
 			return {...state, displayChat: action.payload}
 		},
+		updateDisplayOptions(state, action) {
+			return {...state, displayOptions: action.payload}
+		},
 	},
 });
 
 export const {
 	updateChatSelector,
 	updateRoomtype,
-	updateDisplayChat
+	updateDisplayChat,
+	updateDisplayOptions,
 } = chat.actions;
 export default chat.reducer;

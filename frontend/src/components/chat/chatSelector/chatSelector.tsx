@@ -6,6 +6,7 @@ import { Store } from "../../../app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRoomtype } from '../../../features/chat/chat.slice';
 import { closeChat } from '../../../features/uiState/uiState.slice';
+import '../Chat.scss';
 
 // interface Chat {
 // 	stateChanger: any
@@ -22,6 +23,7 @@ export default function ChatSelector() {
 	return (
 		<>
 			<div>
+				
 				<button onClick={ () => dispatch(updateRoomtype(e_roomtype.DM)) }>DMs</button>
 				<button onClick={ () => dispatch(updateRoomtype(e_roomtype.ROOM)) }>Rooms</button>
 				<button onClick={ () => dispatch(closeChat()) }>Close</button>
