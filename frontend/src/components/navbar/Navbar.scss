@@ -80,6 +80,13 @@
 		justify-content: center;
 		align-items: flex-start;
 	}
+
+	#logo {
+		max-height: 50px;
+		display: inline-block;
+		text-align: left;
+		vertical-align: top;
+	}
 }
 
 #navbar.logged_out_nav {

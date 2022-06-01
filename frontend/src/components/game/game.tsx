@@ -175,7 +175,7 @@ function Game() {
 
 	return (
 		<div className="main">
-			<p>Welcome to the Pong Game</p>
+			<h2>Welcome to the Pong Game</h2>
 			{start ? (
 				<button id="button-game" onClick={() => launch()}>Start Game</button>
 			) : (
