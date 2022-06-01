@@ -65,7 +65,7 @@ function Game() {
 		ball: ball,
 		context: canvasContext,
 		playerleft: playerLeft,
-		playerright: playerLeft,
+		playerright: playerRight,
 	}
 	const [canvasWidth, setCanvasWidth] = useState(gameRef.width);
 	const [canvasHeight, setCanvasHeight] = useState(gameRef.height);
@@ -118,7 +118,6 @@ function Game() {
 	}
 
 	socket.on("updateLeftPlayer", (value: number) => {
-		console.log("New Value: ", value);
 		setPlayerLeft({
 			...playerLeft,
 			position: {
@@ -129,7 +128,6 @@ function Game() {
 	})
 
 	socket.on("updateRightPlayer", (value: number) => {
-		console.log("New Value: ", value);
 		setPlayerRight({
 			...playerRight,
 			position: {
@@ -157,25 +155,13 @@ function Game() {
 
 	useEffect(() => {
 		if (arrowDown) {
-			let pos1: number;
-			let pos2: number;
-			pos1 = playerLeft.position.y;
-			pos2 = playerRight.position.y;
-			console.log("player left pos: ", pos1);
-			console.log("player right pos: ", pos2);
-			socket.emit("arrowDown", pos1, pos2);
+			socket.emit("arrowDown", gameRef);
 		}
 	});
 
 	useEffect(() => {
 		if (arrowUp) {
-			let pos1: number;
-			let pos2: number;
-			pos1 = playerLeft.position.y;
-			pos2 = playerRight.position.y;
-			console.log("player left pos: ", pos1);
-			console.log("player right pos: ", pos2);
-			socket.emit("arrowUp", pos1, pos2);
+			socket.emit("arrowUp", gameRef);
 		}
 	});
 
@@ -191,9 +177,9 @@ function Game() {
 		<div className="main">
 			<p>Welcome to the Pong Game</p>
 			{start ? (
-				<button onClick={() => launch()}>Start Game</button>
+				<button id="button-game" onClick={() => launch()}>Start Game</button>
 			) : (
-				<button onClick={() => leave()}>Stop Game</button>
+				<button id="button-game" onClick={() => leave()}>Stop Game</button>
 			)}
 			<p></p>
 			{!start && ready ? (

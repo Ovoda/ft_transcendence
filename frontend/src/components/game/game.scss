@@ -1,10 +1,13 @@
 .main {
 	width: 100%;
 	height: 100%;
+	display: block;
+    margin-left: auto;
+    margin-right: auto 
 }
 
 canvas {
-	background-color: rgb(62, 116, 224);
+	background-color: rgb(201, 201, 201);
 	display: flex;
     justify-content: center;
     align-items: center;
@@ -12,7 +15,50 @@ canvas {
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-	//border-radius: 15px;
-	//border-width: 5px;
-	//border-color:  rgb(0, 0, 0);
+	border-radius: 1%;
+}
+
+/* CSS */
+#button-game {
+  appearance: none;
+  background-color: transparent;
+  border: 2px solid #1A1A1A;
+  border-radius: 15px;
+  box-sizing: border-box;
+  color: #999999;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  font-size: 16px;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0;
+  min-height: 60px;
+  min-width: 0;
+  outline: none;
+  padding: 16px 24px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: 50%;
+  will-change: transform;
+}
+
+#button-game:disabled {
+  pointer-events: none;
+}
+
+#button-game:hover {
+  color: #fff;
+  background-color: #1A1A1A;
+  box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+  transform: translateY(-2px);
+}
+
+#button-game:active {
+  box-shadow: none;
+  transform: translateY(0);
 }
