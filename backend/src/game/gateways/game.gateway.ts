@@ -6,9 +6,10 @@ import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 } from "@nestjs/websockets";
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger, Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import { Game} from '../types/game.interface'
+import { GameRoom} from '../types/gameRoom.interface';
+import { GameFront} from '../types/gameFront.interface';
 import { rootCertificates } from "tls";
 import { throws } from "assert";
 import { emit } from "process";
@@ -22,7 +23,7 @@ import { emit } from "process";
 
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-	private games: Game[] = [];
+	private games: GameRoom[] = [];
 
 	@WebSocketServer() server: Server;
 	private logger: Logger = new Logger('GameGateway')
@@ -34,7 +35,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.logger.log(`Current: ${this.games.length}`);
 		let status: boolean;
 		if (!this.games.length || this.games[this.games.length - 1].status === true) {
-			const newGame: Game = {
+			const newGame: GameRoom = {
 				id: "game" + client.id,
 				status: false,
 				player1: client.id,
@@ -60,7 +61,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('leaveGame')
 	handleLeaveGame(client: Socket) {
 		console.log(this.games.length);
-		const index = this.games.findIndex((game: Game) => {
+		const index = this.games.findIndex((game: GameRoom) => {
 			return game.player1 === client.id || game.player2 === client.id;
 		})
 		this.server.to(this.games[index].id).emit('gameStop', client.id);
@@ -68,7 +69,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('deleteRoom')
 	handleDeleteRoom(client: Socket) {
-		const index = this.games.findIndex((game: Game) => {
+		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.player1 === client.id || game.player2 === client.id);
 		})
 		if (index >= 0) {
@@ -87,40 +88,58 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('arrowDown')
-	handleArrowDown(client: Socket, pos: number): void {
-		const index = this.games.findIndex((game: Game) => {
+	handleArrowDown(client: Socket, data: GameFront): void {
+		let newPos: number;
+		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.player1 === client.id || game.player2 === client.id);
 		})
 		if (index >= 0) {
 			if (this.games[index].player1 === client.id) {
-				this.server.to(this.games[index].id).emit('updateLeftPlayer', (pos[0] + 3));
+				newPos = data.playerleft.position.y + data.playerleft.velocity.y;
+				if ((newPos + data.playerleft.height) > data.height) {
+					newPos = data.height - data.playerleft.height;
+				}
+				this.server.to(this.games[index].id).emit('updateLeftPlayer', newPos);
 			}
 			else if (this.games[index].player2 === client.id) {
-				this.server.to(this.games[index].id).emit('updateRightPlayer', (pos[1] + 3));
+				newPos = data.playerright.position.y + data.playerright.velocity.y;
+				if ((newPos + data.playerright.height) > data.height) {
+					newPos = data.height - data.playerright.height;
+				}
+				this.server.to(this.games[index].id).emit('updateRightPlayer', newPos);
 			}
 		}
 	}
 
 	@SubscribeMessage('arrowUp')
-	handleArrowUp(client: Socket, pos: number): void {
-		const index = this.games.findIndex((game: Game) => {
+	handleArrowUp(client: Socket, data: GameFront): void {
+		let newPos: number;
+		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.player1 === client.id || game.player2 === client.id);
 		})
 		if (index >= 0) {
 			if (this.games[index].player1 === client.id) {
-				this.server.to(this.games[index].id).emit('updateLeftPlayer', (pos[0] - 3));
+				newPos = data.playerleft.position.y - data.playerleft.velocity.y;
+				if (newPos < 0) {
+					newPos = 0;
+				}
+				this.server.to(this.games[index].id).emit('updateLeftPlayer', newPos);
 			}
 			else if (this.games[index].player2 === client.id) {
-				this.server.to(this.games[index].id).emit('updateRightPlayer', (pos[1] -3));
+				newPos = data.playerright.position.y - data.playerright.velocity.y;
+				if (newPos < 0) {
+					newPos = 0;
+				}
+				this.server.to(this.games[index].id).emit('updateRightPlayer', newPos);
 			}
 		}
 	}
 
-	@SubscribeMessage('msgToServer')
-	handleMessage(client: Socket, data: any): void {
-		this.logger.log(`Client sent: ${data}`);
-		this.server.emit('msgToClient', data)
-	}
+	//@SubscribeMessage('msgToServer')
+	//handleMessage(client: Socket, data: any): void {
+	//	this.logger.log(`Client sent: ${data}`);
+	//	this.server.emit('msgToClient', data)
+	//}
 
 	afterInit(server: any) {
 		this.logger.log('Init');
@@ -132,7 +151,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	handleDisconnect(client: Socket, ...args: any[]) {
 		console.log(this.games.length);
-		const index = this.games.findIndex((game: Game) => {
+		const index = this.games.findIndex((game: GameRoom) => {
 			return game.player1 === client.id || game.player2 === client.id;
 		})
 		if (index >= 0) {
