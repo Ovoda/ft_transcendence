@@ -87,32 +87,31 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('arrowDown')
-	handleArrowDown(client: Socket): void {
+	handleArrowDown(client: Socket, pos: number): void {
 		const index = this.games.findIndex((game: Game) => {
 			return (game.player1 === client.id || game.player2 === client.id);
 		})
 		if (index >= 0) {
 			if (this.games[index].player1 === client.id) {
-				this.server.to(this.games[index].id).emit('updateLeftPlayer', 3);
-				console.log("Updated Room: ", this.games[index]);
+				this.server.to(this.games[index].id).emit('updateLeftPlayer', (pos[0] + 3));
 			}
 			else if (this.games[index].player2 === client.id) {
-				this.server.to(this.games[index].id).emit('updateRightPlayer', 3);
+				this.server.to(this.games[index].id).emit('updateRightPlayer', (pos[1] + 3));
 			}
 		}
 	}
 
 	@SubscribeMessage('arrowUp')
-	handleArrowUp(client: Socket): void {
+	handleArrowUp(client: Socket, pos: number): void {
 		const index = this.games.findIndex((game: Game) => {
 			return (game.player1 === client.id || game.player2 === client.id);
 		})
 		if (index >= 0) {
 			if (this.games[index].player1 === client.id) {
-				this.server.to(this.games[index].id).emit('updateLeftPlayer', -3);
+				this.server.to(this.games[index].id).emit('updateLeftPlayer', (pos[0] - 3));
 			}
 			else if (this.games[index].player2 === client.id) {
-				this.server.to(this.games[index].id).emit('updateRightPlayer', -3);
+				this.server.to(this.games[index].id).emit('updateRightPlayer', (pos[1] -3));
 			}
 		}
 	}

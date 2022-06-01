@@ -101,7 +101,6 @@ function Game() {
 
 	function handleKeyPressed(event: KeyboardEvent) {
 		if (event.key === "ArrowDown") {
-			console.log("Arrow Down");
 			setArrowDown(true);
 		}
 		else if (event.key === "ArrowUp") {
@@ -119,21 +118,23 @@ function Game() {
 	}
 
 	socket.on("updateLeftPlayer", (value: number) => {
+		console.log("New Value: ", value);
 		setPlayerLeft({
 			...playerLeft,
 			position: {
 				x: playerLeft.position.x,
-				y: playerLeft.position.y + value,
+				y: value,
 			}
 		})
 	})
 
 	socket.on("updateRightPlayer", (value: number) => {
+		console.log("New Value: ", value);
 		setPlayerRight({
 			...playerRight,
 			position: {
 				x: playerRight.position.x,
-				y: playerRight.position.y + value,
+				y: value,
 			}
 		})
 	})
@@ -156,13 +157,25 @@ function Game() {
 
 	useEffect(() => {
 		if (arrowDown) {
-			socket.emit("arrowDown");
+			let pos1: number;
+			let pos2: number;
+			pos1 = playerLeft.position.y;
+			pos2 = playerRight.position.y;
+			console.log("player left pos: ", pos1);
+			console.log("player right pos: ", pos2);
+			socket.emit("arrowDown", pos1, pos2);
 		}
 	});
 
 	useEffect(() => {
 		if (arrowUp) {
-			socket.emit("arrowUp");
+			let pos1: number;
+			let pos2: number;
+			pos1 = playerLeft.position.y;
+			pos2 = playerRight.position.y;
+			console.log("player left pos: ", pos1);
+			console.log("player right pos: ", pos2);
+			socket.emit("arrowUp", pos1, pos2);
 		}
 	});
 
@@ -199,3 +212,7 @@ function Game() {
 }
 
 export default Game;
+
+
+// ADD INIT GAME FOR EVERY CLICK ON START
+// SEND POS TO BACK TO SYNCHRONISE CLIENTS
