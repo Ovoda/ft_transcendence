@@ -17,10 +17,14 @@ import Chat from './components/chat/chat';
 function App() {
 
   /** Tools */
-  const dispatch = useDispatch();
 
   /** Global Data */
-  const uiState: UiState = useSelector((store: Store) => store.uiState);
+    const store: Store = useSelector((store: Store) => store);
+    const userData = store.user;
+    const uiState = store.uiState;
+
+    /** Tools */
+    const dispatch = useDispatch();
 
   /** Hooks */
   useFetchSession();
@@ -35,7 +39,7 @@ function App() {
         settingsWindowState={uiState.openedSettings}
         setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
       <header className="App-header">
-        <Game></Game>
+		{ userData.login !== "" && <Game /> }
       </header>
     </div >
   );

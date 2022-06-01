@@ -15,11 +15,11 @@ export default function ChatButton(){
 		<>
 			{
 				!uiState.showChat &&
-				<div id='chat_button' onClick={ ()=> dispatch(openChat())}>Chat</div>
+				<button id='chat_button' onClick={ ()=> dispatch(openChat())}>Chat</button>
 			}
 			{
 				uiState.showChat &&
-				<div id='chat_button' onClick={ ()=> dispatch(closeChat())}>Chat</div>
+				<button id='chat_button' onClick={ ()=> dispatch(closeChat())}>Chat</button>
 			}
 		</>
 	);
