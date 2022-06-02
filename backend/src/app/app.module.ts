@@ -6,6 +6,7 @@ import { configService } from './config/config.service';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { WebsocketsModule } from 'src/websockets/websockets.module';
+import { ChatModule } from 'src/chat/chat.module';
 
 @Module({
 	imports: [
@@ -14,6 +15,7 @@ import { WebsocketsModule } from 'src/websockets/websockets.module';
 		UserModule,
 		AuthModule,
 		WebsocketsModule,
+		ChatModule,
 	],
 	controllers: [AppController],
 	exports: [TypeOrmModule],

@@ -1,76 +1,44 @@
 import Player from './interfaces/player.interface';
+import drawPlayer from './services/player.service';
 import Ball from './interfaces/ball.interface';
-import FixedGame from './interfaces/game.interface';
+import drawBall from './services/ball.service';
+import FullGame from './interfaces/game.interface';
 import { io, Socket } from "socket.io-client";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import './game.scss';
 
 const socket: Socket = io("ws://localhost:3001");
 
-//function animate() {
-//	console.log("animate");
-//	json = initGame(json);
-//	console.log("init done");
-//	requestAnimationFrame(animate)
-//	if (json?.c && json?.canvas)
-//	{
-//		console.log("canvas");
-//		json.c.clearRect(0, 0, json.canvas.width, json.canvas.height);
-//		drawPlayers(json.canvas, json.c, json.keys_1, json.player1, json.keys_2, json.player2);
-//		json.ball.update(json.c, json.canvas, json.player1, json.player2);
-//	}
-//}
-
-function launch(Start: any, Ready: any) {
-	Start(false);
-	socket.emit("joinGame");
-	socket.on("gameStatus", (data: any) => {
-		console.log("Status of the game room", data);
-		Ready(data);
-		if (data == true) {
-			//animate();
-		}
-	})
-}
-
-function leave(Start: any) {
-	Start(true);
-	socket.emit("leaveGame");
-}
-
 function Game() {
-	const gameRef: FixedGame = {
-		width: 1000,
-		height: 600,
-	}
 	const canvaRef = useRef<HTMLCanvasElement>(null);
 	const [start, setStart] = useState(true);
 	const [ready, setReady] = useState(false);
-	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-	const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-	const [canvasWidth, setCanvasWidth] = useState(gameRef.width);
-	const [canvasHeight, setCanvasHeight] = useState(gameRef.height);
+	const [win, setWin] = useState("");
+	const [windowWidth, setWindowWidth] = useState(600);
+	const [windowHeight, setWindowHeight] = useState(400);
 	const [canvasContext, setContext] = useState(canvaRef.current?.getContext('2d'));
+	const [arrowUp, setArrowUp] = useState(false);
+	const [arrowDown, setArrowDown] = useState(false);
 	const [ball, setBall] = useState<Ball>({
 		velocity: {
 			x: 3,
 			y: 0,
 		},
 		position: {
-			x: 500,
-			y: 300,
+			x: windowWidth / 2,
+			y: windowHeight / 2,
 		},
-		radius: 5,
+		radius: windowWidth / 50,
 
 	})
 	const [playerLeft, setPlayerLeft] = useState<Player>({
 		score: 0,
 		side: 'left',
-		width: 5,
-		height: 50,
+		width: windowWidth / 45,
+		height: windowHeight / 3,
 		position: {
 			x: 0,
-			y: 150,
+			y: (windowHeight / 2) - ((windowHeight / 3) /2),
 		},
 		velocity: {
 			x: 0,
@@ -80,60 +48,138 @@ function Game() {
 	const [playerRight, setPlayerRight] = useState<Player>({
 		score: 0,
 		side: 'right',
-		width: 5,
-		height: 50,
+		width: windowWidth / 45,
+		height: windowHeight / 3,
 		position: {
-			x: 1000 - 5,
-			y: 150,
+			x: windowWidth - (windowWidth / 45),
+			y: (windowHeight / 2) - ((windowHeight / 3) /2),
 		},
 		velocity: {
 			x: 0,
 			y: 3,
 		}
 	});
-	//const [keyOne, setKeyOne] = useState(0);
-	//const [keyTwo, setKeyTwo] = useState(0);
+	const gameRef: FullGame = {
+		width: windowWidth,
+		height: windowHeight,
+		ball: ball,
+		context: canvasContext,
+		playerleft: playerLeft,
+		playerright: playerRight,
+	}
+	const [canvasWidth, setCanvasWidth] = useState(gameRef.width);
+	const [canvasHeight, setCanvasHeight] = useState(gameRef.height);
 
-	useEffect(() => {
-		window.addEventListener("resize", () => {
-			setWindowWidth(window.innerWidth);
-		});
-	}, []);
 
-	useEffect(() => {
-		setCanvasWidth(windowWidth * 0.7);
-		setCanvasHeight(windowHeight * 0.7);
+	socket.on("gameStop", (stopclient: string) => {
+		console.log("Stopping the game");
+		setStart(true);
+		if (stopclient === socket.id) {
+			setWin("You Lost!");
+		}
+		else {
+			setWin("You Won!");
+		}
+		socket.emit("deleteRoom");
+	})
+
+	function leave() {
+		socket.emit("leaveGame");
+	}
+
+	function launch() {
+		setStart(false);
+		setWin("");
+		socket.emit("joinGame");
+		socket.on("gameStatus", (data: any) => {
+			setReady(data);
+			if (data === true) {
+				animate();
+			}
+		})
+	}
+
+	function handleKeyPressed(event: KeyboardEvent) {
+		if (event.key === "ArrowDown") {
+			setArrowDown(true);
+		}
+		else if (event.key === "ArrowUp") {
+			setArrowUp(true);
+		}
+	}
+
+	function handleKeyUnpressed(event: KeyboardEvent) {
+		if (event.key === "ArrowDown") {
+			setArrowDown(false);
+		}
+		else if (event.key === "ArrowUp") {
+			setArrowUp(false);
+		}
+	}
+
+	socket.on("updateLeftPlayer", (value: number) => {
 		setPlayerLeft({
 			...playerLeft,
-			width: (window.innerWidth * 0.7) / 50,
-			height: (window.innerWidth * 0.7) / 3,
 			position: {
-				x: 0,
-				y: 0,
+				x: playerLeft.position.x,
+				y: value,
 			}
 		})
+	})
+
+	socket.on("updateRightPlayer", (value: number) => {
 		setPlayerRight({
 			...playerRight,
-			width: (window.innerWidth * 0.7) / 50,
-			height: (window.innerWidth * 0.7) / 3,
 			position: {
-				x: 0,
-				y: 0,
+				x: playerRight.position.x,
+				y: value,
 			}
 		})
-		setBall({
-			...ball,
-			radius: Math.sqrt(((0.2 * (window.innerWidth * 0.7) * (window.innerHeight * 0.7) / 100) / Math.PI)),
-		})
-	}, [windowWidth]);
+	})
+
+	useEffect(() => {
+		window.addEventListener("keydown", handleKeyPressed);
+		window.addEventListener("keyup", handleKeyUnpressed);
+		return () => {
+			window.removeEventListener("keydown", handleKeyPressed);
+			window.removeEventListener("keyup", handleKeyUnpressed);
+		};
+	});
+
+	useEffect(() => {
+		requestAnimationFrame(animate);
+	}, [playerLeft]);
+	useEffect(() => {
+		requestAnimationFrame(animate);
+	}, [playerRight]);
+
+	useEffect(() => {
+		if (arrowDown) {
+			socket.emit("arrowDown", gameRef);
+		}
+	});
+
+	useEffect(() => {
+		if (arrowUp) {
+			socket.emit("arrowUp", gameRef);
+		}
+	});
+
+	function animate() {
+		gameRef.context = canvaRef.current?.getContext('2d');
+		gameRef.context?.clearRect(0, 0, gameRef.width, gameRef.height);
+		drawBall(gameRef, ball);
+		drawPlayer(gameRef, playerLeft);
+		drawPlayer(gameRef, playerRight);
+	}
 
 	return (
 		<div className="main">
-			<p>Welcome to the Pong Game</p>
+			<h2>Welcome to the Pong Game</h2>
 			{start ? (
-				<button onClick={() => launch(setStart, setReady)}>Start Game</button>
+				<button id="button-game" onClick={() => launch()}>Start Game</button>
 			) : (
-				<button onClick={() => leave(setStart)}>Stop Game</button>
+				<button id="button-game" onClick={() => leave()}>Stop Game</button>
 			)}
 			<p></p>
 			{!start && ready ? (
@@ -141,35 +187,18 @@ function Game() {
 			) : (
 				<p></p>
 			)}
-			{!start && !ready ? (
+			{!start && !ready ?(
 				<p>Waiting for another player...</p>
 			) : (
 				<p></p>
 			)}
+			{start && win != "" ? (<p>{win}</p>):(<p></p>)}
 		</div>
 	);
 }
 
-//window.addEventListener("keydown", function (event) {
-//	switch (event.key) {
-//		case "ArrowDown":
-//			json.keys_1.down = true;
-//			json.keys_2.down = true;
-//			if (json.c && json.canvas)
-//				{json.player1.update(json.c, json.keys_1, json.canvas);
-//				json.player2.update(json.c, json.keys_2, json.canvas);}
-//			break ;
-//		case "ArrowUp":
-//			json.keys_1.up = true;
-//			json.keys_2.up = true;
-//			if (json.c && json.canvas)
-//				{json.player1.update(json.c, json.keys_1, json.canvas);
-//				json.player2.update(json.c, json.keys_2, json.canvas);}
-//			break ;
-//		default:
-//			return ;
-//		}
-//		event.preventDefault();
-//	}, true);
-
 export default Game;
+
+
+// ADD INIT GAME FOR EVERY CLICK ON START
+// SEND POS TO BACK TO SYNCHRONISE CLIENTS

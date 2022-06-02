@@ -9,12 +9,13 @@ import UserSettings from './components/user/UserSettings';
 import UiState from './features/uiState/interfaces/UiState';
 import { useDispatch, useSelector } from 'react-redux';
 import { Store } from './app/store';
-import { closeSettingWindow, updateUiState } from './features/uiState/uiState.slice';
+import { closeChat, closeSettingWindow, updateUiState } from './features/uiState/uiState.slice';
 import TfaRegistration from './components/auth/TfaRegistration';
 import TfaLogin from './components/auth/TfaLogin';
 import { createMainSocket, initSocket } from './services/websocket';
 import { useEffect } from 'react';
 import UserData from './features/user/interfaces/user.interface';
+import Chat from './components/chat/chat';
 
 const socket = createMainSocket();
 
@@ -44,11 +45,12 @@ function App() {
       <Navbar />
       <TfaRegistration />
       <TfaLogin />
+      <Chat />
       <UserSettings
         settingsWindowState={uiState.openedSettings}
         setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
       <header className="App-header">
-        <Game></Game>
+        {userData.login !== "" && <Game />}
       </header>
     </div >
   );

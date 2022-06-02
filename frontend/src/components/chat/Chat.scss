@@ -1,0 +1,44 @@
+#chat {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	background-color: white;
+
+	width: 300px;
+    height: 100vh;
+	
+	position: fixed;
+	top: 0;
+
+	.chat_window{
+		align-items: center;
+		flex-direction: column;
+		background-color: white;
+
+		width: 300px;
+		height: 100vh;
+		position: fixed;
+		top: 0;
+
+		// .chat_options{
+		// 	align-items: center;
+		// 	flex-direction: column;
+		// 	background-color: white;
+	
+		// 	width: 300px;
+		// 	height: 100vh;
+		// 	position: fixed;
+		// 	top: 0;
+		// }
+	}
+	.chat_options{
+		align-items: center;
+		flex-direction: column;
+		background-color: white;
+
+		width: 300px;
+		height: 100vh;
+		position: fixed;
+		top: 0;
+	}
+}
