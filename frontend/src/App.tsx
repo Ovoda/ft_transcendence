@@ -12,17 +12,32 @@ import { Store } from './app/store';
 import { closeSettingWindow, updateUiState } from './features/uiState/uiState.slice';
 import TfaRegistration from './components/auth/TfaRegistration';
 import TfaLogin from './components/auth/TfaLogin';
+import { createMainSocket, initSocket } from './services/websocket';
+import { useEffect } from 'react';
+import UserData from './features/user/interfaces/user.interface';
+
+const socket = createMainSocket();
 
 function App() {
+
+
+  /** Global Data */
+  const store: Store = useSelector((store: Store) => store);
+  const uiState: UiState = store.uiState;
+  const userData: UserData = store.user;
 
   /** Tools */
   const dispatch = useDispatch();
 
-  /** Global Data */
-  const uiState: UiState = useSelector((store: Store) => store.uiState);
-
   /** Hooks */
   useFetchSession();
+
+  useEffect(() => {
+    if (userData.login !== "") {
+      console.log("init socket");
+      initSocket(socket, userData.id);
+    }
+  }, [userData]);
 
   return (
     <div className="App">

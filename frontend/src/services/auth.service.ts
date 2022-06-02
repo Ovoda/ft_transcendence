@@ -1,8 +1,9 @@
 import Cookies from "js-cookie";
-import { api, getUserData } from "./api.service";
+import { config } from "../app/config";
+import { api } from "./api.service";
 
 export function login() {
-    window.location.href = `http://localhost:3001/auth/user`;
+    window.location.href = config.getValue("REACT_APP_BACKEND_URL") + "/auth/user";
 }
 
 export function logout() {

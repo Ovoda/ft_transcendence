@@ -1,15 +1,13 @@
 
-import { MouseEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import Auth from "../../features/auth/interfaces/auth.interface";
 import "./TfaRegistration.scss";
-import qrcode from "qrcode";
 import useDigitInput from 'react-digit-input';
 import UiState from "../../features/uiState/interfaces/UiState";
-import { closeTfaLogin, closeTfaRegistration, updateUiState } from "../../features/uiState/uiState.slice";
-import { enableTfa } from "../../services/tfa.service";
-import { updateTfaEnabled, updateUser } from "../../features/user/user.slice";
+import { closeTfaLogin } from "../../features/uiState/uiState.slice";
+import { updateUser } from "../../features/user/user.slice";
 import UserData from "../../features/user/interfaces/user.interface";
 import { loginTfa } from "../../services/auth.service";
 import { getUserData } from "../../services/api.service";

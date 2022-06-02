@@ -18,7 +18,6 @@ export class TfaStrategy extends PassportStrategy(Strategy, "user-tfa") {
     }
 
     async validate(payload: JwtPayload) {
-        console.log(payload);
         if (!payload) {
             throw new InvalidTokenException();
         }
