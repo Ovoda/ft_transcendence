@@ -6,6 +6,7 @@ import FullGame from './interfaces/game.interface';
 import { io, Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import './game.scss';
+import { createLanguageServiceSourceFile } from 'typescript';
 
 const socket: Socket = io("ws://localhost:3001");
 
@@ -18,11 +19,12 @@ function Game() {
 	const [windowHeight, setWindowHeight] = useState(400);
 	const [canvasContext, setContext] = useState(canvaRef.current?.getContext('2d'));
 	const [arrowUp, setArrowUp] = useState(false);
+	const [side, setSide] = useState(0);
 	const [arrowDown, setArrowDown] = useState(false);
 	const [ball, setBall] = useState<Ball>({
 		velocity: {
 			x: 3,
-			y: 0,
+			y: 1,
 		},
 		position: {
 			x: windowWidth / 2,
@@ -42,7 +44,7 @@ function Game() {
 		},
 		velocity: {
 			x: 0,
-			y: 3,
+			y: 5,
 		}
 	});
 	const [playerRight, setPlayerRight] = useState<Player>({
@@ -56,7 +58,7 @@ function Game() {
 		},
 		velocity: {
 			x: 0,
-			y: 3,
+			y: 5,
 		}
 	});
 	const gameRef: FullGame = {
@@ -70,10 +72,9 @@ function Game() {
 	const [canvasWidth, setCanvasWidth] = useState(gameRef.width);
 	const [canvasHeight, setCanvasHeight] = useState(gameRef.height);
 
-
 	socket.on("gameStop", (stopclient: string) => {
-		console.log("Stopping the game");
 		setStart(true);
+		setSide(0);
 		if (stopclient === socket.id) {
 			setWin("You Lost!");
 		}
@@ -94,7 +95,12 @@ function Game() {
 		socket.on("gameStatus", (data: any) => {
 			setReady(data);
 			if (data === true) {
-				animate();
+				if (side === 0) {
+					socket.emit("animateGame", ball.position.x, ball.position.y);
+				}
+			}
+			else {
+				setSide(1);
 			}
 		})
 	}
@@ -116,6 +122,16 @@ function Game() {
 			setArrowUp(false);
 		}
 	}
+
+	socket.on("updateBall", (data: any) => {
+		setBall({
+			...ball,
+			position: {
+				x: data[0],
+				y: data[1],
+			},
+		})
+	}) 
 
 	socket.on("updateLeftPlayer", (value: number) => {
 		setPlayerLeft({
@@ -148,20 +164,58 @@ function Game() {
 
 	useEffect(() => {
 		requestAnimationFrame(animate);
+		if (side === 1) {
+			let newPosX: number;
+			let newPosY: number;
+			if (ball.position.x + ball.velocity.x < 0 || ball.position.x + ball.velocity.x > gameRef.width) {
+				ball.velocity.x = - ball.velocity.x;
+			}
+			if (ball.position.y + ball.velocity.y < 0 || ball.position.y + ball.velocity.y > gameRef.height) {
+				ball.velocity.y = - ball.velocity.y;
+			}
+			newPosX = ball.position.x + ball.velocity.x;
+			newPosY = ball.position.y + ball.velocity.y;
+			socket.emit("animateGame", newPosX, newPosY);
+		}
+	}, [ball]);
+
+	useEffect(() => {
+		requestAnimationFrame(animate);
 	}, [playerLeft]);
+
 	useEffect(() => {
 		requestAnimationFrame(animate);
 	}, [playerRight]);
 
 	useEffect(() => {
 		if (arrowDown) {
-			socket.emit("arrowDown", gameRef);
+			let player: Player;
+			let newPos: number;
+			if (side === 1)
+				player = playerLeft;
+			else
+				player = playerRight;
+			newPos = player.position.y + player.velocity.y;
+			if (player.position.y + player.velocity.y + player.height > gameRef.height) {
+				newPos = gameRef.height - player.height;
+			}
+			socket.emit("movePlayer", newPos);
 		}
 	});
 
 	useEffect(() => {
 		if (arrowUp) {
-			socket.emit("arrowUp", gameRef);
+			let player: Player;
+			let newPos: number;
+			if (side === 1)
+				player = playerLeft;
+			else
+				player = playerRight;
+			newPos = player.position.y - player.velocity.y;
+			if (player.position.y - player.velocity.y < 0) {
+				newPos = 0;
+			}
+			socket.emit("movePlayer", newPos);
 		}
 	});
 
@@ -201,4 +255,3 @@ export default Game;
 
 
 // ADD INIT GAME FOR EVERY CLICK ON START
-// SEND POS TO BACK TO SYNCHRONISE CLIENTS
