@@ -26,14 +26,19 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 
 	public async createRoles(dto: CreateChatDto){
 		let roles: ChatRoleEntity[] = [];
-		for (let i = 0; i < dto.userIds.length; i++){
+		for (let i = 0; i < dto.logins.length; i++){
 			let role = await this.create({
-				user: await this.userService.findOneById(dto.userIds[i]),
+				user: await this.userService.findOne(
+					{
+						where: {
+							login: dto.logins[i]
+						}
+					}),
 				role: (i == 0) ? e_roleType.OWNER : e_roleType.LAMBDA,
 			});
 			roles.push(role);
 		}
-		for (let i = 0; i < dto.userIds.length; i++){
+		for (let i = 0; i < dto.logins.length; i++){
 			await this.save(roles[i]);
 		}
 		return roles;

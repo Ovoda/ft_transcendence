@@ -3,7 +3,7 @@ import { e_roomType } from "../types/room.type";
 
 export class CreateChatDto {
 	@IsNotEmpty()
-	userIds: string[];
+	logins: string[];
 
 	@IsNotEmpty()
 	roomType: e_roomType;
