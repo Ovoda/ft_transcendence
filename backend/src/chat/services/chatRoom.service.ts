@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { throws } from "assert";
 import { use } from "passport";
@@ -19,7 +19,8 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 	constructor(
 		@InjectRepository(ChatRoomEntity)
 		protected readonly _repository: Repository<ChatRoomEntity>,
-		private readonly chatRoleService : ChatRoleService,
+		@Inject(forwardRef(() => ChatRoleService))
+		private readonly chatRoleService: ChatRoleService,
 		private readonly chatMessageService: ChatMessageService,
 		private readonly userService: UserService,
 		protected readonly _log: Logger,

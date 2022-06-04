@@ -1,11 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { debugPort } from "process";
 import { CrudService } from "src/app/templates/crud.service";
 import { Repository } from "typeorm";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
 import { ChatMessageEntity } from "../entities/chatMessage.entity";
-import { ChatRoomEntity } from "../entities/chatRoom.entity";
 
 @Injectable()
 export class ChatMessageService extends CrudService<ChatMessageEntity>{
