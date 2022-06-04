@@ -8,7 +8,7 @@ export class FtStrategy extends PassportStrategy(Strategy, "user-ft") {
         super({
             clientID: "4e16351ea15fbcc347c924b88e116d13722b6424abfe6464cb3b78f3b5c42d71",
             clientSecret: "3d0fa05ae72ad9d8b1c5a215671559d5c81489d25c4797bf69ef9d96636edcfe",
-            callbackURL: "http://localhost:3001/auth/42/callback",
+            callbackURL: process.env.BACKEND_URL + "/auth/42/callback",
             scope: "public",
         })
     }

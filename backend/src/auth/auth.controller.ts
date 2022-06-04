@@ -31,9 +31,9 @@ export class AuthController {
             }
         });
 
-        let url = "http://localhost:3000";
+        let url = process.env.FRONTEND_URL;
         if (user.tfaEnabled) {
-            url = "http://localhost:3000/tfa";
+            url = process.env.FRONTEND_URL + "tfa";
         }
 
         res.status(302).redirect(url);

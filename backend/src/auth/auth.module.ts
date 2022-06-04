@@ -15,7 +15,7 @@ import { TfaStrategy } from './strategies/tfa.auth.strategy';
     PassportModule,
     JwtModule.register({
       secret: configService.getJwtTokenSecret(),
-      signOptions: { expiresIn: '15min' },
+      signOptions: { expiresIn: '6h' },
     })
   ],
   providers: [AuthService, JwtStrategy, FtStrategy, TfaStrategy],

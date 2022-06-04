@@ -10,3 +10,37 @@ interface Player {
 }
 
 export default Player;
+
+export function setInitialPlayerLeftState(windowWidth: number, windowHeight: number) {
+	return ({
+		score: 0,
+		side: 'left',
+		width: windowWidth / 45,
+		height: windowHeight / 3,
+		position: {
+			x: 0,
+			y: (windowHeight / 2) - ((windowHeight / 3) / 2),
+		},
+		velocity: {
+			x: 0,
+			y: 2,
+		}
+	});
+}
+
+export function setInitialPlayerRightState(windowWidth: number, windowHeight: number) {
+	return ({
+		score: 0,
+		side: 'right',
+		width: windowWidth / 45,
+		height: windowHeight / 3,
+		position: {
+			x: windowWidth - (windowWidth / 45),
+			y: (windowHeight / 2) - ((windowHeight / 3) / 2),
+		},
+		velocity: {
+			x: 0,
+			y: 2,
+		}
+	});
+}

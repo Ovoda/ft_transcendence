@@ -6,18 +6,13 @@ import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 } from "@nestjs/websockets";
-import { ConsoleLogger, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { GameRoom } from '../types/gameRoom.interface';
-import { GameFront } from '../types/gameFront.interface';
-import { rootCertificates } from "tls";
-import { throws } from "assert";
-import { emit } from "process";
-
 
 @WebSocketGateway({
 	cors: {
-		origin: "http://localhost:3000",
+		origin: "*",
 	},
 })
 
@@ -50,7 +45,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.games[this.games.length - 1].player2 = client.id;
 			this.games[this.games.length - 1].status = true;
 			console.log("join room");
-			
+
 			client.join(this.games[this.games.length - 1].id);
 			status = true;
 			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', status);
@@ -102,9 +97,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.player1 === client.id || game.player2 === client.id);
 		})
-		const clients = this.server.sockets.adapter.rooms.get(this.games[index].id);
-		console.log(clients.size);
-		console.log(this.games[index].id);
+
 		if (index >= 0) {
 			if (this.games[index].player1 === client.id) {
 				this.server.to(this.games[index].id).emit('updateLeftPlayer', data);

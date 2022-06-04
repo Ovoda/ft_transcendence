@@ -11,6 +11,7 @@
     "@types/node": "^16.11.33",
     "@types/react-dom": "^18.0.3",
     "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
     "js-cookie": "^3.0.1",
     "qrcode": "^1.5.0",
     "react": "^18.1.0",

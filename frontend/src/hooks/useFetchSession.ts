@@ -15,8 +15,7 @@ export default function useFetchSession() {
 
         console.log(window.location.href);
 
-
-        if (token && window.location.href === "http://localhost:3000/") {
+        if (token && window.location.href === process.env.REACT_APP_BACKEND_URL as string) {
             fetchUserData();
         }
 
