@@ -5,6 +5,8 @@ import { ChatMessageEntity } from "src/chat/entities/chatMessage.entity";
 import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
 import { UserEntity } from "src/user/entities/user.entity";
 import { UserRelationsEntity } from "src/user/entities/userRelations.entity";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { INestApplication } from "@nestjs/common";
 
 export class ConfigService {
 
@@ -62,6 +64,16 @@ export class ConfigService {
             synchronize: true,
         });
     }
+
+	public setupSwagger(app: INestApplication) {
+		const config = new DocumentBuilder()
+		  .setTitle('Transcendance con los WOLFOS')
+		  .setDescription('Last 42\'s common core project')
+		  .setVersion('1.0')
+		  .build();
+		const document = SwaggerModule.createDocument(app, config);
+		SwaggerModule.setup('api', app, document);
+	  }
 }
 
 export const configService = new ConfigService();

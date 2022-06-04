@@ -30,12 +30,14 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Post('message')
+	@Post('message/:role_id')
 	@HttpCode(201)
 	async postMessage(
-		@Body() createChatMessageDto: CreateChatMessageDto
+		@Request() req,
+		@Body() createChatMessageDto: CreateChatMessageDto,
+		@Param('role_id') role_id: string,
 	){
-		return await this.chatMessageService.postMessage(createChatMessageDto);
+		return await this.chatRoleService.postMessageFromRole(req.user.id, role_id, createChatMessageDto)
 	}
 
 	@UseGuards(JwtAuthGuard)

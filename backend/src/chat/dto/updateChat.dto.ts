@@ -1,3 +1,4 @@
+import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty } from 'class-validator';
 import { e_roleType } from '../types/role.type';

@@ -1,3 +1,4 @@
+import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 
 export class CreateChatMessageDto {
