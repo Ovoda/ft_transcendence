@@ -40,7 +40,7 @@ function Game() {
 		height: windowHeight / 3,
 		position: {
 			x: 0,
-			y: (windowHeight / 2) - ((windowHeight / 3) /2),
+			y: (windowHeight / 2) - ((windowHeight / 3) / 2),
 		},
 		velocity: {
 			x: 0,
@@ -54,7 +54,7 @@ function Game() {
 		height: windowHeight / 3,
 		position: {
 			x: windowWidth - (windowWidth / 45),
-			y: (windowHeight / 2) - ((windowHeight / 3) /2),
+			y: (windowHeight / 2) - ((windowHeight / 3) / 2),
 		},
 		velocity: {
 			x: 0,
@@ -131,7 +131,7 @@ function Game() {
 				y: data[1],
 			},
 		})
-	}) 
+	})
 
 	socket.on("updateLeftPlayer", (value: number) => {
 		console.log("Update Player Left");
@@ -245,12 +245,12 @@ function Game() {
 			) : (
 				<p></p>
 			)}
-			{!start && !ready ?(
+			{!start && !ready ? (
 				<p>Waiting for another player...</p>
 			) : (
 				<p></p>
 			)}
-			{start && win != "" ? (<p>{win}</p>):(<p></p>)}
+			{start && win != "" ? (<p>{win}</p>) : (<p></p>)}
 		</div>
 	);
 }

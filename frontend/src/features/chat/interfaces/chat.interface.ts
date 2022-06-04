@@ -1,11 +1,15 @@
+import Message from "src/shared/interfaces/Message";
+
 export enum e_roomtype {
 	DM = 'DM',
 	ROOM = 'ROOM',
 }
 
 export default interface Chat {
-	chatSelector: boolean;
+	displayChatSelector: boolean;
 	roomtype: e_roomtype;
 	displayChat: boolean;
 	displayOptions: boolean;
+	messages: Message[];
+	currentRoom: string;
 }

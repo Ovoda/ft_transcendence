@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import CloseChat from "src/components/chat/chatBox/closeChat";
 import UiState from "./interfaces/UiState";
 
 const initialState: UiState = {
@@ -7,7 +6,7 @@ const initialState: UiState = {
     logged: false,
     showTfaRegistration: false,
     showTfaLogin: false,
-	showChat: false,
+    showChat: false,
 }
 
 const uiState = createSlice({
@@ -35,12 +34,12 @@ const uiState = createSlice({
         closeTfaLogin(state) {
             return { ...state, showTfaLogin: false };
         },
-		openChat(state) {
-			return {...state, showChat: true}
-		},
-		closeChat(state) {
-			return {...state, showChat: false}
-		}
+        openChat(state) {
+            return { ...state, showChat: true }
+        },
+        closeChat(state) {
+            return { ...state, showChat: false }
+        }
     }
 })
 
@@ -52,8 +51,8 @@ export const {
     closeTfaRegistration,
     openTfaLogin,
     closeTfaLogin,
-	openChat,
-	closeChat,
+    openChat,
+    closeChat,
 } = uiState.actions;
 
 export default uiState.reducer;

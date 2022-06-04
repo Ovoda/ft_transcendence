@@ -1,7 +1,10 @@
 import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import { JoinRoomDto } from "./dtos/JoinRoom.dto";
 import RegisterClientDto from "./dtos/RegisterClient.dto";
+import SendChatMessageDto from "./dtos/SendChatMessageDto";
 import ClientSocket from "./interfaces/Socket.interface";
+import { remove } from 'lodash';
 
 @WebSocketGateway({
     transport: ['websocket'],
@@ -26,21 +29,28 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage("RegisterClient")
     public registerClientSocket(socket: Socket, userId: string) {
         this.events.push({ socket, userId });
-        console.log(this.events.length);
+        console.log(`Registered client, new length : ${this.events.length}`);
     }
 
     @SubscribeMessage("RemoveClient")
     public removeClientSocket(socket: Socket) {
 
-        const socketIndex = this.events.findIndex((event) => {
-            return (event.socket.id === socket.id);
+        remove(this.events, (event) => {
+            event.socket.id === socket.id
         })
+        console.log(`Removed client, new length : ${this.events.length}`);
+    }
 
-        console.log(`index is ${socketIndex}`);
+    @SubscribeMessage("ClientMessage")
+    public sendMessage(socket: Socket, body: SendChatMessageDto) {
+        console.log(body);
 
-        if (socketIndex)
+        const ret = this.server.to(body.room).emit("ServerMessage", body);
+    }
 
-            this.events = [...this.events.slice(0, socketIndex), ...this.events.slice(socketIndex + 1)];
-        console.log(this.events.length);
+    @SubscribeMessage("Join")
+    public joinRoom(socket: Socket, body: JoinRoomDto) {
+        socket.join(body.roomId);
+        console.log(`Socket ${socket.id} joined room ${body.roomId}`);
     }
 }

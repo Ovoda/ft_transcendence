@@ -8,8 +8,8 @@ import {
 } from "@nestjs/websockets";
 import { ConsoleLogger, Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import { GameRoom} from '../types/gameRoom.interface';
-import { GameFront} from '../types/gameFront.interface';
+import { GameRoom } from '../types/gameRoom.interface';
+import { GameFront } from '../types/gameFront.interface';
 import { rootCertificates } from "tls";
 import { throws } from "assert";
 import { emit } from "process";
@@ -30,8 +30,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('joinGame')
 	handleJoinGame(client: Socket, message: string) {
+<<<<<<< HEAD
 		this.logger.log(`New Game Request from: ${client.id}`);
 		this.logger.log(`Current Games: ${this.games.length}`);
+=======
+		// this.logger.log(`New Game Request from: ${client.id}`);
+		// this.logger.log(`Current: ${this.games.length}`);
+>>>>>>> c231d09 (working on chat)
 		let status: boolean;
 		if (!this.games.length || this.games[this.games.length - 1].status === true) {
 			const newGame: GameRoom = {
@@ -117,16 +122,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	//@SubscribeMessage('msgToServer')
 	//handleMessage(client: Socket, data: any): void {
-	//	this.logger.log(`Client sent: ${data}`);
+	// this.logger.log(`Client sent: ${data}`);
 	//	this.server.emit('msgToClient', data)
 	//}
 
 	afterInit(server: any) {
-		this.logger.log('Init');
+		// this.logger.log('Init');
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		this.logger.log(`Client connected: ${client.id}`);
+		// this.logger.log(`Client connected: ${client.id}`);
 	}
 
 	handleDisconnect(client: Socket, ...args: any[]) {

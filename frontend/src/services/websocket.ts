@@ -1,12 +1,25 @@
 import { Socket, io } from "socket.io-client";
+import Message from "src/shared/interfaces/Message";
+import SendChatMessageDto from "./interfaces/SendMessageDto";
 
-export function createMainSocket(): Socket {
-    return io("ws://localhost:3001", { transports: ["websocket"] });
-}
+export default class ClientSocket {
+    socket: Socket = io("ws://localhost:3001", { transports: ["websocket"] });;
 
-export function initSocket(socket: Socket, userId: string) {
-    socket.on("connect", () => {
-        console.log("socket connected");
-    });
-    socket.emit("RegisterClient", userId);
+    public initSocket(userId: string) {
+        this.socket.on("connect", () => {
+            this.socket.emit("RegisterClient", userId);
+        });
+    }
+
+    public on(event: string, fun: any) {
+        return (this.socket.on(event, fun));
+    }
+
+    public sendMessage(body: Message) {
+        this.socket.emit("ClientMessage", body);
+    }
+
+    public joinRoom(roomId: string) {
+        this.socket.emit("Join", { roomId });
+    }
 }
