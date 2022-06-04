@@ -3,7 +3,13 @@
         "baseUrl": ".",
         "paths": {
             "style/*": [
-                "./src/shared/stylesheets/*"
+                "./src/shared/stylesheets/*",
+            ],
+            "enums/*": [
+                "./src/shared/enums/*"
+            ],
+            "services/*": [
+                "./src/services/*"
             ],
         }
     }

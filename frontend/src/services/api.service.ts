@@ -1,6 +1,7 @@
 import axios from "axios";
 import { config } from "../app/config";
 import UserData from "../features/user/interfaces/user.interface";
+import CreateRoomDto from "./interfaces/CreateRoom.dto";
 
 
 export const api = axios.create({
@@ -14,5 +15,14 @@ export async function getUserData(): Promise<UserData | null | undefined> {
         return response.data as UserData;
     } catch (error: any) {
         console.log(error.response);
+    }
+}
+
+export async function createRoom(createRoomDto: CreateRoomDto) {
+    try {
+        const ret = await api.post("/chat/create", createRoomDto);
+        console.log(ret.data);
+    } catch (error: any) {
+        console.log(error);
     }
 }

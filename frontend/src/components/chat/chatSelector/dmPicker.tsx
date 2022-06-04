@@ -1,8 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
+import { createRoom } from "src/services/api.service";
 import { openChatDms, setCurrentRoom } from "../../../features/chat/chat.slice";
 import './dmPicker.scss';
+import RoomCreation from "./roomCreation";
 // MUST REMOVE THAT AND RENDER DYNAMICLY
 
 const usersDM = [
@@ -41,6 +43,10 @@ export default function DmPicker() {
 		dispatch(setCurrentRoom(id));
 	}
 
+	function handleRoomCreation() {
+		// createRoom();
+	}
+
 	if (chat.displayChatSelector) {
 		return (
 			<div id="dm_picker">
@@ -50,8 +56,9 @@ export default function DmPicker() {
 							<img src={user.picture} alt="profile_picture" width="50" height="50" />
 							{user.login}
 						</div>
-					)}
-
+					)
+				}
+				<RoomCreation />
 			</div>
 		);
 	}

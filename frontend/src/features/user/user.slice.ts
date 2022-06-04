@@ -7,7 +7,7 @@ const initialState: UserData = {
     login: "",
     avatar: "",
     tfaEnabled: false,
-    roles: [];
+    roles: [],
 }
 
 const UserDataSlice = createSlice({

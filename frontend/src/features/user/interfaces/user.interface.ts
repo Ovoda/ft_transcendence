@@ -1,3 +1,4 @@
+import UserRole from "./userRole.interface";
 
 
 export default interface UserData {
@@ -5,5 +6,5 @@ export default interface UserData {
     login: string;
     avatar: string;
     tfaEnabled: boolean;
-    roles: [];
+    roles: UserRole[];
 }

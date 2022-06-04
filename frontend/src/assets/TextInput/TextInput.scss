@@ -1,0 +1,63 @@
+.reskue_text_input_container {
+    position: relative;
+    margin: 2rem 0;
+
+    input {
+        height: 5rem;
+        width: 100%;
+        border: 1px solid #5F6367;
+        border-radius: 0.5rem;
+        box-sizing: border-box;
+
+        &:focus {
+            outline: none;
+            border: 2px solid #4285F4;
+        }
+
+        &:not(input[value=""])+.placeholder_text p {
+            background-color: white;
+            font-size: 1.1rem;
+            color: black;
+            transform: translate(0, -200%);
+        }
+
+        &:focus+.placeholder_text p {
+            box-sizing: border-box;
+            background-color: white;
+            font-size: 1.1rem;
+            transform: translate(0, -200%);
+            border-color: #4285F4;
+            color: #4285F4 !important;
+        }
+
+
+    }
+
+    .placeholder_text {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border: 3px solid transparent;
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+
+        p {
+            font-size: 1.4rem;
+            padding: 0 0.5rem;
+            background-color: transparent;
+            color: #5F6367;
+            transform: translate(0);
+            transition: transform 0.15s ease-out, font-size 0.15s ease-out, background-color 0.2s ease-out, color 0.15s ease-out;
+        }
+    }
+
+    input,
+    .placeholder_text {
+        font-size: 1.4rem;
+        padding: 0 1.2rem;
+    }
+}
