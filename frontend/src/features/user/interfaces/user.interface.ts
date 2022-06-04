@@ -5,4 +5,5 @@ export default interface UserData {
     login: string;
     avatar: string;
     tfaEnabled: boolean;
+    roles: 
 }

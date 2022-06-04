@@ -45,7 +45,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     public sendMessage(socket: Socket, body: SendChatMessageDto) {
         console.log(body);
 
-        const ret = this.server.to(body.room).emit("ServerMessage", body);
+        this.server.to(body.room).emit("ServerMessage", body);
     }
 
     @SubscribeMessage("Join")

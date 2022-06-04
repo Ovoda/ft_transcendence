@@ -23,9 +23,9 @@ export class AuthController {
     @Get("42/callback")
     @UseGuards(FtAuthGuard)
     async ftCallback(@Query("code") code: string, @Req() req: any, @Res() res: Response) {
-        const authInfos = await this.authService.login(req.user);
+        const { access_token } = await this.authService.login(req.user);
 
-        const cookie = `authentication=${authInfos.access_token}; HttpOnly; Path=/; Max-Age=15min`
+        const cookie = `authentication=${access_token}; HttpOnly; Path=/; Max-Age=15min`
 
         res.setHeader("Set-Cookie", cookie);
 
