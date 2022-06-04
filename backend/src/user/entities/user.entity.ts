@@ -25,9 +25,9 @@ export class UserEntity {
 	// @JoinTable()
 	// chatroom: ChatEntity[];
 
-	@ManyToMany(() => UserRelationsEntity , relations => relations.users)
+	@ManyToMany(() => UserRelationsEntity , relations => relations.users, {nullable: true})
 	relations: UserRelationsEntity[];
 
-	@OneToMany(()=> ChatRoleEntity, role => role.user)
+	@OneToMany(()=> ChatRoleEntity, role => role.user, {eager: true})
 	roles: ChatRoleEntity[];
 }
