@@ -6,7 +6,6 @@ import { api } from "./api.service";
 import { DisableTfaProps } from "./interfaces/DisableTfaProps.interface";
 import { GenerateTfaProps } from "./interfaces/GenerateTfaProps.interface";
 import { ToggleTfaProps } from "./interfaces/ToggleTfaProps.interface";
-import Cookies from "js-cookie";
 import { config } from "../app/config";
 
 
@@ -30,14 +29,8 @@ export async function toggleTfa({ dispatch, uiTfaEnabled }: ToggleTfaProps) {
 }
 
 export async function generateTfa({ dispatch }: GenerateTfaProps) {
-    const token = Cookies.get("access_token");
-    if (!token) return;
-
     const res = await axios.get(config.getValue("REACT_APP_BACKEND_URL") + "/auth/tfa/generate", {
         responseType: "blob",
-        headers: {
-            Authorization: "Bearer " + token,
-        },
     });
 
     const url = window.URL.createObjectURL(new Blob([res.data]));

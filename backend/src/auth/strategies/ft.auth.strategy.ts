@@ -5,10 +5,14 @@ import { Strategy } from "passport-42";
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy, "user-ft") {
     constructor() {
+        console.log(process.env.FT_APP_CLIENT_ID);
+        console.log(process.env.FT_APP_CLIENT_SECRET);
+        console.log(process.env.FT_APP_CALLBACK_URL);
+
         super({
-            clientID: "4e16351ea15fbcc347c924b88e116d13722b6424abfe6464cb3b78f3b5c42d71",
-            clientSecret: "3d0fa05ae72ad9d8b1c5a215671559d5c81489d25c4797bf69ef9d96636edcfe",
-            callbackURL: process.env.BACKEND_URL + "/auth/42/callback",
+            clientID: process.env.FT_APP_CLIENT_ID,
+            clientSecret: process.env.FT_APP_CLIENT_SECRET,
+            callbackURL: process.env.FT_APP_CALLBACK_URL,
             scope: "public",
         })
     }

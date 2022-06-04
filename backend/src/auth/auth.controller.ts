@@ -1,5 +1,6 @@
 import { Body, Controller, Get, HttpCode, Post, Query, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Response, Request } from "express";
+import { ConfigService } from "src/app/config/config.service";
 import { UserService } from "src/user/user.service";
 import { AuthService } from "./auth.service";
 import { EnableTfaDto } from "./dtos/enableTFA.dto";
@@ -23,7 +24,10 @@ export class AuthController {
     @UseGuards(FtAuthGuard)
     async ftCallback(@Query("code") code: string, @Req() req: any, @Res() res: Response) {
         const authInfos = await this.authService.login(req.user);
-        res.cookie("access_token", authInfos.access_token);
+
+        const cookie = `authentication=${authInfos.access_token}; HttpOnly; Path=/; Max-Age=15min`
+
+        res.setHeader("Set-Cookie", cookie);
 
         const user = await this.userService.findOne({
             where: {
@@ -33,9 +37,8 @@ export class AuthController {
 
         let url = process.env.FRONTEND_URL;
         if (user.tfaEnabled) {
-            url = process.env.FRONTEND_URL + "tfa";
+            url = process.env.FRONTEND_URL + "/tfa";
         }
-
         res.status(302).redirect(url);
     }
 
@@ -70,7 +73,7 @@ export class AuthController {
     @Post("tfa/authenticate")
     @HttpCode(200)
     @UseGuards(JwtAuthGuard)
-    async authenticateTfa(@Req() req: JwtRequest, @Body() body: EnableTfaDto) {
+    async authenticateTfa(@Req() req: JwtRequest, @Body() body: EnableTfaDto, @Res() res: Response) {
         const tfaCode = body.tfaCode;
 
         const codeIsValid = await this.authService.checkTfaCodeValidity(tfaCode, req.user);
@@ -78,6 +81,20 @@ export class AuthController {
         if (!codeIsValid) {
             throw new UnauthorizedException("Wrong authentification code");
         }
-        return await this.authService.getJwtAccessToken(req.user.id, true);
+        const { access_token } = await this.authService.getJwtAccessToken(req.user.id, true);
+
+        const cookie = `authentication=${access_token}; HttpOnly; Path=/; Max-Age=15min`
+
+        res.setHeader("Set-Cookie", cookie);
+        res.send();
+    }
+
+    @Get("/logout")
+    @UseGuards(TfaGuard)
+    async logout(@Res() res: Response) {
+        const cookie = `authentication=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+
+        res.setHeader("Set-Cookie", cookie);
+        res.send();
     }
 }

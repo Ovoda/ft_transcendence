@@ -61,7 +61,6 @@ function App() {
           setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
         <header className="App-header">
           {userData.login !== "" && <Game />}
-          <Game />
         </header>
       </socketContext.Provider>
     </div >

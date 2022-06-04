@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
+import { Request } from "express";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { configService } from "src/app/config/config.service";
 import { UserService } from "src/user/user.service";
@@ -12,7 +13,16 @@ export class TfaStrategy extends PassportStrategy(Strategy, "user-tfa") {
         private readonly userService: UserService,
     ) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                (request: Request) => {
+                    let data = request?.cookies?.authentication;
+
+                    if (!data) {
+                        return null;
+                    }
+                    return data;
+                }
+            ]),
             secretOrKey: configService.getJwtTokenSecret(),
         });
     }

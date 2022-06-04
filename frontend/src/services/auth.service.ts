@@ -6,22 +6,18 @@ export function login() {
     window.location.href = config.getValue("REACT_APP_BACKEND_URL") + "/auth/user";
 }
 
-export function logout() {
-    Cookies.remove("access_token");
+export async function logout() {
+    Cookies.remove("authentication");
+    const res = await api.get("/auth/logout");
+    console.log(res);
     window.location.reload();
 }
 
 export async function loginTfa(code: string) {
     try {
-        const res = await api.post("/auth/tfa/authenticate", {
+        await api.post("/auth/tfa/authenticate", {
             tfaCode: code,
         });
-        if (res) {
-            console.log(res.data);
-
-            Cookies.remove("needs_tfa");
-            Cookies.set("access_token", res.data.access_token);
-        }
         return true;
     } catch (error: any) {
         console.log(error.response);

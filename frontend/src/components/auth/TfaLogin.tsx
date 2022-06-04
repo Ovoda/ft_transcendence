@@ -39,6 +39,9 @@ export default function TfaLogin() {
         async function callTfaEnabling() {
             const res = await loginTfa(code);
 
+            console.log(res);
+
+
             if (res) {
                 const userData = await getUserData();
                 if (userData) {
@@ -56,7 +59,6 @@ export default function TfaLogin() {
         }
     }, [code]);
 
-    // if (uiState.showTfaLogin) {
     return (
         <div id="tfa_registration_container">
             <div id="tfa_registration">
@@ -73,6 +75,4 @@ export default function TfaLogin() {
             </div>
         </div >
     );
-    // }
-    // return (<></>);
 }
