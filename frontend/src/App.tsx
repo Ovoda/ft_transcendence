@@ -18,6 +18,7 @@ import Chat from './components/chat/chat';
 import ClientSocket from './services/websocket';
 import { addMessage } from './features/chat/chat.slice';
 import Message from './shared/interfaces/Message';
+import { BrowserRouter } from 'react-router-dom';
 
 const mainSocket = new ClientSocket();
 
@@ -50,12 +51,12 @@ function App() {
     mainSocket.joinRoom(chat.currentRoom);
   }, [chat.currentRoom]);
 
+
   return (
     <div className="App">
       <socketContext.Provider value={mainSocket}>
         <Navbar />
         <TfaRegistration />
-        <TfaLogin />
         <Chat />
         <UserSettings
           settingsWindowState={uiState.openedSettings}

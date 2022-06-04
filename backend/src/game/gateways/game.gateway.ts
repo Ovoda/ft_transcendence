@@ -30,13 +30,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('joinGame')
 	handleJoinGame(client: Socket, message: string) {
-<<<<<<< HEAD
 		this.logger.log(`New Game Request from: ${client.id}`);
 		this.logger.log(`Current Games: ${this.games.length}`);
-=======
-		// this.logger.log(`New Game Request from: ${client.id}`);
-		// this.logger.log(`Current: ${this.games.length}`);
->>>>>>> c231d09 (working on chat)
 		let status: boolean;
 		if (!this.games.length || this.games[this.games.length - 1].status === true) {
 			const newGame: GameRoom = {

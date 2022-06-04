@@ -3,6 +3,5 @@ export default interface UiState {
     openedSettings: boolean;
     logged: boolean;
     showTfaRegistration: boolean;
-    showTfaLogin: boolean;
-	showChat: boolean;
+    showChat: boolean;
 }

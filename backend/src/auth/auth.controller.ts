@@ -30,12 +30,13 @@ export class AuthController {
                 login: req.user.login,
             }
         });
+
+        let url = "http://localhost:3000";
         if (user.tfaEnabled) {
-            res.cookie("needs_tfa", "true");
+            url = "http://localhost:3000/tfa";
         }
 
-
-        res.status(302).redirect("http://localhost:3000");
+        res.status(302).redirect(url);
     }
 
     @Get("tfa/generate")

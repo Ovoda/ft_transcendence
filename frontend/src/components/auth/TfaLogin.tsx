@@ -6,11 +6,11 @@ import Auth from "../../features/auth/interfaces/auth.interface";
 import "./TfaRegistration.scss";
 import useDigitInput from 'react-digit-input';
 import UiState from "../../features/uiState/interfaces/UiState";
-import { closeTfaLogin } from "../../features/uiState/uiState.slice";
 import { updateUser } from "../../features/user/user.slice";
 import UserData from "../../features/user/interfaces/user.interface";
 import { loginTfa } from "../../services/auth.service";
 import { getUserData } from "../../services/api.service";
+import { useNavigate } from "react-router-dom";
 
 
 export default function TfaLogin() {
@@ -23,7 +23,7 @@ export default function TfaLogin() {
 
     /** Tools */
     const dispatch = useDispatch();
-
+    const navigate = useNavigate();
 
     const [code, setCode] = useState<string>("");
     const [codeValidity, setCodeValidity] = useState<boolean | undefined>(undefined);
@@ -45,7 +45,7 @@ export default function TfaLogin() {
                     dispatch(updateUser(userData));
                 }
                 setCode("");
-                dispatch(closeTfaLogin());
+                navigate("/");
             } else {
                 setCodeValidity(false);
             }
@@ -56,23 +56,23 @@ export default function TfaLogin() {
         }
     }, [code]);
 
-    if (uiState.showTfaLogin) {
-        return (
-            <div id="tfa_registration_container">
-                <div id="tfa_registration">
-                    <h2>Enter the code</h2>
-                    <div id="tfa_registration_digits">
-                        <input inputMode="decimal" autoFocus {...digits[0]} />
-                        <input inputMode="decimal" {...digits[1]} />
-                        <input inputMode="decimal" {...digits[2]} />
-                        <input inputMode="decimal" {...digits[3]} />
-                        <input inputMode="decimal" {...digits[4]} />
-                        <input inputMode="decimal" {...digits[5]} />
-                    </div>
-                    <p>{codeValidity ? "code valid" : "code invalid"}</p>
+    // if (uiState.showTfaLogin) {
+    return (
+        <div id="tfa_registration_container">
+            <div id="tfa_registration">
+                <h2>Enter the code</h2>
+                <div id="tfa_registration_digits">
+                    <input inputMode="decimal" autoFocus {...digits[0]} />
+                    <input inputMode="decimal" {...digits[1]} />
+                    <input inputMode="decimal" {...digits[2]} />
+                    <input inputMode="decimal" {...digits[3]} />
+                    <input inputMode="decimal" {...digits[4]} />
+                    <input inputMode="decimal" {...digits[5]} />
                 </div>
-            </div >
-        );
-    }
-    return (<></>);
+                <p>{codeValidity ? "code valid" : "code invalid"}</p>
+            </div>
+        </div >
+    );
+    // }
+    // return (<></>);
 }

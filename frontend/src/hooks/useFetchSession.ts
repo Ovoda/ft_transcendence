@@ -1,7 +1,6 @@
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { openTfaLogin } from "../features/uiState/uiState.slice";
 import { updateUser } from "../features/user/user.slice";
 import { getUserData } from "../services/api.service";
 
@@ -13,15 +12,12 @@ export default function useFetchSession() {
 
     useEffect(() => {
         const token = Cookies.get("access_token");
-        const needsTfa = Cookies.get("needs_tfa");
-        if (token !== null && token !== undefined) {
 
-            if (!needsTfa) {
-                fetchUserData();
-            }
-            else if (needsTfa) {
-                dispatch(openTfaLogin());
-            }
+        console.log(window.location.href);
+
+
+        if (token && window.location.href === "http://localhost:3000/") {
+            fetchUserData();
         }
 
         async function fetchUserData() {

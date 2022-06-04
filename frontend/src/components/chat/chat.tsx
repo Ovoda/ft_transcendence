@@ -2,9 +2,9 @@ import ChatData from '../../features/chat/interfaces/chat.interface'
 import { Store } from "../../app/store";
 import { useDispatch, useSelector } from "react-redux";
 import ChatSelector from "./chatSelector/chatSelector";
-import ChatBox from './chatBox/ChatBox';
 import "./Chat.scss";
 import ChatOptions from './chatOptions/chatOptions';
+import ChatBox from './chatBox/chatBox';
 
 export default function Chat() {
 	// GLOBAL DATA.
