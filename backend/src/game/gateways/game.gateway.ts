@@ -41,6 +41,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				player2: null,
 			}
 			this.games.push(newGame);
+			console.log("join room");
 			client.join(newGame.id);
 			status = false;
 			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', status);
@@ -48,6 +49,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		else {
 			this.games[this.games.length - 1].player2 = client.id;
 			this.games[this.games.length - 1].status = true;
+			console.log("join room");
+			
 			client.join(this.games[this.games.length - 1].id);
 			status = true;
 			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', status);
@@ -95,10 +98,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('movePlayer')
-	handleArrowDown(client: Socket, data: number): void {
+	handleArrow(client: Socket, data: number): void {
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.player1 === client.id || game.player2 === client.id);
 		})
+		const clients = this.server.sockets.adapter.rooms.get(this.games[index].id);
+		console.log(clients.size);
+		console.log(this.games[index].id);
 		if (index >= 0) {
 			if (this.games[index].player1 === client.id) {
 				this.server.to(this.games[index].id).emit('updateLeftPlayer', data);

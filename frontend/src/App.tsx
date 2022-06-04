@@ -50,7 +50,7 @@ function App() {
         settingsWindowState={uiState.openedSettings}
         setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
       <header className="App-header">
-        {userData.login !== "" && <Game />}
+        {/*{userData.login !== "" && <Game />}*/}
 		<Game></Game>
       </header>
     </div >

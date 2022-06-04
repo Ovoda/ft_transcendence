@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import './game.scss';
 import { createLanguageServiceSourceFile } from 'typescript';
 
-const socket: Socket = io("ws://localhost:3001");
+const socket: Socket = io("ws://localhost:3001", { transports: ["websocket"] });
 
 function Game() {
 	const canvaRef = useRef<HTMLCanvasElement>(null);
@@ -134,6 +134,7 @@ function Game() {
 	}) 
 
 	socket.on("updateLeftPlayer", (value: number) => {
+		console.log("Update Player Left");
 		setPlayerLeft({
 			...playerLeft,
 			position: {
@@ -144,6 +145,7 @@ function Game() {
 	})
 
 	socket.on("updateRightPlayer", (value: number) => {
+		console.log("Update Player Right");
 		setPlayerRight({
 			...playerRight,
 			position: {
@@ -189,6 +191,7 @@ function Game() {
 
 	useEffect(() => {
 		if (arrowDown) {
+			console.log("Arrow Down");
 			let player: Player;
 			let newPos: number;
 			if (side === 1)
@@ -205,6 +208,7 @@ function Game() {
 
 	useEffect(() => {
 		if (arrowUp) {
+			console.log("Arrow Up");
 			let player: Player;
 			let newPos: number;
 			if (side === 1)
@@ -222,7 +226,7 @@ function Game() {
 	function animate() {
 		gameRef.context = canvaRef.current?.getContext('2d');
 		gameRef.context?.clearRect(0, 0, gameRef.width, gameRef.height);
-		drawBall(gameRef, ball);
+		//drawBall(gameRef, ball);
 		drawPlayer(gameRef, playerLeft);
 		drawPlayer(gameRef, playerRight);
 	}
