@@ -1,3 +1,4 @@
+import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { IsNotEmpty } from "class-validator";
 import { UserEntity } from "../entities/user.entity";
 import { e_userRelations } from "../types/userRelations.type";

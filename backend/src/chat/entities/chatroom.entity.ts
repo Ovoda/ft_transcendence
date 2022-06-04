@@ -1,3 +1,4 @@
+import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { Exclude } from "class-transformer";
 import { IsNotEmpty } from "class-validator";
 import { UserEntity } from "src/user/entities/user.entity";

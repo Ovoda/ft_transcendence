@@ -66,6 +66,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		}
 		const message = await this.chatMessageService.postMessage(createMessageChatDto);
 		const chatroom = role.chatroom;
+		message.prev_message = (role.chatroom.lastmessage) ? role.chatroom.lastmessage : null;
 		await this.chatRoomService.updateLastMessage(chatroom.id, message.id);
 		return chatroom;
 	}

@@ -1,3 +1,4 @@
+import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp } from "typeorm";
 import { e_userRelations } from "../types/userRelations.type";
 import { UserEntity } from "./user.entity";

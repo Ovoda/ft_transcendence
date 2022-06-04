@@ -1,3 +1,4 @@
+import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { Exclude } from "class-transformer";
 import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
 import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
