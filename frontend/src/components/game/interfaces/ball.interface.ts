@@ -11,8 +11,8 @@ export default Ball;
 export function setInitialBallState(windowWidth: number, windowHeight: number) {
 	return ({
 		velocity: {
-			x: 1,
-			y: 1,
+			x: 0.5,
+			y: 0.5,
 		},
 		position: {
 			x: windowWidth / 2,

@@ -53,6 +53,27 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 
+	@SubscribeMessage('udpateRightScore')
+	handleResetScore(client: Socket, data: any) {
+		console.log("Update Score Right");
+		const index = this.games.findIndex((game: GameRoom) => {
+			return (game.player1 === client.id || game.player2 === client.id);
+		})
+		if (index >= 0) {
+			this.server.to(this.games[index].id).emit("updateScore", data);
+		}
+	}
+
+	@SubscribeMessage('udpateLeftScore')
+	handleNewLeftScore(client: Socket, data: number) {
+		const index = this.games.findIndex((game: GameRoom) => {
+			return (game.player1 === client.id || game.player2 === client.id);
+		})
+		if (index >= 0) {
+			this.server.to(this.games[index].id).emit("updateScore", data);
+		}
+	}
+
 	@SubscribeMessage('animateGame')
 	handleAnimateGame(client: Socket, data: any) {
 		const index = this.games.findIndex((game: GameRoom) => {

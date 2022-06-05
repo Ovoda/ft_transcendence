@@ -1,7 +1,7 @@
 import Player from '../interfaces/player.interface';
-import Game from '../interfaces/game.interface';
+import GameCanvas from '../interfaces/gameCanvas.interface';
 
-function drawPlayer(game: Game, player: Player) {
+function drawPlayer(game: GameCanvas, player: Player) {
 	game.context?.fillRect(player.position.x, player.position.y, player.width, player.height);
 }
 
