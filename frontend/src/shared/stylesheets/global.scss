@@ -7,3 +7,23 @@ body {
     font-family: 'Lato', sans-serif;
     font-size: 10px;
 }
+
+.error_text {
+    box-sizing: border-box;
+    font-size: 1.4rem;
+    color: red;
+    margin: 1rem 0;
+}
+
+.success_text {
+    box-sizing: border-box;
+    font-size: 1.4rem;
+    color: green;
+    margin: 1rem 0;
+}
+
+.link {
+    font-size: 1.4rem;
+    color: #4285F4;
+    cursor: pointer;
+}

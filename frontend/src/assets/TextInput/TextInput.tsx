@@ -34,7 +34,6 @@ export default function TextInput({ text, setText, type = "text", name = "", id 
             <label className="placeholder_text" htmlFor={name} >
                 <p>{placeholder}</p>
             </label>
-            <div className="error_text"></div>
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect } from "react";
+import React, { MouseEvent, useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import '../Chat.scss';
@@ -7,12 +7,15 @@ import ChatButton from "../utils/ChatButton";
 import { clearMessages, closeChatDms } from "../../../features/chat/chat.slice";
 import ChatSender from "./ChatSender";
 import './ChatBox.scss';
+import ClientSocket from "services/websocket";
+import { mainSocketContext } from "../../../App";
 
 export default function ChatBox() {
 
 	/** Global data */
 	const chat = useSelector((store: Store) => store.chat);
 	const messages = chat.messages;
+	const mainSocket: ClientSocket | null = useContext(mainSocketContext);
 
 	/** Tools */
 	const dispatch = useDispatch();
@@ -26,6 +29,7 @@ export default function ChatBox() {
 		event.preventDefault();
 		dispatch(closeChatDms());
 		dispatch(clearMessages());
+		mainSocket?.leaveRoom(chat.currentRoom);
 	}
 
 	return (

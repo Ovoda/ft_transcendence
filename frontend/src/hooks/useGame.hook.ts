@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useContext, useEffect } from "react";
-import { socketContext } from "../App";
+import { mainSocketContext } from "../App";
 import Ball from "src/components/game/interfaces/ball.interface";
 import Player from "src/components/game/interfaces/player.interface";
 import UpdateBallDto from "./interfaces/UpdateBall.dto";
@@ -18,7 +18,7 @@ interface Props {
 
 export function useGameListeners({ gameplay, setGameplay, setGameStatus, gameStatus }: Props) {
 
-    const mainSocket = useContext(socketContext);
+    const mainSocket = useContext(mainSocketContext);
 
     useEffect(() => {
 

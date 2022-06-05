@@ -1,35 +1,83 @@
 import { Socket, io } from "socket.io-client";
-import { socketContext } from "src/App";
-import Message from "src/shared/interfaces/Message";
-import SendChatMessageDto from "./interfaces/SendMessageDto";
+import SendChatMessageDto from "src/shared/interfaces/Message";
 
+/**
+ * @class ClientSocket
+ * ClientSocket is a customized superset of the basic websocket object (Socket from socket-io).
+ * @function init
+ * @function on
+ * @function emit
+ * @function sendMessage
+ * @function joinRoom
+ * @function leaveRoom
+ * @function leaveGame
+ */
 export default class ClientSocket {
-    socket: Socket = io(process.env.REACT_APP_BACKEND_WS_URL as string, { transports: ["websocket"] });;
+    /**
+     * Inner websocket object
+     */
+    private socket: Socket = io(process.env.REACT_APP_BACKEND_WS_URL as string, { transports: ["websocket"] });;
 
+    /**
+     * Current socket id
+     */
     public id = this.socket.id;
 
-    public initSocket(userId: string) {
+    /**
+     * Initialize a socket registering it on the server for chat, user and game events
+     * @param userId current user id
+     */
+    public init(userId: string) {
         this.socket.on("connect", () => {
             this.socket.emit("RegisterClient", userId);
         });
     }
 
+    /**
+     * Listen for a specific websocket event
+     * @param event event to listen to 
+     * @param fun callball function, triggered when event occurs
+     */
     public on(event: string, fun: any) {
-        return (this.socket.on(event, fun));
+        this.socket.on(event, fun);
     }
 
+    /**
+     * Emits a specific websocket event
+     * @param event event to send
+     * @param data (optional) data to send to the event 
+     */
     public emit(event: string, data?: any) {
-        return (this.socket.emit(event, data));
+        this.socket.emit(event, data);
     }
 
-    public sendMessage(body: Message) {
-        this.socket.emit("ClientMessage", body);
+    /**
+     * Sends a message to the websocket server
+     * @param message message to send
+     */
+    public sendMessage(message: SendChatMessageDto) {
+        this.socket.emit("ClientMessage", message);
     }
 
+    /**
+     * Joins a given chat room
+     * @param roomId ID of the room to join
+     */
     public joinRoom(roomId: string) {
-        this.socket.emit("Join", { roomId });
+        this.socket.emit("JoinRoom", { roomId });
     }
 
+    /**
+     * Leaves a given chat room
+     * @param roomId ID of the room to leave
+     */
+    public leaveRoom(roomId: string) {
+        this.socket.emit("LeaveRoom", { roomId })
+    }
+
+    /**
+     * Leaves the current game
+     */
     public leaveGame() {
         this.socket.emit("leaveGame");
     }

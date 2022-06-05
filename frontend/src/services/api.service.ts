@@ -20,9 +20,14 @@ export async function getUserData(): Promise<UserData | null | undefined> {
 
 export async function createDm(createRoomDto: CreateRoomDto) {
     try {
-        const ret = await api.post("/chat/create", createRoomDto);
-        return await getUserData();
+        await api.post("/chat/create", createRoomDto);
+        return { data: await getUserData(), error: "" }
     } catch (error: any) {
         console.log(error);
+
+        if (error.response.status === 404) {
+            return { data: null, error: "User not found" };
+        }
+        return { data: null, error: error.response.data.message };
     }
 }

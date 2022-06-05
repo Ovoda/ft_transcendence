@@ -11,6 +11,15 @@
             "services/*": [
                 "./src/services/*"
             ],
+            "features/*": [
+                "./src/features/*"
+            ],
+            "assets/*": [
+                "./src/assets/*"
+            ],
+            "images/*": [
+                "./src/shared/images/*"
+            ],
         }
     }
 }

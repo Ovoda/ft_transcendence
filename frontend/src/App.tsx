@@ -3,7 +3,6 @@ import './App.scss';
 import Game from './components/game/game';
 import useFetchSession from './hooks/useFetchSession';
 import Navbar from './components/navbar';
-import "style/button.scss";
 import { api } from './services/api.service';
 import UserSettings from './components/user/UserSettings';
 import UiState from './features/uiState/interfaces/UiState';
@@ -21,7 +20,7 @@ import Message from './shared/interfaces/Message';
 
 const mainSocket = new ClientSocket();
 
-export const socketContext = createContext<null | ClientSocket>(null);
+export const mainSocketContext = createContext<null | ClientSocket>(null);
 
 function App() {
 
@@ -39,7 +38,7 @@ function App() {
 
   useEffect(() => {
     if (userData.login !== "") {
-      mainSocket.initSocket(userData.id);
+      mainSocket.init(userData.id);
       mainSocket.on("ServerMessage", (message: Message) => {
         dispatch(addMessage(message));
       });
@@ -47,12 +46,14 @@ function App() {
   }, [userData]);
 
   useEffect(() => {
-    mainSocket.joinRoom(chat.currentRoom);
+    if (chat.currentRoom !== "") {
+      mainSocket.joinRoom(chat.currentRoom);
+    }
   }, [chat.currentRoom]);
 
   return (
     <div className="App">
-      <socketContext.Provider value={mainSocket}>
+      <mainSocketContext.Provider value={mainSocket}>
         <Navbar />
         <TfaRegistration />
         <Chat />
@@ -62,7 +63,7 @@ function App() {
         <header className="App-header">
           {userData.login !== "" && <Game />}
         </header>
-      </socketContext.Provider>
+      </mainSocketContext.Provider>
     </div >
   );
 }

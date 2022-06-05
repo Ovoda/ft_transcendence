@@ -1,15 +1,19 @@
 .reskue_text_input_container {
     position: relative;
     margin: 2rem 0;
+    font-family: 'Lato', sans-serif;
 
     input {
+        font-family: 'Lato', sans-serif;
         height: 5rem;
         width: 100%;
         border: 1px solid #5F6367;
+        padding: 1rem;
         border-radius: 0.5rem;
         box-sizing: border-box;
 
         &:focus {
+            padding: 1.1rem;
             outline: none;
             border: 2px solid #4285F4;
         }
@@ -34,6 +38,7 @@
     }
 
     .placeholder_text {
+        font-family: 'Lato', sans-serif;
         position: absolute;
         top: 0;
         bottom: 0;

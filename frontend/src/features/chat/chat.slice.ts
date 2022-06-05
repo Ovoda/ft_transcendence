@@ -3,12 +3,13 @@ import Chat, { e_roomtype } from "./interfaces/chat.interface";
 import Message from '../../shared/interfaces/Message';
 
 const initialState: Chat = {
-	displayChatSelector: true,
-	roomtype: e_roomtype.DM,
-	displayChat: false,
-	displayOptions: false,
 	messages: [],
 	currentRoom: "",
+	displayChat: false,
+	displayOptions: false,
+	roomtype: e_roomtype.DM,
+	displayChatSelector: true,
+	displayRoomCreationModal: false,
 };
 
 const chat = createSlice({
@@ -29,6 +30,12 @@ const chat = createSlice({
 		},
 		closeChatDms(state) {
 			return { ...state, displayChat: false, displayChatSelector: true };
+		},
+		openChatRoomCreationModal(state) {
+			return { ...state, displayRoomCreationModal: true };
+		},
+		closeChatRoomCreationModal(state) {
+			return { ...state, displayRoomCreationModal: false };
 		},
 		addMessage(state, action) {
 			return { ...state, messages: [...state.messages, action.payload] };
@@ -51,6 +58,8 @@ export const {
 	closeChatDms,
 	addMessage,
 	clearMessages,
-	setCurrentRoom
+	setCurrentRoom,
+	openChatRoomCreationModal,
+	closeChatRoomCreationModal
 } = chat.actions;
 export default chat.reducer;

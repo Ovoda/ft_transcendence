@@ -5,7 +5,7 @@ import drawBall from './services/ball.service';
 import FullGame from './interfaces/game.interface';
 import { useContext, useEffect, useRef, useState } from "react";
 import './game.scss';
-import { socketContext } from '../../App';
+import { mainSocketContext } from '../../App';
 import { useGameListeners } from '../../hooks/useGame.hook';
 import UpdateBallDto from '../../hooks/interfaces/UpdateBall.dto';
 import GameStatus, { initialGameStatus } from './interfaces/gameStatus.interface';
@@ -16,7 +16,7 @@ import Gameplay, { setInitialGameplayState } from './interfaces/gameplay.interfa
 function Game() {
 
 	/** Global Data */
-	const mainSocket = useContext(socketContext);
+	const mainSocket = useContext(mainSocketContext);
 
 	/** Variables */
 	const canvaRef = useRef<HTMLCanvasElement>(null);

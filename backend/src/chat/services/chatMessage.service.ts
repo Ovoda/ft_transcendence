@@ -1,9 +1,10 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
 import { Repository } from "typeorm";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
 import { ChatMessageEntity } from "../entities/chatMessage.entity";
+import { ChatRoomService } from "./chatRoom.service";
 
 @Injectable()
 export class ChatMessageService extends CrudService<ChatMessageEntity>{
@@ -11,7 +12,8 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		@InjectRepository(ChatMessageEntity)
 		protected readonly _repository: Repository<ChatMessageEntity>,
 		protected readonly _log: Logger,
-	){
+		// private readonly chatRoomService: ChatRoomService,
+	) {
 		super(_repository, _log);
 	}
 
@@ -19,12 +21,12 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		let messages: ChatMessageEntity[] = [];
 		let message = await this.findOneById(messageId);
 		messages.push(message);
-		if (!message.prev_message){
+		if (!message.prev_message) {
 			return messages;
 		} else {
-			for (let i = 0; i < limit; i++){
-				if (!message.prev_message){
-					break ;
+			for (let i = 0; i < limit; i++) {
+				if (!message.prev_message) {
+					break;
 				}
 				let tmp = await this.findOneById(message.prev_message);
 				messages.push(tmp);
@@ -34,11 +36,17 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		return messages;
 	}
 
-	async postMessage(dto: CreateChatMessageDto){
-		return await this.save({
+	/**
+	 * Creates and saves a chat message instance in the database
+	 * @param dto chat message data
+	 * @returns created message entity
+	 */
+	async postMessage(dto: CreateChatMessageDto) {
+		const newMessage = await this.save({
 			message: dto.message,
 			userId: dto.userId,
-			prev_message: dto.prevMessage ? dto.prevMessage : null,
+			prev_message: dto.prevMessage,
 		});
+		return newMessage;
 	}
 }

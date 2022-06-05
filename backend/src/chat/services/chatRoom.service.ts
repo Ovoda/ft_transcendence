@@ -24,7 +24,7 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 		private readonly chatMessageService: ChatMessageService,
 		private readonly userService: UserService,
 		protected readonly _log: Logger,
-	){
+	) {
 		super(_repository, _log);
 	}
 
@@ -34,7 +34,7 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 			name: dto.name,
 			users: roles,
 		})
-		for (let i = 0; i < roles.length; i++){
+		for (let i = 0; i < roles.length; i++) {
 			const role = await this.chatRoleService.updateById(roles[i].id, {
 				chatroom: chat,
 			});
@@ -60,7 +60,7 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 		return chat;
 	}
 
-	async getChatRoomManyMessages(room_id: string, limit: number){
+	async getChatRoomManyMessages(room_id: string, limit: number) {
 		const lastMessageId = await this.checkLastMessage(room_id);
 		if (!lastMessageId) {
 			throw new noMessagesYet("No message in chat room yet.");
@@ -69,7 +69,9 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 		return messages;
 	}
 
-	async postChatRoomMessage(dto: CreateChatMessageDto, room_id: string){
+	async postChatRoomMessage(dto: CreateChatMessageDto, room_id: string) {
+		const room = await this.findOneById(room_id);
+		dto.prevMessage = room.lastmessage;
 		const message = await this.chatMessageService.postMessage(dto);
 		return await this.updateById(room_id, {
 			lastmessage: message.id,

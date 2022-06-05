@@ -1,0 +1,81 @@
+.room_creation {
+    box-sizing: border-box;
+    min-width: 100%;
+    max-width: 350px;
+    background-color: white;
+    padding: 3rem;
+    border-radius: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    position: relative;
+
+    gap: 1rem;
+
+    img {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+
+    h2 {
+        color: black;
+        font-size: 3rem;
+        font-weight: 300;
+        width: 100%;
+        text-align: center;
+    }
+
+    .reskue_text_input_container {
+        width: 100%;
+        margin: 0;
+    }
+
+    #room_creation_modal_nav {
+        width: 100%;
+
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .error_text,
+    .success_text,
+    .link {
+        line-height: 1.4rem;
+        width: 100%;
+    }
+
+    .link {
+        text-align: middle;
+    }
+}
+
+.right {
+    animation: 0.7s moveRight forwards;
+}
+
+.left {
+    animation: 0.7s moveLeft forwards;
+}
+
+@keyframes moveRight {
+    0% {
+        transform: translate(0);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes moveLeft {
+    0% {
+        transform: translate(-100%);
+    }
+
+    100% {
+        transform: translateX(0%);
+    }
+}

@@ -1,5 +1,4 @@
 #tfa_registration_container {
-
     width: 100vw;
     height: 100vh;
 
@@ -7,6 +6,7 @@
     z-index: 100;
 
     top: 0;
+    left: 0;
     box-sizing: border-box;
 
     display: flex;
@@ -17,7 +17,7 @@
 
     #tfa_registration {
 
-        border-radius: 10px;
+        border-radius: 1rem;
         display: flex;
         flex-direction: column;
         // justify-content: center;

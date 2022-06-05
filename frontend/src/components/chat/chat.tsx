@@ -1,10 +1,9 @@
 import ChatData from '../../features/chat/interfaces/chat.interface'
 import { Store } from "../../app/store";
 import { useDispatch, useSelector } from "react-redux";
-import ChatSelector from "./chatSelector/chatSelector";
 import "./Chat.scss";
-import ChatOptions from './chatOptions/chatOptions';
 import ChatBox from './chatBox/chatBox';
+import DmPicker from './chatSelector/dmPicker';
 
 export default function Chat() {
 	// GLOBAL DATA.
@@ -22,7 +21,7 @@ export default function Chat() {
 	} else {
 		return (
 			<div id='chat'>
-				<ChatSelector />
+				<DmPicker />
 				{chatData.displayChat && <ChatBox />}
 				{/* {chatData.displayOptions && <ChatOptions />} */}
 			</div>

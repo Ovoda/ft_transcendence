@@ -1,16 +1,13 @@
 import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addMessage } from "../../../features/chat/chat.slice";
-import { socketContext } from "../../../App";
-import ChatButton from "../utils/ChatButton";
+import { mainSocketContext } from "../../../App";
 import './ChatSender.scss';
 import { Store } from "src/app/store";
-
 
 export default function ChatSender() {
 
 	/** Global data */
-	const mainSocket = useContext(socketContext);
+	const mainSocket = useContext(mainSocketContext);
 	const { user, chat } = useSelector((store: Store) => store);
 
 	/** Tools */

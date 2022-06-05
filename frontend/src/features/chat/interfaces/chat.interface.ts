@@ -10,6 +10,7 @@ export default interface Chat {
 	roomtype: e_roomtype;
 	displayChat: boolean;
 	displayOptions: boolean;
+	displayRoomCreationModal: boolean,
 	messages: Message[];
 	currentRoom: string;
 }

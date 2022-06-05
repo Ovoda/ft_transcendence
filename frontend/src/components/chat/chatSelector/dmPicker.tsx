@@ -1,10 +1,13 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import { openChatDms, setCurrentRoom } from "../../../features/chat/chat.slice";
+import { openChatDms, openChatRoomCreationModal, setCurrentRoom } from "../../../features/chat/chat.slice";
+import AddChatRoomButton from "./AddChatRoomButton";
 import './dmPicker.scss';
-import RoomCreation from "./roomCreation";
-
+import AddFriend from "./AddFriend";
+import "./RoomCreation.scss";
+import Button from "assets/Button/Button";
+import AddRoomMenu from "./AddRoomMenu";
 
 export default function DmPicker() {
 
@@ -19,6 +22,12 @@ export default function DmPicker() {
 		dispatch(setCurrentRoom(id));
 	}
 
+	/** Opens a modal to create rooms */
+	async function handleRoomCreationModal() {
+		dispatch(openChatRoomCreationModal());
+		return false;
+	}
+
 	if (chat.displayChatSelector) {
 		return (
 			<div id="dm_picker">
@@ -29,7 +38,8 @@ export default function DmPicker() {
 						</div>
 					)
 				}
-				<RoomCreation />
+				<Button onClick={handleRoomCreationModal}>Add</Button>
+				<AddRoomMenu />
 			</div>
 		);
 	}

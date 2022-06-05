@@ -1,0 +1,56 @@
+#room_creation_modal_container {
+    width: 100vw;
+    height: 100vh;
+
+    position: fixed;
+    z-index: 100;
+
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+
+    #room_creation_menu {
+        box-sizing: border-box;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        border-radius: 1rem;
+        overflow: hidden;
+        position: relative;
+
+        img {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            max-width: 1.4rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        #room_creation_container {
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 350px;
+            display: flex;
+            background-color: white;
+
+            overflow: hidden;
+        }
+
+        #room_creation_modal_nav {
+            box-sizing: border-box;
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+}
