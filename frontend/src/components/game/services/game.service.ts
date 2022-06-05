@@ -83,9 +83,15 @@ export function getNewBallPos(gameplay: Gameplay, gamestatus: GameStatus, height
 		gameplay.ball.velocity.y = - gameplay.ball.velocity.y;
 	}
 	else if (playerLeftCollision(gameplay, gamestatus)) {
+		gameplay.ball.velocity.y = gameplay.ball.position.y - (gameplay.playerLeft.position.y + (gameplay.playerLeft.height / 2));
+		if (gameplay.ball.velocity.y !== 0)
+			gameplay.ball.velocity.y /= 100;
 		gameplay.ball.velocity.x = - gameplay.ball.velocity.x;
 	}
 	else if (playerRightCollision(gameplay, gamestatus)) {
+		gameplay.ball.velocity.y = (gameplay.ball.position.y - (gameplay.playerRight.position.y + (gameplay.playerRight.height / 2)));
+		if (gameplay.ball.velocity.y !== 0)
+			gameplay.ball.velocity.y /= 100;
 		gameplay.ball.velocity.x = - gameplay.ball.velocity.x;
 	}
 	newPos.x = gameplay.ball.position.x + gameplay.ball.velocity.x;

@@ -43,10 +43,6 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		/** Set socket listener */
 		mainSocket.on("gameStop", (stopclient: string) => {
-			console.log("LOSER IS");
-			console.log(stopclient);
-			console.log("I AM");
-			console.log(mainSocket.socket.id);
 			const winResult = stopclient === mainSocket.socket.id ? "You Lost!" : "You Won!";
 
 			setGameStatus((gameStatus: GameStatus) => {
