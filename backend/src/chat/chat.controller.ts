@@ -8,16 +8,16 @@ import { ChatRoomService } from './services/chatRoom.service';
 
 @Controller('chat')
 export class ChatController {
-  constructor(
-	  private readonly chatRoomService: ChatRoomService,
-	  private readonly chatRoleService: ChatRoleService,
-	  private readonly chatMessageService: ChatMessageService,
-	  ) {}
+	constructor(
+		private readonly chatRoomService: ChatRoomService,
+		private readonly chatRoleService: ChatRoleService,
+		private readonly chatMessageService: ChatMessageService,
+	) { }
 
 	@UseGuards(JwtAuthGuard)
 	@Post('create')
 	@HttpCode(201)
-	async createChat(@Body() dto: CreateChatDto){
+	async createChat(@Body() dto: CreateChatDto) {
 		const roles = await this.chatRoleService.createRoles(dto);
 		return await this.chatRoomService.createChat(dto, roles);
 	}
@@ -25,7 +25,7 @@ export class ChatController {
 	@UseGuards(JwtAuthGuard)
 	@Get('room/:role_id')
 	@HttpCode(201)
-	async getRoomFromRole(@Request() req, @Param('role_id') role_id: string){
+	async getRoomFromRole(@Request() req, @Param('role_id') role_id: string) {
 		return await this.chatRoleService.getRoomFromRole(req.user.id, role_id);
 	}
 
@@ -36,7 +36,7 @@ export class ChatController {
 		@Request() req,
 		@Body() createChatMessageDto: CreateChatMessageDto,
 		@Param('role_id') role_id: string,
-	){
+	) {
 		return await this.chatRoleService.postMessageFromRole(req.user.id, role_id, createChatMessageDto)
 	}
 
@@ -48,7 +48,7 @@ export class ChatController {
 		@Param('role_id') role_id: string,
 		@Param('message_id') message_id: string,
 		@Query('limit') limit: number,
-	){
+	) {
 		return await this.chatRoleService.getManyMessagesFromRole(req.user.id, role_id, message_id, limit);
 	}
 

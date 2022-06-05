@@ -8,7 +8,11 @@ import { GenerateTfaProps } from "./interfaces/GenerateTfaProps.interface";
 import { ToggleTfaProps } from "./interfaces/ToggleTfaProps.interface";
 import { config } from "../app/config";
 
-
+/**
+ * Attempts to enable TFA on current user
+ * @param tfaCode tfa code verification
+ * @returns true if code is valid, false otherwise
+ */
 export async function enableTfa(tfaCode: string): Promise<boolean> {
     try {
         await api.post("/auth/tfa/enable", {
@@ -20,6 +24,11 @@ export async function enableTfa(tfaCode: string): Promise<boolean> {
     }
 }
 
+/**
+ * Toggles TFA on current user
+ * @param props.dispatch useDisptach() return object from redux
+ * @param props.uiTfaEnabled redux global data tfa enabled checker value
+ */
 export async function toggleTfa({ dispatch, uiTfaEnabled }: ToggleTfaProps) {
     if (uiTfaEnabled === true) {
         generateTfa({ dispatch });
@@ -28,6 +37,10 @@ export async function toggleTfa({ dispatch, uiTfaEnabled }: ToggleTfaProps) {
     }
 }
 
+/**
+ * Generates TFA QRCode for current user
+ * @param props.dispatch useDisptach() return object from redux
+ */
 export async function generateTfa({ dispatch }: GenerateTfaProps) {
     const res = await axios.get(config.getValue("REACT_APP_BACKEND_URL") + "/auth/tfa/generate", {
         responseType: "blob",
@@ -39,11 +52,14 @@ export async function generateTfa({ dispatch }: GenerateTfaProps) {
     dispatch(openTfaRegistration());
 }
 
+/**
+ * Disables TFA for current user
+ * @param props.dispatch useDisptach() return object from redux 
+ */
 export async function disableTfa({ dispatch }: DisableTfaProps) {
     try {
         const res = await api.get("/auth/tfa/disable");
         dispatch(updateTfaEnabled(false));
-        console.log(res);
     } catch (error: any) {
         console.log(error.response);
     }

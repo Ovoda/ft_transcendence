@@ -13,14 +13,11 @@ import SendChatMessageDto from "src/shared/interfaces/Message";
  * @function leaveGame
  */
 export default class ClientSocket {
-    /**
-     * Inner websocket object
-     */
+
+    /** Inner websocket object */
     public socket: Socket = io(process.env.REACT_APP_BACKEND_WS_URL as string, { transports: ["websocket"] });;
 
-    /**
-     * Current socket id
-     */
+    /** Current client socket id */
     public id = this.socket.id;
 
     /**
@@ -75,11 +72,8 @@ export default class ClientSocket {
         this.socket.emit("LeaveRoom", { roomId })
     }
 
-    /**
-     * Leaves the current game
-     */
+    /** Leaves the current game */
     public leaveGame() {
-        // BRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUH !!!!!!!!!!!!!
         this.socket.emit("leaveGame");
     }
 

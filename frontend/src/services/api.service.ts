@@ -3,12 +3,16 @@ import { config } from "../app/config";
 import UserData from "../features/user/interfaces/user.interface";
 import CreateRoomDto from "./interfaces/CreateRoom.dto";
 
-
+/** Superset of axios, fills baseURL and enables credentials */
 export const api = axios.create({
     baseURL: config.getValue("REACT_APP_BACKEND_URL"),
     withCredentials: true
 })
 
+/**
+ * Fetch current user data from api
+ * @returns user data if successfull requests, null otherwise
+ */
 export async function getUserData(): Promise<UserData | null | undefined> {
     try {
         const response = await api.get("/user");
@@ -18,13 +22,24 @@ export async function getUserData(): Promise<UserData | null | undefined> {
     }
 }
 
+export async function getPreviousMessages(roleId: string, messageId: string) {
+    try {
+        const ret = api.get("/chat/many/messages/:role_id/:message_id");
+    } catch (err: any) {
+
+    }
+}
+
+/**
+ * Create a DM chat room (add friend)
+ * @param createRoomDto DTO for chatroom creation
+ * @returns data and empty error if successfull, null data and error message otherwise
+ */
 export async function createDm(createRoomDto: CreateRoomDto) {
     try {
         await api.post("/chat/create", createRoomDto);
         return { data: await getUserData(), error: "" }
     } catch (error: any) {
-        console.log(error);
-
         if (error.response.status === 404) {
             return { data: null, error: "User not found" };
         }
