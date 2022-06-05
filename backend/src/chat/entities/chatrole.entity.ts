@@ -13,9 +13,9 @@ export class ChatRoleEntity {
 	@Column()
 	role: e_roleType;
 
-	@ManyToOne(()=> UserEntity, user => user.roles)
+	@ManyToOne(() => UserEntity, user => user.roles)
 	user: UserEntity;
 
-	@ManyToOne(()=> ChatRoomEntity, {nullable: true, eager: true})
+	@ManyToOne(() => ChatRoomEntity, { nullable: true, eager: true })
 	chatroom: ChatRoomEntity;
 }

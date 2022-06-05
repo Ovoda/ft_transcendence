@@ -4,6 +4,7 @@ import { RoomTypeEnum } from "../enums/RoomType.enum";
 
 export default interface Room {
     id: string;
+    name: string;
     lastmessage: string;
     room_type: RoomTypeEnum;
     password: string;

@@ -18,10 +18,10 @@ export async function getUserData(): Promise<UserData | null | undefined> {
     }
 }
 
-export async function createRoom(createRoomDto: CreateRoomDto) {
+export async function createDm(createRoomDto: CreateRoomDto) {
     try {
         const ret = await api.post("/chat/create", createRoomDto);
-        console.log(ret.data);
+        return await getUserData();
     } catch (error: any) {
         console.log(error);
     }

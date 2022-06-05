@@ -1,28 +1,47 @@
 import { useState } from "react";
 import { RoomTypeEnum } from "enums/RoomType.enum";
 import TextInput from "../../../assets/TextInput/TextInput";
-import { createRoom } from "services/api.service";
+import { createDm, getUserData } from "services/api.service";
+import UserData from "../../../features/user/interfaces/user.interface";
+import { useDispatch, useSelector } from "react-redux";
+import { Store } from "src/app/store";
+import { updateUser } from "../../../features/user/user.slice";
 
 export default function RoomCreation() {
 
-    /** Variables */
-    const [name, setName] = useState<string>("");
-    const [userId, setUserId] = useState<string>("");
+    /** Global data */
+    const user: UserData = useSelector((store: Store) => store.user);
 
-    function handleRoomCreation() {
-        createRoom({
-            name,
-            userIds: [userId],
+    /** Variables */
+    const [login, setLogin] = useState<string>("");
+    const [errorText, setErrorText] = useState<string>("");
+
+    /** Tools */
+    const dispatch = useDispatch();
+
+    async function handleRoomCreation() {
+
+        if (login === user.login) {
+            setErrorText("You cannot add yourself");
+            return;
+        }
+
+        const userData = await createDm({
+            name: login,
+            logins: [user.login, login],
             password: "",
             roomType: RoomTypeEnum.DM
         });
+
+        if (!userData) return;
+        dispatch(updateUser(userData));
     }
 
     return (
         <>
-            <TextInput id="" text={name} setText={setName} type="text" name="" placeholder="room name" />
-            <TextInput id="" text={userId} setText={setUserId} type="text" name="" placeholder="user" />
-            <button onClick={handleRoomCreation}></button>
+            <TextInput id="" text={login} setText={setLogin} type="text" name="" placeholder="user" />
+            <button onClick={handleRoomCreation}>Create room</button>
+            <p>{errorText}</p>
         </>
     );
 }
