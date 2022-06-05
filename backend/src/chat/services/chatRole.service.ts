@@ -3,9 +3,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
+import { ChangeRoleDto } from "../dto/changeRole.dto";
 import { CreateChatDto } from "../dto/createChat.dto";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
 import { ChatRoleEntity } from "../entities/chatRole.entity";
+import { OwnerError } from "../exceptions/ownerError.exception";
 import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
 import { e_roleType } from "../types/role.type";
 import { ChatMessageService } from "./chatMessage.service";
@@ -23,8 +25,28 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		protected readonly _log: Logger,
 	){
 		super(_repository, _log);
-	}	
+	}
 
+	/**
+	 * Setup automaticly role to LAMBDA if current date has passed expires in role entity
+	 * @param role_id message id in db to goes from
+	 * @returns nothing
+	 */
+	public async uploadRoleFromExpiration(role_id: string){
+		const date = new Date();
+		const upldRole = await this.findOneById(role_id);
+		if (upldRole.expires){
+			if ((upldRole.role === e_roleType.MUTE || upldRole.role === e_roleType.BANNED) && upldRole.expires < date){
+				upldRole.role = e_roleType.LAMBDA;
+			}
+		}
+	}
+
+	/**
+	 * Create all associated roles when chatroom is created.
+	 * @param dto CreateChatDto
+	 * @returns array of created roles.
+	 */
 	public async createRoles(dto: CreateChatDto){
 		let roles: ChatRoleEntity[] = [];
 		for (let i = 0; i < dto.logins.length; i++){
@@ -45,33 +67,115 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		return roles;
 	}
 
+		/**
+	 * Create all associated roles when chatroom is created.
+	 * @param user_id the user calling the route. Avoid random user to read messages.
+	 * @param role_id the role trying to connect on the room.
+	 * @returns chatroom if given role is not banned, undefined either.
+	 */
 	async getRoomFromRole(user_id: string, role_id: string) {
 		const role = await this.findOneById(role_id);
 		if (role.user.id != user_id){
 			throw new UserUnauthorized("this user cannot go to this room");
 		}
 		// Faire ici le ban !
+		if (role.role === e_roleType.BANNED){
+			throw new UserUnauthorized("User is banned from this room");
+			// return null;
+		}
 		return await this.chatRoomService.findOneById(role.chatroom.id);
 	}
 
+	/**
+	 * get messages verifying the role and the user_id match.
+	 * @param user_id the user calling the route. Avoid random user to read messages.
+	 * @param role_id the role trying to get messages.
+	 * @returns array of messages if given role is not banned, undefined either.
+	 */
 	async getManyMessagesFromRole(user_id: string, role_id: string, message_id: string, limit: number) {
 		const role = await this.findOneById(role_id);
 		
 		if (user_id != role.user.id){
 			throw new UserUnauthorized("This user cannot read thoses messages.");
 		}
+		if (role.role === e_roleType.BANNED){
+			throw new UserUnauthorized("User is banned from this room");
+			// return null;
+		}
 		return await this.chatMessageService.getManyMessagesFromId(message_id, limit);
 	}
 
+	/**
+	 * create message verifying the role and the user_id match.
+	 * @param user_id the user calling the route. Avoid random user to read messages.
+	 * @param role_id the role trying to get messages.
+	 * @param createMessageChatDto necessary paramaters to create ChatMessageEntity
+	 * @returns returns the updated chatroom.
+	 */
 	async postMessageFromRole(user_id: string, role_id: string, createMessageChatDto: CreateChatMessageDto) {
 		const role = await this.findOneById(role_id);
 		if (user_id != role.user.id){
 			throw new UserUnauthorized("this user cannot post message to this room");
+		}
+		if (role.role === e_roleType.MUTE) {
+			throw new UserUnauthorized("User is muted on this room");
+			//return null;
 		}
 		const message = await this.chatMessageService.postMessage(createMessageChatDto);
 		const chatroom = role.chatroom;
 		message.prev_message = (role.chatroom.lastmessage) ? role.chatroom.lastmessage : null;
 		await this.chatRoomService.updateLastMessage(chatroom.id, message.id);
 		return chatroom;
+	}
+
+	/**
+	 * changing role by current user of a giver user identified by his login. Checking all rights in new role.
+	 * @param user_id the user calling the route. Avoid random user to read messages.
+	 * @param changeRoleDto the data we need to change a role.
+	 * @returns returns the modified role..
+	 */
+	async changeRole(user_id: string, changeRoleDto: ChangeRoleDto) {
+		if (changeRoleDto.newRole === e_roleType.OWNER){
+			throw new OwnerError("Owner is set at the chatroom creation and cannot be changed.");
+		}
+		const callerRole = await this.findOne({
+			where: {
+				chatroom: await this.chatRoomService.findOneById(changeRoleDto.chatroom_id),
+				user: await this.userService.findOne({where: {id: user_id}}),
+			}
+		});
+		// console.log(callerRole);
+		const roleModified = await this.findOne({
+			where: {
+				chatroom: await this.chatRoomService.findOneById(changeRoleDto.chatroom_id),
+				user: await this.userService.findOne({where: {login: changeRoleDto.login}}),
+			}
+		})
+		// console.log(roleModified);
+		if (
+			callerRole.role === e_roleType.LAMBDA
+			|| callerRole.role === e_roleType.MUTE
+			|| callerRole.role === e_roleType.BANNED
+			) {
+			throw new UserUnauthorized("You cannot change role");
+		}
+		if (
+			callerRole.role === e_roleType.OWNER
+			) {
+			roleModified.role = changeRoleDto.newRole;
+			roleModified.expires = (changeRoleDto.expires) ? changeRoleDto.expires : null;
+		} 
+		else if (
+			callerRole.role === e_roleType.ADMIN
+			&& roleModified.role !== e_roleType.OWNER
+			&& roleModified.role !== e_roleType.ADMIN
+			) {
+			roleModified.role = changeRoleDto.newRole;
+			roleModified.expires = (changeRoleDto.expires) ? changeRoleDto.expires : null;
+		} 
+		else {
+			throw new UserUnauthorized("Unexpected change.");
+		}
+		return roleModified;
 	}
 }

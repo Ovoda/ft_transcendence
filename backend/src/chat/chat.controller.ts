@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query, Request } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import { ChangeRoleDto } from './dto/changeRole.dto';
 import { CreateChatDto } from './dto/createChat.dto';
 import { CreateChatMessageDto } from './dto/createChatMessage.dto';
 import { ChatMessageService } from './services/chatMessage.service';
@@ -26,6 +27,12 @@ export class ChatController {
 	@Get('room/:role_id')
 	@HttpCode(200)
 	async getRoomFromRole(@Request() req, @Param('role_id') role_id: string){
+		// retourner un objet du type: 
+		// {
+		// 	room_name: si roomtype === DM -> userlogin != req.user.login sinon room.name,
+		// 	room: getRoomFromRole
+		// }
+		await this.chatRoleService.uploadRoleFromExpiration(role_id);
 		return await this.chatRoleService.getRoomFromRole(req.user.id, role_id);
 	}
 
@@ -37,7 +44,8 @@ export class ChatController {
 		@Body() createChatMessageDto: CreateChatMessageDto,
 		@Param('role_id') role_id: string,
 	) {
-		return await this.chatRoleService.postMessageFromRole(req.user.id, role_id, createChatMessageDto)
+		await this.chatRoleService.uploadRoleFromExpiration(role_id);
+		return await this.chatRoleService.postMessageFromRole(req.user.id, role_id, createChatMessageDto);
 	}
 
 	@UseGuards(JwtAuthGuard)
@@ -49,8 +57,14 @@ export class ChatController {
 		@Param('message_id') message_id: string,
 		@Query('limit') limit: number,
 	) {
+		await this.chatRoleService.uploadRoleFromExpiration(role_id);
 		return await this.chatRoleService.getManyMessagesFromRole(req.user.id, role_id, message_id, limit);
 	}
 
-
+	@UseGuards(JwtAuthGuard)
+	@Post('change/role')
+	@HttpCode(201)
+	async changeRole(@Request() req, @Body() changeRoleDto: ChangeRoleDto){
+		return await this.chatRoleService.changeRole(req.user.id, changeRoleDto);
+	}
 }

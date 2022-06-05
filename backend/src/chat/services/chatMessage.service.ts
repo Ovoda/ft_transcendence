@@ -17,7 +17,13 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		super(_repository, _log);
 	}
 
-	async getManyMessagesFromId(messageId: string, limit: number) {
+	/**
+	 * Get limit or ten messages from the message id.
+	 * @param messageId message id in db to goes from
+	 * @param limit (optional) the number of message you want to get, 10 if optionnal
+	 * @returns array of messages comming from the passing message id
+	 */
+	async getManyMessagesFromId(messageId: string, limit?: number) {
 		let messages: ChatMessageEntity[] = [];
 		let message = await this.findOneById(messageId);
 		if (!message){
