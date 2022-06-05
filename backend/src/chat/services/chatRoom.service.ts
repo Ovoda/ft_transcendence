@@ -66,7 +66,11 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 			throw new noMessagesYet("No message in chat room yet.");
 		}
 		const messages = await this.chatMessageService.getManyMessagesFromId(lastMessageId, limit);
-		return messages;
+		const obj = {
+			prev_message: messages[messages.length - 1].prev_message,
+			messages: messages,
+		}
+		return obj;
 	}
 
 	async postChatRoomMessage(dto: CreateChatMessageDto, room_id: string) {

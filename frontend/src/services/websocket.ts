@@ -16,7 +16,7 @@ export default class ClientSocket {
     /**
      * Inner websocket object
      */
-    private socket: Socket = io(process.env.REACT_APP_BACKEND_WS_URL as string, { transports: ["websocket"] });;
+    public socket: Socket = io(process.env.REACT_APP_BACKEND_WS_URL as string, { transports: ["websocket"] });;
 
     /**
      * Current socket id
@@ -79,6 +79,7 @@ export default class ClientSocket {
      * Leaves the current game
      */
     public leaveGame() {
+        // BRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUH !!!!!!!!!!!!!
         this.socket.emit("leaveGame");
     }
 

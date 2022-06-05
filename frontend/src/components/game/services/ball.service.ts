@@ -1,7 +1,7 @@
 import Ball from "../interfaces/ball.interface";
-import Game from '../interfaces/game.interface';
+import GameCanvas from "../interfaces/gameCanvas.interface";
 
-function drawBall(game: Game, ball: Ball) {
+function drawBall(game: GameCanvas, ball: Ball) {
 	game.context?.beginPath();
 	game.context?.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);
 	game.context?.fill();

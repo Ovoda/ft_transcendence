@@ -36,22 +36,35 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				player2: null,
 			}
 			this.games.push(newGame);
-			console.log("join room");
+			console.log("JOIN ROOM");
+			console.log(client.id, "in room ", newGame.id);
 			client.join(newGame.id);
 			status = false;
+			this.server.to(client.id).emit('setSide', "left");
 			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', status);
 		}
 		else {
 			this.games[this.games.length - 1].player2 = client.id;
 			this.games[this.games.length - 1].status = true;
-			console.log("join room");
-
+			console.log("JOIN ROOM");
+			console.log(client.id, "in room ", this.games[this.games.length - 1].id);
 			client.join(this.games[this.games.length - 1].id);
 			status = true;
+			this.server.to(client.id).emit('setSide', "right");
 			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', status);
 		}
 	}
 
+
+	@SubscribeMessage('resetGame')
+	handleResetScore(client: Socket, data: any) {
+		const index = this.games.findIndex((game: GameRoom) => {
+			return (game.player1 === client.id || game.player2 === client.id);
+		})
+		if (index >= 0) {
+			this.server.to(this.games[index].id).emit("updateScore", data);
+		}
+	}
 
 	@SubscribeMessage('animateGame')
 	handleAnimateGame(client: Socket, data: any) {

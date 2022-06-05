@@ -1,8 +1,10 @@
 import Player, { setInitialPlayerLeftState, setInitialPlayerRightState } from './interfaces/player.interface';
+import { resetPlayerLeftPosition, resetPlayerRightPosition } from './interfaces/player.interface';
+import Position from './interfaces/position.interface';
 import drawPlayer from './services/player.service';
 import { setInitialBallState } from './interfaces/ball.interface';
 import drawBall from './services/ball.service';
-import FullGame from './interfaces/game.interface';
+import { getNewBallPos } from './services/game.service';
 import { useContext, useEffect, useRef, useState } from "react";
 import './game.scss';
 import { mainSocketContext } from '../../App';
@@ -11,7 +13,7 @@ import UpdateBallDto from '../../hooks/interfaces/UpdateBall.dto';
 import GameStatus, { initialGameStatus } from './interfaces/gameStatus.interface';
 import { UserStatusEnum } from './enums/userStatus.enum';
 import Gameplay, { setInitialGameplayState } from './interfaces/gameplay.interface';
-
+import GameCanvas, { setInitialGameCanvasState } from './interfaces/gameCanvas.interface';
 
 function Game() {
 
@@ -20,39 +22,29 @@ function Game() {
 
 	/** Variables */
 	const canvaRef = useRef<HTMLCanvasElement>(null);
-	const [canvasContext, setContext] = useState(canvaRef.current?.getContext('2d'));
-	const [windowWidth, setWindowWidth] = useState(600);
-	const [windowHeight, setWindowHeight] = useState(400);
 
+	/** Variables */
+	const [gameCanvas, setGameCanvas] = useState<GameCanvas>(setInitialGameCanvasState(canvaRef));
 	const [gameStatus, setGameStatus] = useState<GameStatus>(initialGameStatus);
-	const [gameplay, setGameplay] = useState<Gameplay>(setInitialGameplayState(windowWidth, windowHeight));
-
-	const gameRef: FullGame = {
-		width: windowWidth,
-		height: windowHeight,
-		ball: gameplay.ball,
-		context: canvasContext,
-		playerleft: gameplay.playerLeft,
-		playerright: gameplay.playerRight,
-	}
-	const [canvasWidth, setCanvasWidth] = useState(gameRef.width);
-	const [canvasHeight, setCanvasHeight] = useState(gameRef.height);
+	const [gameplay, setGameplay] = useState<Gameplay>(setInitialGameplayState(gameCanvas.width, gameCanvas.height));
 
 	/** Set game listeners (keyboard events & socket events) */
 	useGameListeners({
 		gameplay,
 		setGameplay,
 		gameStatus,
-		setGameStatus
+		setGameStatus,
+		gameCanvas,
+		setGameCanvas,
 	});
 
 	/** Start the game */
 	function launch() {
 		setGameplay({
 			...gameplay,
-			ball: setInitialBallState(windowWidth, windowHeight),
-			playerLeft: setInitialPlayerLeftState(windowWidth, windowHeight),
-			playerRight: setInitialPlayerRightState(windowWidth, windowHeight),
+			ball: setInitialBallState(gameCanvas.width, gameCanvas.height),
+			playerLeft: setInitialPlayerLeftState(gameCanvas.width, gameCanvas.height),
+			playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
 		})
 		setGameStatus({ ...gameStatus, start: false, win: "" });
 		mainSocket?.emit("joinGame");
@@ -62,20 +54,16 @@ function Game() {
 	useEffect(() => {
 		requestAnimationFrame(animate);
 		if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-			let newPosX: number;
-			let newPosY: number;
-			if (gameplay.ball.position.x + gameplay.ball.velocity.x < 0 || gameplay.ball.position.x + gameplay.ball.velocity.x > gameRef.width) {
-				gameplay.ball.velocity.x = - gameplay.ball.velocity.x;
+			let newPos: Position;
+			newPos = getNewBallPos(gameplay, gameStatus, gameCanvas.height, gameCanvas.width);
+			if (newPos.y < 0 || newPos.x < 0) {
+				mainSocket?.emit("resetGame", { posX: gameplay.playerLeft.score, posY: gameplay.playerRight.score } as UpdateBallDto);
 			}
-			if (gameplay.ball.position.y + gameplay.ball.velocity.y < 0 || gameplay.ball.position.y + gameplay.ball.velocity.y > gameRef.height) {
-				gameplay.ball.velocity.y = - gameplay.ball.velocity.y;
+			else {
+				mainSocket?.emit("animateGame", { posX: newPos.x, posY: newPos.y } as UpdateBallDto);
 			}
-			newPosX = gameplay.ball.position.x + gameplay.ball.velocity.x;
-			newPosY = gameplay.ball.position.y + gameplay.ball.velocity.y;
-			mainSocket?.emit("animateGame", { posX: newPosX, posY: newPosY } as UpdateBallDto);
 		}
 	}, [gameplay.ball]);
-
 
 	/** Update players */
 	useEffect(() => {
@@ -87,8 +75,15 @@ function Game() {
 	}, [gameplay.playerRight]);
 
 	useEffect(() => {
+		mainSocket?.emit("updateScoreLeft", gameplay.playerLeft.score);
+	}, [gameplay.playerLeft.score])
+
+	useEffect(() => {
+		mainSocket?.emit("updateScoreRight", gameplay.playerLeft.score);
+	}, [gameplay.playerRight.score])
+
+	useEffect(() => {
 		if (gameplay.arrowDown) {
-			console.log("Arrow Down");
 			let player: Player;
 			let newPos: number;
 
@@ -97,10 +92,9 @@ function Game() {
 			} else {
 				player = gameplay.playerRight;
 			}
-
 			newPos = player.position.y + player.velocity.y;
-			if (player.position.y + player.velocity.y + player.height > gameRef.height) {
-				newPos = gameRef.height - player.height;
+			if (player.position.y + player.velocity.y + player.height > gameCanvas.height) {
+				newPos = gameCanvas.height - player.height;
 			}
 			mainSocket?.emit("movePlayer", newPos);
 		}
@@ -108,7 +102,6 @@ function Game() {
 
 	useEffect(() => {
 		if (gameplay.arrowUp) {
-			console.log("Arrow Up");
 			let player: Player;
 			let newPos: number;
 			if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
@@ -126,29 +119,36 @@ function Game() {
 
 	/** Render game */
 	function animate() {
-		gameRef.context = canvaRef.current?.getContext('2d');
-		gameRef.context?.clearRect(0, 0, gameRef.width, gameRef.height);
-		drawBall(gameRef, gameplay.ball);
-		drawPlayer(gameRef, gameplay.playerLeft);
-		drawPlayer(gameRef, gameplay.playerRight);
+		gameCanvas.context = canvaRef.current?.getContext('2d');
+		gameCanvas.context?.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+		drawBall(gameCanvas, gameplay.ball);
+		drawPlayer(gameCanvas, gameplay.playerLeft);
+		drawPlayer(gameCanvas, gameplay.playerRight);
 	}
 
 	return (
 		<div className="main">
 			<h2>Welcome to the Pong Game</h2>
 			{gameStatus.start ? (
-				<button id="button-game" onClick={() => launch()}>Start Game</button>
+				<>
+					<button id="button-game" onClick={() => launch()}>Start Game</button>
+					<p></p>
+					<button id="button-game" onClick={() => launch()}>Watch Game</button>
+				</>
 			) : (
 				<button id="button-game" onClick={() => mainSocket?.leaveGame()}>Stop Game</button>
 			)}
 			<p></p>
 			{!gameStatus.start && gameStatus.ready && (
-				<canvas ref={canvaRef} height={canvasHeight} width={canvasWidth} id="canvas"></canvas>
+				<div id="game_area">
+					<h1>{gameplay.playerLeft.score} : {gameplay.playerRight.score}</h1>
+					<canvas ref={canvaRef} height={gameCanvas.height} width={gameCanvas.width} id="canvas"></canvas>
+				</div>
 			)}
 			{!gameStatus.start && !gameStatus.ready && (
 				<p>Waiting for another player...</p>
 			)}
-			{(gameStatus.start && gameStatus.win != "") ? (<p>{gameStatus.win}</p>) : (<p></p>)}
+			{(gameStatus.start && gameStatus.win != "") ? (<h2>{gameStatus.win}</h2>) : (<p></p>)}
 		</div>
 	);
 }
