@@ -54,9 +54,12 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		return await this.chatRoomService.findOneById(role.chatroom.id);
 	}
 
-	async getManyMessagesFromRole(user_id: string, role_id: string, limit: number) {
-		const room = await this.getRoomFromRole(user_id, role_id);
-		return await this.chatMessageService.getManyMessagesFromId(room.id, limit);
+	async getManyMessagesFromRole(user_id: string, role_id: string, message_id: string, limit: number) {
+		const role = await this.findOneById(role_id);
+		if (user_id != role.user.id){
+			throw new UserUnauthorized("This user cannot read thoses messages.");
+		}
+		return await this.chatMessageService.getManyMessagesFromId(message_id, limit);
 	}
 
 	async postMessageFromRole(user_id: string, role_id: string, createMessageChatDto: CreateChatMessageDto) {

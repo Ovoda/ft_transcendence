@@ -41,14 +41,15 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('many/messages/:role_id')
+	@Get('many/messages/:role_id/:message_id')
 	@HttpCode(201)
 	async getManyMessages(
 		@Request() req,
 		@Param('role_id') role_id: string,
+		@Param('message_id') message_id: string,
 		@Query('limit') limit: number,
 	){
-		return await this.chatRoleService.getManyMessagesFromRole(req.user.id, role_id, limit);
+		return await this.chatRoleService.getManyMessagesFromRole(req.user.id, role_id, message_id, limit);
 	}
 
 
