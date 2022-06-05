@@ -73,8 +73,8 @@ export default class ClientSocket {
     }
 
     /** Leaves the current game */
-    public leaveGame() {
-        this.socket.emit("leaveGame");
+    public leaveGame(data: any) {
+        this.socket.emit("leaveGame", data);
     }
 
 }

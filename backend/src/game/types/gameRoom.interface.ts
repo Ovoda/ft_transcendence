@@ -1,6 +1,8 @@
 export class GameRoom {
 	id: string;
 	status: boolean;
-	player1: string;
-	player2: string;
+	user1: string;
+	user2: string;
+	socket1: string;
+	socket2: string;
 }

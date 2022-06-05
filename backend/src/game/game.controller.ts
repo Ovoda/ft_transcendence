@@ -1,33 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
+import { ApiProperty, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query } from '@nestjs/common';
+import { CreateGameDto } from './dto/createGame.dto';
+import { UpdateGameDto } from './dto/updateGame.dto';
+import { GameService } from './services/game.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 
-//@Controller('game')
-//export class GameController {
-//  constructor(private readonly gameService: GameService) {}
+@Controller('game')
+export class GameController {
+	constructor(
+		private readonly gameService: GameService
+	) { }
 
-//  @Post()
-//  create(@Body() createGameDto: CreateGameDto) {
-//    return this.gameService.create(createGameDto);
-//  }
+	@Get('all')
+	@HttpCode(200)
+	async getGames(
+		@Query() limit: number,
+		@Query() pages: number,
+	) {
+		return await this.gameService.findMany({
+			limit: limit,
+			page: pages
+		});
+	}
 
-//  @Get()
-//  findAll() {
-//    return this.gameService.findAll();
-//  }
-
-//  @Get(':id')
-//  findOne(@Param('id') id: string) {
-//    return this.gameService.findOne(+id);
-//  }
-
-//  @Patch(':id')
-//  update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
-//    return this.gameService.update(+id, updateGameDto);
-//  }
-
-//  @Delete(':id')
-//  remove(@Param('id') id: string) {
-//    return this.gameService.remove(+id);
-//  }
-//}
+}

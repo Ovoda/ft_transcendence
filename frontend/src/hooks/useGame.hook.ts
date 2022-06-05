@@ -94,12 +94,12 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			})
 			if (data.posX === scoreToWin) {
 				if (gameStatus.side === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
-					mainSocket.emit('leaveGame');
+					mainSocket.emit('leaveGame', [gameplay.playerLeft.score, gameplay.playerRight.score]);
 				}
 			}
 			else if (data.posY === scoreToWin) {
 				if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-					mainSocket.emit('leaveGame');
+					mainSocket.emit('leaveGame', [gameplay.playerLeft.score, gameplay.playerRight.score]);
 				}
 			}
 			else {
