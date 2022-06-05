@@ -56,6 +56,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 
 	async getManyMessagesFromRole(user_id: string, role_id: string, message_id: string, limit: number) {
 		const role = await this.findOneById(role_id);
+		
 		if (user_id != role.user.id){
 			throw new UserUnauthorized("This user cannot read thoses messages.");
 		}

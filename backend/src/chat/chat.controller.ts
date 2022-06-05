@@ -24,8 +24,8 @@ export class ChatController {
 
 	@UseGuards(JwtAuthGuard)
 	@Get('room/:role_id')
-	@HttpCode(201)
-	async getRoomFromRole(@Request() req, @Param('role_id') role_id: string) {
+	@HttpCode(200)
+	async getRoomFromRole(@Request() req, @Param('role_id') role_id: string){
 		return await this.chatRoleService.getRoomFromRole(req.user.id, role_id);
 	}
 
@@ -42,7 +42,7 @@ export class ChatController {
 
 	@UseGuards(JwtAuthGuard)
 	@Get('many/messages/:role_id/:message_id')
-	@HttpCode(201)
+	@HttpCode(200)
 	async getManyMessages(
 		@Request() req,
 		@Param('role_id') role_id: string,
