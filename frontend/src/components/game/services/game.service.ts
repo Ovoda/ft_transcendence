@@ -33,7 +33,7 @@ function wallHorizontalCollision(gameplay: Gameplay, gamestatus: GameStatus, hei
 	if (gameplay.ball.position.y + gameplay.ball.velocity.y < 0) {
 		return true;
 	}
-	else if (gameplay.ball.position.y + gameplay.ball.velocity.y > height) {
+	else if (gameplay.ball.position.y + gameplay.ball.velocity.y + gameplay.ball.radius > height) {
 		return true;
 	}
 	return false;
@@ -41,12 +41,10 @@ function wallHorizontalCollision(gameplay: Gameplay, gamestatus: GameStatus, hei
 
 function wallVerticalCollision(gameplay: Gameplay, gamestatus: GameStatus, width: number) {
 	if (gameplay.ball.position.x + gameplay.ball.velocity.x <= 0) {
-		console.log("HIT WALL LEFT");
 		gameplay.playerRight.score += 1;
 		return true;
 	}
 	else if (gameplay.ball.position.x + gameplay.ball.velocity.x >= width) {
-		console.log("HIT WALL RIGHT");
 		gameplay.playerLeft.score += 1;
 		return true;
 	}

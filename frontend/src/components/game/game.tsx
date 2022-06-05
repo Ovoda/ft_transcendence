@@ -73,12 +73,10 @@ function Game() {
 	}, [gameplay.playerRight]);
 
 	useEffect(() => {
-		console.log("Update Score Left");
 		mainSocket?.emit("updateScoreLeft", gameplay.playerLeft.score);
 	}, [gameplay.playerLeft.score])
 
 	useEffect(() => {
-		console.log("Update Score Right");
 		mainSocket?.emit("updateScoreRight", gameplay.playerLeft.score);
 	}, [gameplay.playerRight.score])
 
@@ -92,7 +90,6 @@ function Game() {
 			} else {
 				player = gameplay.playerRight;
 			}
-
 			newPos = player.position.y + player.velocity.y;
 			if (player.position.y + player.velocity.y + player.height > gameCanvas.height) {
 				newPos = gameCanvas.height - player.height;
@@ -131,7 +128,11 @@ function Game() {
 		<div className="main">
 			<h2>Welcome to the Pong Game</h2>
 			{gameStatus.start ? (
-				<button id="button-game" onClick={() => launch()}>Start Game</button>
+				<>
+					<button id="button-game" onClick={() => launch()}>Start Game</button>
+					<p></p>
+					<button id="button-game" onClick={() => launch()}>Watch Game</button>
+				</>
 			) : (
 				<button id="button-game" onClick={() => mainSocket?.leaveGame()}>Stop Game</button>
 			)}
@@ -145,7 +146,7 @@ function Game() {
 			{!gameStatus.start && !gameStatus.ready && (
 				<p>Waiting for another player...</p>
 			)}
-			{(gameStatus.start && gameStatus.win != "") ? (<p>{gameStatus.win}</p>) : (<p></p>)}
+			{(gameStatus.start && gameStatus.win != "") ? (<h2>{gameStatus.win}</h2>) : (<p></p>)}
 		</div>
 	);
 }

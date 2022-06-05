@@ -11,6 +11,9 @@ import Position from "src/components/game/interfaces/position.interface";
 import { resetPlayerLeftPosition, resetPlayerRightPosition } from '../components/game/interfaces/player.interface';
 import { setInitialBallState } from '../components/game/interfaces/ball.interface';
 import GameCanvas from "src/components/game/interfaces/gameCanvas.interface";
+import { Socket } from "socket.io-client";
+
+const scoreToWin: number = 10;
 
 interface Props {
 	setGameplay: Dispatch<SetStateAction<Gameplay>>,
@@ -44,7 +47,11 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		/** Set socket listener */
 		mainSocket.on("gameStop", (stopclient: string) => {
-			const winResult = stopclient === mainSocket.id ? "You Lost!" : "You Won!";
+			console.log("LOSER IS");
+			console.log(stopclient);
+			console.log("I AM");
+			console.log(mainSocket.socket.id);
+			const winResult = stopclient === mainSocket.socket.id ? "You Lost!" : "You Won!";
 
 			setGameStatus((gameStatus: GameStatus) => {
 				return { ...gameStatus, start: true, side: 0, win: winResult };
@@ -53,7 +60,6 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			mainSocket.emit("deleteRoom");
 		});
 
-
 		mainSocket.on("gameStatus", (fullRoom: any) => {
 
 			setGameStatus((gameStatus: GameStatus) => {
@@ -61,22 +67,27 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			});
 
 			if (fullRoom === true) {
-				if (gameStatus.side === UserStatusEnum.UNASSIGNED as UserStatusEnum) {
-
-					// TODO
-					// setGameStatus((gameStatus: GameStatus) => {
-					//     return { ...gameStatus, side: UserStatusEnum.PLAYER_RIGHT }
-					// });
-
+				if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
 					mainSocket.emit("animateGame", {
 						posX: gameplay.ball.position.x,
 						posY: gameplay.ball.position.y
 					} as UpdateBallDto);
 				}
-			} else {
+			}
+		})
+
+		mainSocket.on("setSide", (data: string) => {
+			if (data === "left") {
+				gameStatus.side = UserStatusEnum.PLAYER_LEFT;
 				setGameStatus((gameStatus: GameStatus) => {
 					return { ...gameStatus, side: UserStatusEnum.PLAYER_LEFT }
-				});
+				})
+			}
+			else if (data === "right") {
+				gameStatus.side = UserStatusEnum.PLAYER_RIGHT;
+				setGameStatus((gameStatus: GameStatus) => {
+					return { ...gameStatus, side: UserStatusEnum.PLAYER_RIGHT }
+				})
 			}
 		})
 
@@ -89,10 +100,22 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 					playerRight: resetPlayerRightPosition(gameCanvas.width, gameCanvas.height, data.posY),
 				}
 			})
-			mainSocket.emit("animateGame", {
-				posX: gameplay.ball.position.x,
-				posY: gameplay.ball.position.y
-			} as UpdateBallDto);
+			if (data.posX === scoreToWin) {
+				if (gameStatus.side === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
+					mainSocket.emit('leaveGame');
+				}
+			}
+			else if (data.posY === scoreToWin) {
+				if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+					mainSocket.emit('leaveGame');
+				}
+			}
+			else {
+				mainSocket.emit("animateGame", {
+					posX: gameplay.ball.position.x,
+					posY: gameplay.ball.position.y,
+				} as UpdateBallDto);
+			}
 		})
 
 		mainSocket.on("updateBall", (data: UpdateBallDto) => {
@@ -126,8 +149,6 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		})
 
 		mainSocket.on("updateRightPlayer", (value: number) => {
-			//console.log("Update Player Right");
-
 			setGameplay((gameplay: Gameplay) => {
 				return {
 					...gameplay,
