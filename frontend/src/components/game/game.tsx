@@ -14,14 +14,19 @@ import GameStatus, { initialGameStatus } from './interfaces/gameStatus.interface
 import { UserStatusEnum } from './enums/userStatus.enum';
 import Gameplay, { setInitialGameplayState } from './interfaces/gameplay.interface';
 import GameCanvas, { setInitialGameCanvasState } from './interfaces/gameCanvas.interface';
+import { Store } from '../../app/store';
+import { useSelector } from 'react-redux';
+import UserData from 'features/user/interfaces/user.interface';
+import SetUserDto from './interfaces/SetUser.dto';
 
 function Game() {
 
 	/** Global Data */
 	const mainSocket = useContext(mainSocketContext);
-
-	/** Variables */
 	const canvaRef = useRef<HTMLCanvasElement>(null);
+
+	const store: Store = useSelector((store: Store) => store);
+	const userData: UserData = store.user;
 
 	/** Variables */
 	const [gameCanvas, setGameCanvas] = useState<GameCanvas>(setInitialGameCanvasState(canvaRef));
@@ -47,7 +52,11 @@ function Game() {
 			playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
 		})
 		setGameStatus({ ...gameStatus, start: false, win: "" });
-		mainSocket?.emit("joinGame");
+		let userInfo : SetUserDto = {
+			id : userData.id,
+			login : userData.login,
+		}
+		mainSocket?.emit("joinGame", userInfo);
 	}
 
 	/** Update ball object */
@@ -136,12 +145,12 @@ function Game() {
 					<button id="button-game" onClick={() => launch()}>Watch Game</button>
 				</>
 			) : (
-				<button id="button-game" onClick={() => mainSocket?.leaveGame()}>Stop Game</button>
+				<button id="button-game" onClick={() => mainSocket?.leaveGame([gameplay.playerLeft.score, gameplay.playerRight.score])}>Stop Game</button>
 			)}
 			<p></p>
 			{!gameStatus.start && gameStatus.ready && (
 				<div id="game_area">
-					<h1>{gameplay.playerLeft.score} : {gameplay.playerRight.score}</h1>
+					<h1>{gameplay.playerLeft.login} {gameplay.playerLeft.score} : {gameplay.playerRight.score} {gameplay.playerRight.login} </h1>
 					<canvas ref={canvaRef} height={gameCanvas.height} width={gameCanvas.width} id="canvas"></canvas>
 				</div>
 			)}
