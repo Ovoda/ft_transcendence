@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { mainSocketContext } from "../App";
 import UpdateBallDto from "./interfaces/UpdateBall.dto";
+import UpdateScoreDto from "./interfaces/UpdateScore.dto";
 import { handleKeyPressed, handleKeyUnpressed } from "../components/game/services/game.service";
 import GameStatus from "src/components/game/interfaces/gameStatus.interface";
 import { UserStatusEnum } from "../components/game/enums/userStatus.enum";
@@ -14,8 +15,6 @@ import { useSelector } from "react-redux";
 import UserData from "features/user/interfaces/user.interface";
 
 const scoreToWin: number = 10;
-
-
 
 interface Props {
 	setGameplay: Dispatch<SetStateAction<Gameplay>>,
@@ -150,12 +149,12 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			})
 			if (data.posX === scoreToWin) {
 				if (gameStatus.side === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
-					mainSocket.emit('leaveGame', [gameplay.playerLeft.score, gameplay.playerRight.score]);
+					mainSocket.emit('leaveGame', data);
 				}
 			}
 			else if (data.posY === scoreToWin) {
 				if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-					mainSocket.emit('leaveGame', [gameplay.playerLeft.score, gameplay.playerRight.score]);
+					mainSocket.emit('leaveGame', data);
 				}
 			}
 			else {
