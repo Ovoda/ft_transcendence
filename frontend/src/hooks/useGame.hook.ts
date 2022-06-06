@@ -2,11 +2,10 @@ import { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { mainSocketContext } from "../App";
 import UpdateBallDto from "./interfaces/UpdateBall.dto";
 import UpdateScoreDto from "./interfaces/UpdateScore.dto";
-import { handleKeyPressed, handleKeyUnpressed } from "../components/game/services/game.service";
+import { handleKeyPressed, handleKeyUnpressed } from "../components/game/services/play.service";
 import GameStatus from "src/components/game/interfaces/gameStatus.interface";
 import { UserStatusEnum } from "../components/game/enums/userStatus.enum";
 import Gameplay from "src/components/game/interfaces/gameplay.interface";
-import { resetPlayerLeftPosition, resetPlayerRightPosition } from '../components/game/interfaces/player.interface';
 import { setInitialBallState } from '../components/game/interfaces/ball.interface';
 import GameCanvas from "src/components/game/interfaces/gameCanvas.interface";
 import { login } from "services/auth.service";
@@ -38,11 +37,13 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			(event: KeyboardEvent) => handleKeyPressed({
 				event,
 				setGameplay,
+				gameStatus,
 			}));
 		window.addEventListener("keyup",
 			(event: KeyboardEvent) => handleKeyUnpressed({
 				event,
 				setGameplay,
+				gameStatus,
 			}));
 
 
@@ -59,8 +60,9 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			mainSocket.emit("deleteRoom");
 		});
 
-		mainSocket.on("gameStatus", (fullRoom: any) => {
 
+		/** Set status of Room */
+		mainSocket.on("gameStatus", (fullRoom: any) => {
 			setGameStatus((gameStatus: GameStatus) => {
 				return { ...gameStatus, ready: fullRoom };
 			});
@@ -75,6 +77,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			}
 		})
 
+
+		/** Set logins of players */
 		mainSocket.on("leftLogin", (data: string) => {
 			setGameplay((gameplay: Gameplay) => {
 				return {
@@ -99,6 +103,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			})
 		})
 
+
+		/** Set sides of players */
 		mainSocket.on("setSide", (data: string) => {
 			if (data === "left") {
 				gameStatus.side = UserStatusEnum.PLAYER_LEFT;
@@ -216,11 +222,12 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				(event: KeyboardEvent) => handleKeyPressed({
 					event,
 					setGameplay,
+					GameStatus,
 				}));
 			window.addEventListener("keyup",
 				(event: KeyboardEvent) => handleKeyUnpressed({
 					event,
-					setGameplay,
+					GameStatus,
 				}));
 		};
 	}, []);

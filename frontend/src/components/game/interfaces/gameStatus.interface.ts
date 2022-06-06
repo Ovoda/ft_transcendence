@@ -5,6 +5,7 @@ export default interface GameStatus {
     ready: boolean;
     win: string;
     side: UserStatusEnum;
+	watch: boolean;
 }
 
 export const initialGameStatus = {
@@ -12,4 +13,5 @@ export const initialGameStatus = {
     ready: false,
     win: "",
     side: UserStatusEnum.UNASSIGNED,
+	watch: false,
 }

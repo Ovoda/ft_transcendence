@@ -1,30 +1,32 @@
 import React, { Dispatch, SetStateAction } from "react";
 import Gameplay from "../interfaces/gameplay.interface";
 import Position from "../interfaces/position.interface";
-import Player from "src/components/game/interfaces/player.interface";
-import Ball from "src/components/game/interfaces/ball.interface";
-import FullGame from "src/components/game/interfaces/game.interface";
-import GameStatus, { initialGameStatus } from "../interfaces/gameStatus.interface";
-
+import GameStatus from "../interfaces/gameStatus.interface";
+import { UserStatusEnum } from "../enums/userStatus.enum";
 
 export interface handleKeysProps {
 	event: KeyboardEvent;
-	setGameplay: Dispatch<SetStateAction<Gameplay>>
+	setGameplay: Dispatch<SetStateAction<Gameplay>>,
+	gameStatus: GameStatus,
 }
 
-export function handleKeyPressed({ event, setGameplay }: handleKeysProps) {
-	if (event.key === "ArrowDown") {
-		setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowDown: true } });
-	} else if (event.key === "ArrowUp") {
-		setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowUp: true } });
+export function handleKeyPressed({ event, setGameplay, gameStatus }: handleKeysProps) {
+	if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum || gameStatus.side === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
+		if (event.key === "ArrowDown") {
+			setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowDown: true } });
+		} else if (event.key === "ArrowUp") {
+			setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowUp: true } });
+		}
 	}
 }
 
-export function handleKeyUnpressed({ event, setGameplay }: handleKeysProps) {
-	if (event.key === "ArrowDown") {
-		setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowDown: false } });
-	} else if (event.key === "ArrowUp") {
-		setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowUp: false } });
+export function handleKeyUnpressed({ event, setGameplay, gameStatus }: handleKeysProps) {
+	if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum || gameStatus.side === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
+		if (event.key === "ArrowDown") {
+			setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowDown: false } });
+		} else if (event.key === "ArrowUp") {
+			setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowUp: false } });
+		}
 	}
 }
 

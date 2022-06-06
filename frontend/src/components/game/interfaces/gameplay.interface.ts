@@ -15,6 +15,6 @@ export function setInitialGameplayState(windowWidth: number, windowHeight: numbe
         arrowDown: false,
         ball: setInitialBallState(windowWidth, windowHeight),
         playerLeft: setInitialPlayerLeftState(windowWidth, windowHeight),
-        playerRight: setInitialPlayerRightState(windowWidth, windowHeight)
+        playerRight: setInitialPlayerRightState(windowWidth, windowHeight),
     });
 }

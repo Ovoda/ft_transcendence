@@ -1,23 +1,26 @@
-import Player, { setInitialPlayerLeftState, setInitialPlayerRightState } from './interfaces/player.interface';
-import { resetPlayerLeftPosition, resetPlayerRightPosition } from './interfaces/player.interface';
-import Position from './interfaces/position.interface';
-import drawPlayer from './services/player.service';
-import { setInitialBallState } from './interfaces/ball.interface';
-import drawBall from './services/ball.service';
-import { getNewBallPos } from './services/game.service';
 import { useContext, useEffect, useRef, useState } from "react";
+import { useSelector } from 'react-redux';
 import './game.scss';
-import { mainSocketContext } from '../../App';
-import { useGameListeners } from '../../hooks/useGame.hook';
-import UpdateBallDto from '../../hooks/interfaces/UpdateBall.dto';
+
+import Player, { setInitialPlayerLeftState, setInitialPlayerRightState } from './interfaces/player.interface';
+import Position from './interfaces/position.interface';
+import { setInitialBallState } from './interfaces/ball.interface';
 import GameStatus, { initialGameStatus } from './interfaces/gameStatus.interface';
-import { UserStatusEnum } from './enums/userStatus.enum';
 import Gameplay, { setInitialGameplayState } from './interfaces/gameplay.interface';
 import GameCanvas, { setInitialGameCanvasState } from './interfaces/gameCanvas.interface';
-import { Store } from '../../app/store';
-import { useSelector } from 'react-redux';
 import UserData from 'features/user/interfaces/user.interface';
-import SetUserDto from './interfaces/SetUser.dto';
+import UpdateBallDto from '../../hooks/interfaces/UpdateBall.dto';
+import SetUserDto from "./interfaces/SetUser.dto";
+
+import drawPlayer from './services/player.service';
+import drawBall from './services/ball.service';
+import { getNewBallPos } from './services/play.service';
+
+import { Store } from '../../app/store';
+import { mainSocketContext } from '../../App';
+import { useGameListeners } from '../../hooks/useGame.hook';
+import { UserStatusEnum } from './enums/userStatus.enum';
+
 
 function Game() {
 
@@ -44,19 +47,25 @@ function Game() {
 	});
 
 	/** Start the game */
-	function launch() {
+	function launchPlaying() {
 		setGameplay({
 			...gameplay,
 			ball: setInitialBallState(gameCanvas.width, gameCanvas.height),
 			playerLeft: setInitialPlayerLeftState(gameCanvas.width, gameCanvas.height),
 			playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
 		})
-		setGameStatus({ ...gameStatus, start: false, win: "" });
-		let userInfo : SetUserDto = {
-			id : userData.id,
-			login : userData.login,
+		setGameStatus({ ...gameStatus, start: false, win: "", watch: false});
+		let userInfo: SetUserDto = {
+			id: userData.id,
+			login: userData.login,
 		}
 		mainSocket?.emit("joinGame", userInfo);
+	}
+
+	//send ID of player you wsnt to watch
+	function launchWatching(user: SetUserDto) {
+		setGameStatus({ ...gameStatus, side: UserStatusEnum.WATCHER, start: false, win: "", watch: true, ready: true})
+		mainSocket?.emit("joingGameAsWatcher", user);
 	}
 
 	/** Update ball object */
@@ -138,16 +147,15 @@ function Game() {
 	return (
 		<div className="main">
 			<h2>Welcome to the Pong Game</h2>
-			{gameStatus.start ? (
-				<>
-					<button id="button-game" onClick={() => launch()}>Start Game</button>
-					<p></p>
-					<button id="button-game" onClick={() => launch()}>Watch Game</button>
-				</>
-			) : (
+			{gameStatus.start && (
+				<button id="button-game" onClick={() => launchPlaying()}>Start Game</button>
+			)}
+			{!gameStatus.start && !gameStatus.watch &&(
 				<button id="button-game" onClick={() => mainSocket?.leaveGame([gameplay.playerLeft.score, gameplay.playerRight.score])}>Stop Game</button>
 			)}
-			<p></p>
+			{!gameStatus.start && gameStatus.watch && (
+				<button id="button-game" onClick={() => launchPlaying()}>Stop Watching</button>
+			)}
 			{!gameStatus.start && gameStatus.ready && (
 				<div id="game_area">
 					<h1>{gameplay.playerLeft.login} {gameplay.playerLeft.score} : {gameplay.playerRight.score} {gameplay.playerRight.login} </h1>
@@ -157,7 +165,7 @@ function Game() {
 			{!gameStatus.start && !gameStatus.ready && (
 				<p>Waiting for another player...</p>
 			)}
-			{(gameStatus.start && gameStatus.win != "") ? (<h2>{gameStatus.win}</h2>) : (<p></p>)}
+			{(gameStatus.start && !gameStatus.watch && gameStatus.win != "") ? (<h2>{gameStatus.win}</h2>) : (<p></p>)}
 		</div>
 	);
 }
