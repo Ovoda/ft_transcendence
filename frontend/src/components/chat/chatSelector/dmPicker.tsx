@@ -45,7 +45,7 @@ export default function DmPicker() {
 				user.roles.map((role) =>
 					<div key={role.id} onClick={() => selectDmRoom(role.chatroom.id, role.id)} className="dm_picker_room">
 						<img src={user.avatar} alt="" />
-						<button onClick={() => watchingRequest(role.chatroom.name, mainSocket)}>Watch Game</button>
+						<Button onClick={() => watchingRequest(role.chatroom.name, mainSocket)}>Watch Game</Button>
 						<p className="dm_picker_room_name">{role.chatroom.name}</p>
 					</div>
 				)
