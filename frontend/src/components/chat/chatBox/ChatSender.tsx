@@ -23,6 +23,7 @@ export default function ChatSender() {
 		let today = new Date();
 		let time = today.toString();
 
+		console.log(chat.currentRole);
 		mainSocket?.sendMessage({
 			content: newMessage,
 			login: user.login,

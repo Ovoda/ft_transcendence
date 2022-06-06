@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
 import { UserService } from "src/user/user.service";
-import { Not, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { ChangeRoleDto } from "../dto/changeRole.dto";
 import { CreateChatDto } from "../dto/createChat.dto";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
@@ -84,21 +84,15 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (role.user.id !== user_id) {
 			throw new UserUnauthorized("this user cannot go to this room");
 		}
-		// Faire ici le ban !
 		if (role.role === e_roleType.BANNED) {
 			throw new UserUnauthorized("User is banned from this room");
-			// return null;
 		}
 		const room = await this.chatRoomService.findOneById(role.chatroom.id);
 		let otherName: string;
 		if (room.room_type === e_roomType.DM) {
-			const currentUsr = await this.userService.findOneById(user_id);
-			const othrole = await this.findOne({ where: [{ chatroom: room.id }, { user: Not(currentUsr) }] });
-			if (role.user.id === user_id) {
-				otherName = othrole.user.login;
-			} else {
-				otherName = role.user.login;
-			}
+			//const currentUsr = await this.userService.findOneById(user_id);
+			const othrole = await this.findMany({ where: { chatroom: room.id }, relations: ['user'] });
+			otherName = (othrole.items[0].user.id === user_id) ? othrole.items[1].user.login : othrole.items[0].user.login;
 		}
 		let obj = {
 			roomName: (room.name) ? room.name : otherName,
@@ -122,7 +116,6 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		}
 		if (role.role === e_roleType.BANNED) {
 			throw new UserUnauthorized("User is banned from this room");
-			// return null;
 		}
 		return await this.chatMessageService.getManyMessagesFromId(message_id, limit);
 	}
@@ -135,10 +128,8 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	 * @returns returns the updated chatroom.
 	 */
 	async postMessageFromRole(user_id: string, role_id: string, createMessageChatDto: CreateChatMessageDto) {
-		console.log("userId", user_id);
 		console.log("roleId", role_id);
-		console.log("create message dto", createMessageChatDto);
-		const role = await this.findOneById(role_id);
+		const role = await this.findOneById(role_id, {relations: ['chatroom', 'user']});
 		if (user_id !== role.user.id) {
 			throw new UserUnauthorized("this user cannot post message to this room");
 		}
@@ -147,8 +138,11 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 			//return null;
 		}
 		const message = await this.chatMessageService.postMessage(createMessageChatDto);
+		const prev = (role.chatroom.lastmessage) ? role.chatroom.lastmessage : null;
+		await this.chatMessageService.updateById(message.id, {
+			prev_message: prev,
+		})
 		const chatroom = role.chatroom;
-		message.prev_message = (role.chatroom.lastmessage) ? role.chatroom.lastmessage : null;
 		await this.chatRoomService.updateLastMessage(chatroom.id, message.id);
 		return chatroom;
 	}
@@ -169,14 +163,14 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 				user: await this.userService.findOne({ where: { id: user_id } }),
 			}
 		});
-		// console.log(callerRole);
+		console.log(callerRole);
 		const roleModified = await this.findOne({
 			where: {
 				chatroom: await this.chatRoomService.findOneById(changeRoleDto.chatroom_id),
 				user: await this.userService.findOne({ where: { login: changeRoleDto.login } }),
 			}
 		})
-		// console.log(roleModified);
+		console.log(roleModified);
 		if (
 			callerRole.role === e_roleType.LAMBDA
 			|| callerRole.role === e_roleType.MUTE
