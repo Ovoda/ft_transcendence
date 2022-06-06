@@ -66,11 +66,15 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	@SubscribeMessage('watchingRequest')
+	handleWatchingRequest(client: Socket, data: string) {
+		this.server.to(client.id).emit("starWatching", data);
+	}
 
-	@SubscribeMessage('joingGameAsWatcher')
-	handleNewWatcher(client: Socket, data: any) {
+	@SubscribeMessage('joinGameAsWatcher')
+	handleNewWatcher(client: Socket, data: string) {
 		const index = this.games.findIndex((game: GameRoom) => {
-			return (game.user1 === data.id || game.user2 === data.id);
+			return (game.login1 === data || game.login2 === data);
 		})
 		if (index >= 0) {
 			this.games[index].watchers.push(client.id);

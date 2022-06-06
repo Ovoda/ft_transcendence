@@ -31,11 +31,6 @@ export class GameService extends CrudService<GameEntity>{
 			looser: (dto.user1 === dto.winner) ? dto.user2 : dto.user1,
 			users: [user1, user2],
 		})
-		console.log(game);
-		console.log(user1);
-		console.log(user2);
-		console.log(user1.games);
-		console.log(user2.games);
 		if (!user1.games) {
 			user1.games = [game];
 		} else {
@@ -48,8 +43,6 @@ export class GameService extends CrudService<GameEntity>{
 		}
 		const newuser1 = await this.userService.save(user1);
 		const newuser2 = await this.userService.save(user2);
-		console.log(newuser1);
-		console.log(newuser2);
 		return game;
 	}
 }
