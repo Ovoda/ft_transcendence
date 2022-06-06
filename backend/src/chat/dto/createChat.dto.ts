@@ -10,7 +10,7 @@ export class CreateChatDto {
 	roomType: e_roomType;
 
 	@IsOptional()
-	roomName?: string;
+	name?: string;
 
 	@IsOptional()
 	password?: string;
