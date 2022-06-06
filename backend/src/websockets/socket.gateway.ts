@@ -5,7 +5,7 @@ import ClientSocket from "./interfaces/Socket.interface";
 import { remove } from 'lodash';
 import { LeaveRoomDto } from "./dtos/LeaveRoom.dto";
 import ClientMessageDto from "./dtos/ClientMessage.dto";
-import { ChatRoomService } from "src/chat/services/chatRoom.service";
+import { ChatRoleService } from "src/chat/services/chatRole.service";
 
 /**
  * This class is a websocket gateway.
@@ -27,7 +27,8 @@ import { ChatRoomService } from "src/chat/services/chatRoom.service";
 })
 export class SocketGateway implements OnGatewayDisconnect {
     constructor(
-        private readonly chatRoomService: ChatRoomService,
+        //private readonly chatRoomService: ChatRoomService,
+		private readonly chatRoleService: ChatRoleService,
     ) { }
 
     /** Websocket server */
@@ -78,12 +79,18 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("ClientMessage")
     public async sendMessage(socket: Socket, body: ClientMessageDto) {
         this.server.to(body.room).emit("ServerMessage", body);
-        await this.chatRoomService.postChatRoomMessage({
-            content: body.content,
-            login: body.login,
-            date: body.date,
-            avatar: body.avatar,
-        }, body.room);
+        // await this.chatRoomService.postChatRoomMessage({
+        //     content: body.content,
+        //     login: body.login,
+        //     date: body.date,
+        //     avatar: body.avatar,
+        // }, body.room);
+		await this.chatRoleService.postMessageFromRole(body.userId, body.roleId, {
+			content: body.content,
+			login: body.login,
+			avatar: body.avatar,
+			date: body.date,
+		});
     }
 
     /**

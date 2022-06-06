@@ -135,6 +135,9 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	 * @returns returns the updated chatroom.
 	 */
 	async postMessageFromRole(user_id: string, role_id: string, createMessageChatDto: CreateChatMessageDto) {
+		console.log("userId", user_id);
+		console.log("roleId", role_id);
+		console.log("create message dto", createMessageChatDto);
 		const role = await this.findOneById(role_id);
 		if (user_id !== role.user.id) {
 			throw new UserUnauthorized("this user cannot post message to this room");

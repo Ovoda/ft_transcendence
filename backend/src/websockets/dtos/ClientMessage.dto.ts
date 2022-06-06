@@ -12,4 +12,6 @@ export default interface ClientMessageDto {
     avatar: string;
     date: string;
     room: string;
+	userId: string;
+	roleId: string;
 } 
