@@ -20,7 +20,7 @@ export default function Chat() {
 		return (
 			<div id='chat'>
 				<DmPicker />
-				{/*<ChatBox />*/}
+				<ChatBox />
 				{/* {chatData.displayOptions && <ChatOptions />} */}
 			</div>
 		);

@@ -68,7 +68,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('watchingRequest')
 	handleWatchingRequest(client: Socket, data: string) {
-		this.server.to(client.id).emit("starWatching", data);
+		console.log("Watching Request for player: ");
+		console.log(data);
+		this.server.to(client.id).emit("startWatching", data);
 	}
 
 	@SubscribeMessage('joinGameAsWatcher')

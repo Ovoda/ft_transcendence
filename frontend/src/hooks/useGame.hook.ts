@@ -13,7 +13,7 @@ import { Store } from '../app/store';
 import { useSelector } from "react-redux";
 import UserData from "features/user/interfaces/user.interface";
 
-const scoreToWin: number = 10;
+const scoreToWin: number = 50;
 
 interface Props {
 	setGameplay: Dispatch<SetStateAction<Gameplay>>,
@@ -64,6 +64,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		/**  Watcher joins game room **/
 		mainSocket.on("startWatching", (data: string) => {
+			console.log("Starting Watching: ");
+			console.log(data);
 			setGameStatus({ ...gameStatus, side: UserStatusEnum.WATCHER, start: false, win: "", watch: true, ready: true })
 			mainSocket?.emit("joinGameAsWatcher", data);
 		})
