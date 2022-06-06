@@ -24,11 +24,6 @@ export class AuthController {
     @UseGuards(FtAuthGuard)
     async ftCallback(@Query("code") code: string, @Req() req: any, @Res() res: Response) {
         const { access_token } = await this.authService.login(req.user);
-
-        const cookie = `authentication=${access_token}; HttpOnly; Path=/; Max-Age=15min`
-
-        res.setHeader("Set-Cookie", cookie);
-
         const user = await this.userService.findOne({
             where: {
                 login: req.user.login,
@@ -39,6 +34,8 @@ export class AuthController {
         if (user.tfaEnabled) {
             url = process.env.FRONTEND_URL + "/tfa";
         }
+
+        res.setHeader("Set-Cookie", this.authService.createAuthCookie(access_token));
         res.status(302).redirect(url);
     }
 
@@ -52,7 +49,7 @@ export class AuthController {
     @Post("tfa/enable")
     @HttpCode(200)
     @UseGuards(JwtAuthGuard)
-    async enableTfa(@Req() req: JwtRequest, @Body() body: EnableTfaDto) {
+    async enableTfa(@Req() req: JwtRequest, @Body() body: EnableTfaDto, @Res() res: Response) {
         const tfaCode = body.tfaCode;
 
         const codeIsValid = await this.authService.checkTfaCodeValidity(tfaCode, req.user);
@@ -60,7 +57,14 @@ export class AuthController {
         if (!codeIsValid) {
             throw new UnauthorizedException("Wrong authentication code");
         }
-        return await this.userService.turnTfaOn(req.user.id);
+        await this.userService.turnTfaOn(req.user.id);
+
+        const { access_token } = await this.authService.getJwtAccessToken(req.user.id, true);
+
+        res.setHeader("Set-Cookie",
+            this.authService.createAuthCookie(access_token)
+        );
+        res.send();
     }
 
     @Get("tfa/disable")
@@ -81,11 +85,10 @@ export class AuthController {
         if (!codeIsValid) {
             throw new UnauthorizedException("Wrong authentification code");
         }
+
         const { access_token } = await this.authService.getJwtAccessToken(req.user.id, true);
 
-        const cookie = `authentication=${access_token}; HttpOnly; Path=/; Max-Age=15min`
-
-        res.setHeader("Set-Cookie", cookie);
+        res.setHeader("Set-Cookie", this.authService.createAuthCookie(access_token));
         res.send();
     }
 

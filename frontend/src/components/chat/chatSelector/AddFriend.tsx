@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { RoomTypeEnum } from "enums/RoomType.enum";
 import TextInput from "../../../assets/TextInput/TextInput";
-import { createDm } from "services/api.service";
+import { createRoom } from "services/api.service";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import { updateUser } from "../../../features/user/user.slice";
@@ -32,8 +32,8 @@ export default function AddFriend({ className, swap }: Props) {
             return false;
         }
 
-        const response = await createDm({
-            name: login,
+        const response = await createRoom({
+            name: "",
             logins: [user.login, login],
             password: "",
             roomType: RoomTypeEnum.DM

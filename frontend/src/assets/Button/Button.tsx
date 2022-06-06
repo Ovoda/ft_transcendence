@@ -3,10 +3,11 @@ import './Button.scss';
 
 interface Props {
     onClick: (event: MouseEvent<HTMLButtonElement>) => Promise<boolean>;
+    id?: string;
     children: ReactNode;
 }
 
-export default function Button({ onClick, children }: Props) {
+export default function Button({ onClick, id = "", children }: Props) {
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -23,9 +24,9 @@ export default function Button({ onClick, children }: Props) {
         <>
             {
                 isLoading ?
-                    <button className="button" >Loading...</button>
+                    <button id={id} className="button" >Loading...</button>
                     :
-                    <button className="button" onClick={handleClick}> {children}</button>
+                    <button id={id} className="button" onClick={handleClick}> {children}</button>
             }
         </>
     )

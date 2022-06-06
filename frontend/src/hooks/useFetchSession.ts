@@ -1,8 +1,8 @@
+import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../features/user/user.slice";
 import { getUserData } from "../services/api.service";
-
 
 export default function useFetchSession() {
 
@@ -10,10 +10,7 @@ export default function useFetchSession() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-
-        // if (window.location.href === process.env.REACT_APP_FRONTEND_URL as string) {
-        fetchUserData();
-        // }
+        if (!Cookies.get("authentication")) return;
 
         async function fetchUserData() {
             const userData = await getUserData();
@@ -22,5 +19,6 @@ export default function useFetchSession() {
                 dispatch(updateUser(userData));
             }
         }
+        fetchUserData();
     }, []);
 }

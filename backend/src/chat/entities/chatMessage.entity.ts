@@ -1,6 +1,4 @@
-import { ApiProperty, ApiBody } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ChatRoleEntity } from "./chatRole.entity";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class ChatMessageEntity {
@@ -8,11 +6,17 @@ export class ChatMessageEntity {
 	id: string;
 
 	@Column()
-	userId: string;
+	login: string;
 
 	@Column()
-	message: string;
+	avatar: string;
 
-	@Column({nullable: true})
+	@Column()
+	content: string;
+
+	@Column()
+	date: string;
+
+	@Column({ nullable: true })
 	prev_message: string;
 }

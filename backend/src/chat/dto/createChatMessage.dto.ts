@@ -3,13 +3,19 @@ import { IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 
 export class CreateChatMessageDto {
 	@IsNotEmpty()
-	message: string;
+	content: string;
 
-	@IsUUID()
 	@IsNotEmpty()
-	userId: string;
+	login: string;
+
+	@IsNotEmpty()
+	avatar: string;
 
 	@IsOptional()
 	@IsUUID()
 	prevMessage?: string;
+
+	@IsNotEmpty()
+	date: string;
+
 }

@@ -77,11 +77,12 @@ export class SocketGateway implements OnGatewayDisconnect {
      */
     @SubscribeMessage("ClientMessage")
     public async sendMessage(socket: Socket, body: ClientMessageDto) {
-        console.log(`Sent message : ${body.content} to room : ${body.room}`);
         this.server.to(body.room).emit("ServerMessage", body);
         await this.chatRoomService.postChatRoomMessage({
-            message: body.content,
-            userId: body.from,
+            content: body.content,
+            login: body.login,
+            date: body.date,
+            avatar: body.avatar,
         }, body.room);
     }
 
@@ -93,7 +94,6 @@ export class SocketGateway implements OnGatewayDisconnect {
      */
     @SubscribeMessage("JoinRoom")
     public joinRoom(socket: Socket, body: JoinRoomDto) {
-        console.log(`Joined room ${body.roomId}`);
         socket.join(body.roomId);
     }
 
@@ -105,7 +105,6 @@ export class SocketGateway implements OnGatewayDisconnect {
      */
     @SubscribeMessage("LeaveRoom")
     public leaveRoom(socket: Socket, body: LeaveRoomDto) {
-        console.log(`Left room ${body.roomId}`);
         socket.leave(body.roomId);
     }
 }

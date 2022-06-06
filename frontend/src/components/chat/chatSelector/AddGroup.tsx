@@ -6,6 +6,8 @@ import { Store } from "src/app/store";
 import Button from "assets/Button/Button";
 import { closeChatRoomCreationModal } from "features/chat/chat.slice";
 import close from 'images/close.png';
+import { createRoom } from "services/api.service";
+import { updateUser } from "features/user/user.slice";
 
 interface Props {
     className: string;
@@ -19,46 +21,43 @@ export default function AddGroup({ className, swap }: Props) {
 
     /** Variables */
     const [groupName, setGroupName] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
     const [errorText, setErrorText] = useState<string>("");
     const [successText, setSuccessText] = useState<string>("");
 
     /** Tools */
     const dispatch = useDispatch();
 
-    // async function handleRoomCreation() {
-    //     if (login === "") return false;
-    //     if (login === user.login) {
-    //         setErrorText("You cannot add yourself");
-    //         return false;
-    //     }
+    async function handleRoomCreation() {
+        if (groupName === "") return false;
 
-    //     const response = await createDm({
-    //         name: login,
-    //         logins: [user.login, login],
-    //         password: "",
-    //         roomType: RoomTypeEnum.DM
-    //     });
+        const response = await createRoom({
+            name: groupName,
+            logins: [user.login],
+            password: "",
+            roomType: RoomTypeEnum.ROOM
+        });
 
-    //     if (!response.data) {
-    //         setErrorText(response.error);
-    //         return false;
-    //     }
+        if (!response.data) {
+            setErrorText(response.error);
+            return false;
+        }
 
-    //     dispatch(updateUser(response.data));
-    //     setSuccessText("User added successfully");
-    //     return false;
-    // }
+        dispatch(updateUser(response.data));
+        setSuccessText("Group created successfully");
+        return false;
+    }
 
-    // useEffect(() => {
-    //     setErrorText("");
-    //     setSuccessText("");
-    // }, [login]);
+    useEffect(() => {
+        setErrorText("");
+        setSuccessText("");
+    }, [groupName, password]);
 
     return (
         <div className={"room_creation " + className}>
             <h2>Create a group</h2>
             <TextInput id="" text={groupName} setText={setGroupName} type="text" name="" placeholder="Group name" />
-            <TextInput id="" text={groupName} setText={setGroupName} type="password" name="" placeholder="Password (optional)" />
+            <TextInput id="" text={password} setText={setPassword} type="password" name="" placeholder="Password (optional)" />
             {
                 errorText ?
                     <p className="error_text">{errorText}</p>
@@ -67,7 +66,7 @@ export default function AddGroup({ className, swap }: Props) {
             }
             <div id="room_creation_modal_nav">
                 <p onClick={swap} className="link">Add a friend</p>
-                <Button onClick={async () => { return false }}>Next</Button>
+                <Button onClick={handleRoomCreation}>Next</Button>
             </div>
         </div>
     );

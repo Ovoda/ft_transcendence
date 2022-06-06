@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { mainSocketContext } from "../../../App";
 import './ChatSender.scss';
 import { Store } from "src/app/store";
+import TextInput from "assets/TextInput/TextInput";
+import Button from "assets/Button/Button";
 
 export default function ChatSender() {
 
@@ -16,38 +18,29 @@ export default function ChatSender() {
 	/** Variables */
 	const [newMessage, setNewMessage] = useState<string>("");
 
-	function handleNewMessageOnChange(event: ChangeEvent<HTMLInputElement>) {
-		event.preventDefault();
-		setNewMessage(event.target.value);
-	}
-
-	function sendMessage(event: FormEvent<HTMLFormElement>) {
+	async function sendMessage(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 
-		if (newMessage === "") return;
+		if (newMessage === "") return false;
 
-		var today = new Date();
-		var time = today.getHours() + ":" + today.getMinutes();
+		let today = new Date();
+		let time = today.toString();
 
 		mainSocket?.sendMessage({
 			content: newMessage,
-			from: user.login,
+			login: user.login,
 			date: time,
 			room: chat.currentRoom,
+			avatar: user.avatar,
 		});
 		setNewMessage("");
+		return false;
 	}
 
 	return (
-		<form className="chat_sender" onSubmit={sendMessage}>
-			<input
-				type="text"
-				className="message_input"
-				placeholder="your message"
-				value={newMessage}
-				onChange={handleNewMessageOnChange}
-			/>
-			<button type="submit">send</button>
+		<form className="chat_sender" onClick={sendMessage}>
+			<TextInput text={newMessage} setText={setNewMessage} type="text" />
+			<button type="submit" hidden></button>
 		</form>
 	);
 }

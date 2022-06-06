@@ -5,6 +5,8 @@ import Message from '../../shared/interfaces/Message';
 const initialState: Chat = {
 	messages: [],
 	currentRoom: "",
+	currentRole: "",
+	currentLastMessage: "",
 	displayChat: false,
 	displayOptions: false,
 	roomtype: e_roomtype.DM,
@@ -25,11 +27,25 @@ const chat = createSlice({
 		updateDisplayOptions(state, action) {
 			return { ...state, displayOptions: action.payload }
 		},
-		openChatDms(state) {
-			return { ...state, displayChat: true, displayChatSelector: false };
+		openChatDm(state, action) {
+			return {
+				...state,
+				displayChat: true,
+				displayChatSelector: false,
+				currentRoom: action.payload.roomId,
+				currentRole: action.payload.roleId,
+				currentLastMessage: action.payload.lastmessage,
+			};
 		},
 		closeChatDms(state) {
-			return { ...state, displayChat: false, displayChatSelector: true };
+			return {
+				...state,
+				displayChat: false,
+				displayChatSelector: true,
+				currentRole: "",
+				currentRoom: "",
+				messages: [],
+			};
 		},
 		openChatRoomCreationModal(state) {
 			return { ...state, displayRoomCreationModal: true };
@@ -40,12 +56,9 @@ const chat = createSlice({
 		addMessage(state, action) {
 			return { ...state, messages: [...state.messages, action.payload] };
 		},
-		clearMessages(state) {
-			return { ...state, messages: [] };
-		},
-		setCurrentRoom(state, action) {
-			console.log(`Current room : ${action.payload}`);
-			return { ...state, currentRoom: action.payload };
+		setMessages(state, action) {
+			const array = action.payload.reverse();
+			return { ...state, messages: array };
 		}
 	},
 });
@@ -54,12 +67,11 @@ export const {
 	updateChatSelector,
 	updateRoomtype,
 	updateDisplayOptions,
-	openChatDms,
+	openChatDm,
 	closeChatDms,
 	addMessage,
-	clearMessages,
-	setCurrentRoom,
+	setMessages,
 	openChatRoomCreationModal,
-	closeChatRoomCreationModal
+	closeChatRoomCreationModal,
 } = chat.actions;
 export default chat.reducer;

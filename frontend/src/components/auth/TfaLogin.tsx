@@ -39,9 +39,6 @@ export default function TfaLogin() {
         async function callTfaEnabling() {
             const res = await loginTfa(code);
 
-            console.log(res);
-
-
             if (res) {
                 const userData = await getUserData();
                 if (userData) {

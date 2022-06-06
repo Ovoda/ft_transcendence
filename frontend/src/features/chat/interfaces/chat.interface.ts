@@ -7,9 +7,11 @@ export enum e_roomtype {
 
 export default interface Chat {
 	displayChatSelector: boolean;
+	currentRole: string;
 	roomtype: e_roomtype;
 	displayChat: boolean;
 	displayOptions: boolean;
+	currentLastMessage: string;
 	displayRoomCreationModal: boolean,
 	messages: Message[];
 	currentRoom: string;

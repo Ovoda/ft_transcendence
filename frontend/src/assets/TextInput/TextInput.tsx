@@ -18,6 +18,10 @@ interface Props {
  * 
  * @param props.text - value of the input text
  * @param props.setText - setter of props.text
+ * @param props.type - input's type
+ * @param props.name - input's name
+ * @param props.id - input's dom ID
+ * @param props.placeholder - input's placeholder
  * @returns an input element of type text
  */
 export default function TextInput({ text, setText, type = "text", name = "", id = "", placeholder = "" }: Props) {

@@ -1,21 +1,17 @@
 .chat_sender {
 	display: flex;
-	justify-content: center;
+	justify-content: space-around;
 	align-items: center;
+	padding: 2rem;
 
-	input {
+	.reskue_text_input_container {
+		margin: 0;
 		width: 100%;
-		padding: 1rem;
-		box-sizing: border-box;
-	}
 
-	button {
-		padding: 1rem;
-		border-radius: 0;
-		border: 1px solid black;
-		background-color: black;
-		color: white;
-		box-shadow: none;
-		box-sizing: border-box;
+		// input {
+		// 	height: 30px;
+		// 	border: 1px solid rgba(0, 0, 0, 0.2);
+		// 	background-color: #fff;
+		// }
 	}
 }

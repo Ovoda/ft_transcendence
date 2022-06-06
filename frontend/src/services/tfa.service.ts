@@ -42,14 +42,16 @@ export async function toggleTfa({ dispatch, uiTfaEnabled }: ToggleTfaProps) {
  * @param props.dispatch useDisptach() return object from redux
  */
 export async function generateTfa({ dispatch }: GenerateTfaProps) {
-    const res = await axios.get(config.getValue("REACT_APP_BACKEND_URL") + "/auth/tfa/generate", {
-        responseType: "blob",
-    });
 
-    const url = window.URL.createObjectURL(new Blob([res.data]));
+    try {
+        const res = await api.get("/auth/tfa/generate", { responseType: "blob", });
+        const url = window.URL.createObjectURL(new Blob([res.data]));
 
-    dispatch(updateQrCode(url));
-    dispatch(openTfaRegistration());
+        dispatch(updateQrCode(url));
+        dispatch(openTfaRegistration());
+    } catch (err: any) {
+        console.log(err.response);
+    }
 }
 
 /**

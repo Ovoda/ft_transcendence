@@ -9,9 +9,12 @@ export function login() {
 
 /** Logs out current user */
 export async function logout() {
-    Cookies.remove("authentication");
-    const res = await api.get("/auth/logout");
-    window.location.reload();
+    try {
+        await api.get("/auth/logout");
+        window.location.reload();
+    } catch (err: any) {
+        console.log(err.response);
+    }
 }
 
 /**

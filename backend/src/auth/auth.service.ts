@@ -17,7 +17,7 @@ export class AuthService {
 
     async login(user: CreateUserDto) {
         const entity = await this.userService.findOrCreate(user);
-        return await this.getJwtAccessToken(entity.id, false);
+        return await this.getJwtAccessToken(entity.id);
     }
 
     async getJwtAccessToken(userID: string, isTfa: boolean = false) {
@@ -47,4 +47,7 @@ export class AuthService {
         });
     }
 
+    createAuthCookie(access_token: string) {
+        return (`authentication=${access_token}; Path=/; Max-Age=6h`);
+    }
 }

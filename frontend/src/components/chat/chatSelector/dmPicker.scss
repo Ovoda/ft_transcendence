@@ -1,34 +1,91 @@
 #dm_picker {
+    box-sizing: border-box;
+
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: 100%;
-    box-sizing: border-box;
+    justify-content: flex-start;
+    gap: 1rem;
 
-    .chat_friend {
-        box-sizing: border-box;
+    background-color: #efefef;
+    height: 100%;
+    border-radius: 1rem;
 
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 1rem;
+    padding: 1rem;
 
-        padding: 0.5rem;
+    .dm_picker_room {
+        position: relative;
         width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-        font-family: 'Radio Canada', sans-serif;
-        font-size: 1.6rem;
+        p.dm_picker_room_name {
+            z-index: 10;
+            position: absolute;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.8);
+            box-sizing: border-box;
 
-        cursor: pointer;
+            font-size: 1.4rem;
+            color: white;
+            padding: 0.5rem 1rem;
+
+            border-radius: 0.5rem;
+            min-width: max-content;
+
+            top: 0;
+            left: 0;
+            transform: translate(100%, 0);
+            transition: all 0.3s;
+            animation: fade-in 0.3s forwards;
+        }
+
+        &:hover p.dm_picker_room_name {
+            display: inline-block;
+        }
 
         img {
+            width: 60px;
+            height: 60px;
             border-radius: 100%;
+            cursor: pointer;
+
+            box-shadow: none;
+            transition: all 0.3s;
+
+            &:hover {
+                box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+            }
         }
 
-        &:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
+    }
 
+    #add_room_button {
+        height: 60px;
+        width: 60px;
+        min-width: 60px;
+
+        box-sizing: border-box;
+
+        font-size: 4rem;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        padding: 0;
+        border-radius: 100%;
+
+    }
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }

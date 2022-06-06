@@ -43,7 +43,7 @@ function App() {
         dispatch(addMessage(message));
       });
     }
-  }, [userData]);
+  }, [userData.login]);
 
   useEffect(() => {
     if (chat.currentRoom !== "") {

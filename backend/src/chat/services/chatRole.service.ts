@@ -21,13 +21,13 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		private readonly chatRoomService: ChatRoomService,
 		private readonly chatMessageService: ChatMessageService,
 		protected readonly _log: Logger,
-	){
+	) {
 		super(_repository, _log);
-	}	
+	}
 
-	public async createRoles(dto: CreateChatDto){
+	public async createRoles(dto: CreateChatDto) {
 		let roles: ChatRoleEntity[] = [];
-		for (let i = 0; i < dto.logins.length; i++){
+		for (let i = 0; i < dto.logins.length; i++) {
 			let role = await this.create({
 				user: await this.userService.findOne(
 					{
@@ -39,15 +39,17 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 			});
 			roles.push(role);
 		}
-		for (let i = 0; i < dto.logins.length; i++){
+		for (let i = 0; i < dto.logins.length; i++) {
 			await this.save(roles[i]);
 		}
 		return roles;
 	}
 
 	async getRoomFromRole(user_id: string, role_id: string) {
-		const role = await this.findOneById(role_id);
-		if (role.user.id != user_id){
+		const role = await this.findOneById(role_id, {
+			relations: ["user"],
+		});
+		if (role.user.id !== user_id) {
 			throw new UserUnauthorized("this user cannot go to this room");
 		}
 		// Faire ici le ban !
@@ -55,8 +57,10 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	}
 
 	async getManyMessagesFromRole(user_id: string, role_id: string, message_id: string, limit: number) {
-		const role = await this.findOneById(role_id);
-		if (user_id != role.user.id){
+		const role = await this.findOneById(role_id, {
+			relations: ['user'],
+		});
+		if (user_id !== role.user.id) {
 			throw new UserUnauthorized("This user cannot read thoses messages.");
 		}
 		return await this.chatMessageService.getManyMessagesFromId(message_id, limit);
@@ -64,7 +68,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 
 	async postMessageFromRole(user_id: string, role_id: string, createMessageChatDto: CreateChatMessageDto) {
 		const role = await this.findOneById(role_id);
-		if (user_id != role.user.id){
+		if (user_id !== role.user.id) {
 			throw new UserUnauthorized("this user cannot post message to this room");
 		}
 		const message = await this.chatMessageService.postMessage(createMessageChatDto);

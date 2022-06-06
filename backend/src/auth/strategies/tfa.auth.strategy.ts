@@ -15,7 +15,7 @@ export class TfaStrategy extends PassportStrategy(Strategy, "user-tfa") {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 (request: Request) => {
-                    let data = request?.cookies?.authentication;
+                    let data = request.cookies.authentication;
 
                     if (!data) {
                         return null;

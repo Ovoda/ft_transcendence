@@ -1,10 +1,9 @@
-import { forwardRef, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
 import { Repository } from "typeorm";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
 import { ChatMessageEntity } from "../entities/chatMessage.entity";
-import { ChatRoomService } from "./chatRoom.service";
 
 @Injectable()
 export class ChatMessageService extends CrudService<ChatMessageEntity>{
@@ -43,9 +42,11 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 	 */
 	async postMessage(dto: CreateChatMessageDto) {
 		const newMessage = await this.save({
-			message: dto.message,
-			userId: dto.userId,
+			content: dto.content,
+			login: dto.login,
+			date: dto.date,
 			prev_message: dto.prevMessage,
+			avatar: dto.avatar,
 		});
 		return newMessage;
 	}

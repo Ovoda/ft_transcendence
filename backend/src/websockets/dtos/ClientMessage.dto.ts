@@ -8,7 +8,8 @@
  */
 export default interface ClientMessageDto {
     content: string;
-    from: string;
+    login: string;
+    avatar: string;
     date: string;
     room: string;
 } 

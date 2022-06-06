@@ -18,15 +18,17 @@ export async function getUserData(): Promise<UserData | null | undefined> {
         const response = await api.get("/user");
         return response.data as UserData;
     } catch (error: any) {
-        console.log(error.response);
+        // console.log(error.response);
     }
 }
 
-export async function getPreviousMessages(roleId: string, messageId: string) {
+export async function getPreviousMessages(roleId: string, messageId: string | null) {
     try {
-        const ret = api.get("/chat/many/messages/:role_id/:message_id");
+        if (!messageId) return [];
+        const ret = await api.get(`/chat/many/messages/${roleId}/${messageId}?limit=20`);
+        return (ret.data);
     } catch (err: any) {
-
+        // console.log(err.response);
     }
 }
 
@@ -35,7 +37,7 @@ export async function getPreviousMessages(roleId: string, messageId: string) {
  * @param createRoomDto DTO for chatroom creation
  * @returns data and empty error if successfull, null data and error message otherwise
  */
-export async function createDm(createRoomDto: CreateRoomDto) {
+export async function createRoom(createRoomDto: CreateRoomDto) {
     try {
         await api.post("/chat/create", createRoomDto);
         return { data: await getUserData(), error: "" }
