@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import { updateUser } from "../../../features/user/user.slice";
 import Button from "assets/Button/Button";
+import { closeChatRoomCreationModal } from "features/chat/chat.slice";
 
 interface Props {
     className: string;
@@ -33,7 +34,7 @@ export default function AddFriend({ className, swap }: Props) {
         }
 
         const response = await createRoom({
-            name: "",
+            name: user.login,
             logins: [user.login, login],
             password: "",
             roomType: RoomTypeEnum.DM
@@ -45,7 +46,8 @@ export default function AddFriend({ className, swap }: Props) {
         }
 
         dispatch(updateUser(response.data));
-        setSuccessText("User added successfully");
+        // setSuccessText("User added successfully");
+        dispatch(closeChatRoomCreationModal())
         return false;
     }
 

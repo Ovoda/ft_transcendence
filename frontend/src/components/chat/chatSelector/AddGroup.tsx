@@ -4,7 +4,7 @@ import TextInput from "../../../assets/TextInput/TextInput";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import Button from "assets/Button/Button";
-import { closeChatRoomCreationModal } from "features/chat/chat.slice";
+import { closeChatRoomCreationModal, openChatRoomCreationModal } from "features/chat/chat.slice";
 import close from 'images/close.png';
 import { createRoom } from "services/api.service";
 import { updateUser } from "features/user/user.slice";
@@ -44,7 +44,7 @@ export default function AddGroup({ className, swap }: Props) {
         }
 
         dispatch(updateUser(response.data));
-        setSuccessText("Group created successfully");
+        dispatch(openChatRoomCreationModal());
         return false;
     }
 

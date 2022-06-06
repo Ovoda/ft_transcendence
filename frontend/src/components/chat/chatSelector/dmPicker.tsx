@@ -20,12 +20,15 @@ export default function DmPicker() {
 	const dispatch = useDispatch();
 
 	async function selectDmRoom(roomId: string, roleId: string) {
+		console.log(roomId);
+
 		if (chat.currentRoom) {
 			mainSocket?.leaveRoom(chat.currentRoom);
 		}
 
 		const ret = await api.get(`/chat/room/${roleId}`);
-		console.log(ret.data);
+
+
 		dispatch(openChatDm({ roomId, roleId, lastmessage: ret.data.lastmessage }));
 	}
 

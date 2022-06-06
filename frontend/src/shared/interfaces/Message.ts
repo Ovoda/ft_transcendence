@@ -7,9 +7,11 @@
  * @field room: string - room ID where message should be sent
  */
 export default interface SendChatMessageDto {
-    content: string;
+    room: string;
+    date: string;
     login: string;
     avatar: string;
-    date: string;
-    room: string;
+    content: string;
+    roleId: string;
+    userId: string;
 }

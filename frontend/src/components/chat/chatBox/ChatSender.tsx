@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
+import React, { ChangeEvent, FormEvent, MouseEvent, useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { mainSocketContext } from "../../../App";
 import './ChatSender.scss';
@@ -12,13 +12,10 @@ export default function ChatSender() {
 	const mainSocket = useContext(mainSocketContext);
 	const { user, chat } = useSelector((store: Store) => store);
 
-	/** Tools */
-	const dispatch = useDispatch();
-
 	/** Variables */
 	const [newMessage, setNewMessage] = useState<string>("");
 
-	async function sendMessage(event: FormEvent<HTMLFormElement>) {
+	async function sendMessage(event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) {
 		event.preventDefault();
 
 		if (newMessage === "") return false;
@@ -32,6 +29,8 @@ export default function ChatSender() {
 			date: time,
 			room: chat.currentRoom,
 			avatar: user.avatar,
+			roleId: chat.currentRole,
+			userId: user.id,
 		});
 		setNewMessage("");
 		return false;
@@ -40,7 +39,7 @@ export default function ChatSender() {
 	return (
 		<form className="chat_sender" onClick={sendMessage}>
 			<TextInput text={newMessage} setText={setNewMessage} type="text" />
-			<button type="submit" hidden></button>
+			<Button onClick={sendMessage}>Send</Button>
 		</form>
 	);
 }
