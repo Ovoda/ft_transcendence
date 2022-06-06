@@ -7,15 +7,6 @@ export class GameEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
-	//@Column()
-	//user1: string;
-
-	//@Column()
-	//user2: string;
-
-	//@Column()
-	//periode: number;
-
 	@Column()
 	winner: string;
 
@@ -29,5 +20,6 @@ export class GameEntity {
 	score2: number;
 
 	@ManyToMany(() => UserEntity, user => user.roles, { nullable: true })
+	@JoinTable()
 	users: UserEntity[];
 }

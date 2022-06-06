@@ -22,29 +22,31 @@ export class GameService extends CrudService<GameEntity>{
 		super(_repository, _log);
 	}
 
-	async saveNewGame(createGameDto: CreateGameDto) {
-		const user1 = await this.userService.findOneById(createGameDto.user1);
-		const user2 = await this.userService.findOneById(createGameDto.user2);
-		console.log(user1, user2);
-		const game = await this.create({
-			score1: createGameDto.score1,
-			score2: createGameDto.score2,
-			winner: createGameDto.winner,
-			looser: (createGameDto.user1 === createGameDto.winner) ? createGameDto.user2 : createGameDto.user1,
+	async saveNewGame(dto: CreateGameDto) {
+		const user1 = await this.userService.findOneById(dto.user1);
+		const user2 = await this.userService.findOneById(dto.user2);
+		const game = await this.save({
+			score1: dto.score1,
+			score2: dto.score2,
+			winner: dto.winner,
+			looser: (dto.user1 === dto.winner) ? dto.user2 : dto.user1,
 			users: [user1, user2],
-		});
-		const savedGame = await this.save(game);
+		})
+		console.log(game);
 		if (!user1.games) {
-			user1.games = [savedGame];
+			user1.games = [game];
 		} else {
-			user1.games.push(savedGame);
+			user1.games.push(game);
 		}
 		if (!user2.games) {
-			user2.games = [savedGame];
+			user2.games = [game];
 		} else {
-			user2.games.push(savedGame);
+			user2.games.push(game);
 		}
-		console.log(game);
-		return savedGame;
+		await this.userService.save(user1);
+		await this.userService.save(user2);
+		console.log(user1);
+		console.log(user2);
+		return game;
 	}
 }

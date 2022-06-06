@@ -51,15 +51,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', false);
 		}
 		else {
-			this.games[this.games.length - 1].socket2 = client.id;
-			this.games[this.games.length - 1].status = true;
-			client.join(this.games[this.games.length - 1].id);
-			this.games[this.games.length - 1].user2 = data.id;
-			this.games[this.games.length - 1].login2 = data.login;
+			const gameroom: GameRoom = this.games[this.games.length - 1];
+			gameroom.socket2 = client.id;
+			gameroom.user2 = data.id;
+			gameroom.login2 = data.login;
+			gameroom.status = true;
+			client.join(gameroom.id);
 			this.server.to(client.id).emit('setSide', "right");
-			this.server.to(this.games[this.games.length - 1].socket1).emit('rightLogin', this.games[this.games.length - 1].login2);
-			this.server.to(this.games[this.games.length - 1].socket2).emit('leftLogin', this.games[this.games.length - 1].login1);
-			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', true);
+			this.server.to(gameroom.socket1).emit('rightLogin', gameroom.login2);
+			this.server.to(gameroom.socket2).emit('leftLogin', gameroom.login1);
+			this.server.to(gameroom.id).emit('gameStatus', true);
 		}
 	}
 
@@ -94,8 +95,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			const newdto: CreateGameDto = {
 				user1: this.games[index].user1,
 				user2: this.games[index].user2,
-				score1: data[0],
-				score2: data[1],
+				score1: data.posX,
+				score2: data.posY,
 				winner: (client.id === this.games[index].socket1 ? this.games[index].user2 : this.games[index].user1),
 			}
 			return await this.gameService.saveNewGame(newdto);
@@ -144,11 +145,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	//}
 
 	afterInit(server: any) {
-		// this.logger.log('Init');
+		 this.logger.log('Init');
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		// this.logger.log(`Client connected: ${client.id}`);
+		 this.logger.log(`Client connected: ${client.id}`);
 	}
 
 	handleDisconnect(client: Socket, ...args: any[]) {
