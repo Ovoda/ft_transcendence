@@ -9,6 +9,7 @@ import { api } from "services/api.service";
 import ClientSocket from "services/websocket";
 import { useContext } from "react";
 import { mainSocketContext } from "../../../App";
+import { watchingRequest } from "../../game/services/watch.service";
 
 export default function DmPicker() {
 
@@ -44,6 +45,7 @@ export default function DmPicker() {
 				user.roles.map((role) =>
 					<div key={role.id} onClick={() => selectDmRoom(role.chatroom.id, role.id)} className="dm_picker_room">
 						<img src={user.avatar} alt="" />
+						<button onClick={() => watchingRequest(role.chatroom.name, mainSocket)}>Watch Game</button>
 						<p className="dm_picker_room_name">{role.chatroom.name}</p>
 					</div>
 				)

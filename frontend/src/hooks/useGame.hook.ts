@@ -32,6 +32,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 	useEffect(() => {
 
+		/**  start watching game of user **/
+
 		/** Set keyboard listeners */
 		window.addEventListener("keydown",
 			(event: KeyboardEvent) => handleKeyPressed({
@@ -60,6 +62,11 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			mainSocket.emit("deleteRoom");
 		});
 
+		/**  Watcher joins game room **/
+		mainSocket.on("startWatching", (data: string) => {
+			setGameStatus({ ...gameStatus, side: UserStatusEnum.WATCHER, start: false, win: "", watch: true, ready: true })
+			mainSocket?.emit("joinGameAsWatcher", data);
+		})
 
 		/** Set status of Room */
 		mainSocket.on("gameStatus", (fullRoom: any) => {

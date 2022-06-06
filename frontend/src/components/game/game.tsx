@@ -63,11 +63,12 @@ function Game() {
 	}
 
 	/**  start watching game of user **/
-	//send ID of player you wsnt to watch
-	function startWatching(user: SetUserDto) {
-		setGameStatus({ ...gameStatus, side: UserStatusEnum.WATCHER, start: false, win: "", watch: true, ready: true })
-		mainSocket?.emit("joingGameAsWatcher", user);
-	}
+	////send ID of player you wsnt to watch
+	//function startWatching(login: string) {
+	//	console.log(login);
+	//	//setGameStatus({ ...gameStatus, side: UserStatusEnum.WATCHER, start: false, win: "", watch: true, ready: true })
+	//	//mainSocket?.emit("joingGameAsWatcher", login);
+	//}
 
 	/**  stop watching game **/
 	function stopWatching() {
