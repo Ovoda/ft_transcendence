@@ -222,12 +222,13 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				(event: KeyboardEvent) => handleKeyPressed({
 					event,
 					setGameplay,
-					GameStatus,
+					gameStatus,
 				}));
 			window.addEventListener("keyup",
 				(event: KeyboardEvent) => handleKeyUnpressed({
 					event,
-					GameStatus,
+					setGameplay,
+					gameStatus,
 				}));
 		};
 	}, []);

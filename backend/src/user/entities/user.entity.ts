@@ -27,7 +27,7 @@ export class UserEntity {
 	// @JoinTable()
 	// chatroom: ChatEntity[];
 
-	@ManyToMany(() => GameEntity, games => games, { nullable: true })
+	@ManyToMany(() => GameEntity, games => games)
 	@JoinTable()
 	games: GameEntity[];
 

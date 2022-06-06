@@ -12,6 +12,7 @@ import { GameRoom } from '../types/gameRoom.interface';
 import { CannotPlay } from "../exceptions/cannotPlay.exception";
 import { GameService } from "../services/game.service";
 import { CreateGameDto } from "../dto/createGame.dto";
+import { forEach } from "lodash";
 
 @WebSocketGateway({
 	cors: {
@@ -44,6 +45,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				login2: null,
 				user1: data.id,
 				user2: null,
+				watchers: [],
 			}
 			this.games.push(newGame);
 			client.join(newGame.id);
@@ -64,6 +66,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+
+	@SubscribeMessage('joingGameAsWatcher')
+	handleNewWatcher(client: Socket, data: any) {
+		const index = this.games.findIndex((game: GameRoom) => {
+			return (game.user1 === data.id || game.user2 === data.id);
+		})
+		if (index >= 0) {
+			this.games[index].watchers.push(client.id);
+			client.join(this.games[index].id);
+		}
+	}
 
 	@SubscribeMessage('resetGame')
 	handleResetScore(client: Socket, data: any) {
@@ -101,6 +114,19 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 			return await this.gameService.saveNewGame(newdto);
 		}
+	}
+
+	@SubscribeMessage('stopWatching')
+	handleStopWatching(client: Socket) {
+		let watcherIndex: number;
+
+		const gameIndex = this.games.findIndex((game: GameRoom) => {
+			return watcherIndex = game.watchers.findIndex((watcher: string) => {
+				return watcher === client.id;
+			})
+		});
+		client.leave(this.games[gameIndex].id);
+		this.games[gameIndex].watchers = [...this.games[gameIndex].watchers.slice(0, watcherIndex), ...this.games[gameIndex].watchers.slice(watcherIndex + 1)];
 	}
 
 	@SubscribeMessage('deleteRoom')
@@ -145,11 +171,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	//}
 
 	afterInit(server: any) {
-		 this.logger.log('Init');
+		this.logger.log('Init');
 	}
 
 	handleConnection(client: Socket, ...args: any[]) {
-		 this.logger.log(`Client connected: ${client.id}`);
+		this.logger.log(`Client connected: ${client.id}`);
 	}
 
 	handleDisconnect(client: Socket, ...args: any[]) {

@@ -3,7 +3,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
-import { domainToASCII } from "url";
 import { CreateGameDto } from "../dto/createGame.dto";
 import { GameEntity } from "../entities/game.entity";
 import { GameGateway } from "../gateways/game.gateway";
@@ -33,6 +32,10 @@ export class GameService extends CrudService<GameEntity>{
 			users: [user1, user2],
 		})
 		console.log(game);
+		console.log(user1);
+		console.log(user2);
+		console.log(user1.games);
+		console.log(user2.games);
 		if (!user1.games) {
 			user1.games = [game];
 		} else {
@@ -43,10 +46,10 @@ export class GameService extends CrudService<GameEntity>{
 		} else {
 			user2.games.push(game);
 		}
-		await this.userService.save(user1);
-		await this.userService.save(user2);
-		console.log(user1);
-		console.log(user2);
+		const newuser1 = await this.userService.save(user1);
+		const newuser2 = await this.userService.save(user2);
+		console.log(newuser1);
+		console.log(newuser2);
 		return game;
 	}
 }

@@ -46,7 +46,7 @@ function Game() {
 		setGameCanvas,
 	});
 
-	/** Start the game */
+	/** Request a new game **/
 	function launchPlaying() {
 		setGameplay({
 			...gameplay,
@@ -54,7 +54,7 @@ function Game() {
 			playerLeft: setInitialPlayerLeftState(gameCanvas.width, gameCanvas.height),
 			playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
 		})
-		setGameStatus({ ...gameStatus, start: false, win: "", watch: false});
+		setGameStatus({ ...gameStatus, start: false, win: "", watch: false });
 		let userInfo: SetUserDto = {
 			id: userData.id,
 			login: userData.login,
@@ -62,10 +62,17 @@ function Game() {
 		mainSocket?.emit("joinGame", userInfo);
 	}
 
+	/**  start watching game of user **/
 	//send ID of player you wsnt to watch
-	function launchWatching(user: SetUserDto) {
-		setGameStatus({ ...gameStatus, side: UserStatusEnum.WATCHER, start: false, win: "", watch: true, ready: true})
+	function startWatching(user: SetUserDto) {
+		setGameStatus({ ...gameStatus, side: UserStatusEnum.WATCHER, start: false, win: "", watch: true, ready: true })
 		mainSocket?.emit("joingGameAsWatcher", user);
+	}
+
+	/**  stop watching game **/
+	function stopWatching() {
+		setGameStatus({ ...gameStatus, side: UserStatusEnum.UNASSIGNED, start: true, win: "", watch: false, ready: false })
+		mainSocket?.emit("stopWatching");
 	}
 
 	/** Update ball object */
@@ -150,11 +157,11 @@ function Game() {
 			{gameStatus.start && (
 				<button id="button-game" onClick={() => launchPlaying()}>Start Game</button>
 			)}
-			{!gameStatus.start && !gameStatus.watch &&(
+			{!gameStatus.start && !gameStatus.watch && (
 				<button id="button-game" onClick={() => mainSocket?.leaveGame([gameplay.playerLeft.score, gameplay.playerRight.score])}>Stop Game</button>
 			)}
 			{!gameStatus.start && gameStatus.watch && (
-				<button id="button-game" onClick={() => launchPlaying()}>Stop Watching</button>
+				<button id="button-game" onClick={() => stopWatching()}>Stop Watching</button>
 			)}
 			{!gameStatus.start && gameStatus.ready && (
 				<div id="game_area">
