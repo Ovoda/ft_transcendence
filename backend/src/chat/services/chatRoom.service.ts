@@ -31,7 +31,7 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 	async createChat(dto: CreateChatDto, roles: ChatRoleEntity[]) {
 		const chat = await this.save({
 			room_type: dto.roomType,
-			name: dto.name,
+			name: dto.roomName,
 			users: roles,
 		})
 		for (let i = 0; i < roles.length; i++) {

@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
 import { UserService } from "src/user/user.service";
-import { Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { ChangeRoleDto } from "../dto/changeRole.dto";
 import { CreateChatDto } from "../dto/createChat.dto";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
@@ -10,6 +10,7 @@ import { ChatRoleEntity } from "../entities/chatRole.entity";
 import { OwnerError } from "../exceptions/ownerError.exception";
 import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
 import { e_roleType } from "../types/role.type";
+import { e_roomType } from "../types/room.type";
 import { ChatMessageService } from "./chatMessage.service";
 import { ChatRoomService } from "./chatRoom.service";
 
@@ -37,7 +38,10 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		const upldRole = await this.findOneById(role_id);
 		if (upldRole.expires){
 			if ((upldRole.role === e_roleType.MUTE || upldRole.role === e_roleType.BANNED) && upldRole.expires < date){
-				upldRole.role = e_roleType.LAMBDA;
+				await this.updateById(upldRole.id, {
+					role: e_roleType.LAMBDA,
+					expires: null,
+				});
 			}
 		}
 	}
@@ -67,7 +71,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		return roles;
 	}
 
-		/**
+	/**
 	 * Create all associated roles when chatroom is created.
 	 * @param user_id the user calling the route. Avoid random user to read messages.
 	 * @param role_id the role trying to connect on the room.
@@ -83,7 +87,22 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 			throw new UserUnauthorized("User is banned from this room");
 			// return null;
 		}
-		return await this.chatRoomService.findOneById(role.chatroom.id);
+		const room = await this.chatRoomService.findOneById(role.chatroom.id);
+		let otherName: string;
+		if (room.room_type === e_roomType.DM){
+			const currentUsr = await this.userService.findOneById(user_id);
+			const othrole = await this.findOne({where : [{chatroom: room.id}, {user: Not(currentUsr)}]});
+			if (role.user.id === user_id){
+				otherName = othrole.user.login;
+			} else {
+				otherName = role.user.login;
+			}
+		}
+		let obj = {
+			roomName: (room.name) ? room.name : otherName,
+			chatRoom: room,
+		}
+		return obj;
 	}
 
 	/**
@@ -162,16 +181,20 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (
 			callerRole.role === e_roleType.OWNER
 			) {
-			roleModified.role = changeRoleDto.newRole;
-			roleModified.expires = (changeRoleDto.expires) ? changeRoleDto.expires : null;
+			await this.updateById(roleModified.id, {
+				role: changeRoleDto.newRole,
+				expires: (changeRoleDto.expires) ? changeRoleDto.expires : null,
+			});
 		} 
 		else if (
 			callerRole.role === e_roleType.ADMIN
 			&& roleModified.role !== e_roleType.OWNER
 			&& roleModified.role !== e_roleType.ADMIN
 			) {
-			roleModified.role = changeRoleDto.newRole;
-			roleModified.expires = (changeRoleDto.expires) ? changeRoleDto.expires : null;
+			await this.updateById(roleModified.id, {
+				role: changeRoleDto.newRole,
+				expires: (changeRoleDto.expires) ? changeRoleDto.expires : null,
+			});
 		} 
 		else {
 			throw new UserUnauthorized("Unexpected change.");
