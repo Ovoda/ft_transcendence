@@ -31,37 +31,35 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	private logger: Logger = new Logger('GameGateway')
 
 	@SubscribeMessage('joinGame')
-	handleJoinGame(client: Socket, user: string) {
+	handleJoinGame(client: Socket, data: any) {
 		this.logger.log(`New Game Request from: ${client.id}`);
 		this.logger.log(`Current Games: ${this.games.length}`);
-		let status: boolean;
 		if (!this.games.length || this.games[this.games.length - 1].status === true) {
 			const newGame: GameRoom = {
 				id: "game" + client.id,
 				status: false,
 				socket1: client.id,
 				socket2: null,
-				user1: user,
+				login1: data.login,
+				login2: null,
+				user1: data.id,
 				user2: null,
 			}
 			this.games.push(newGame);
-			console.log("JOIN ROOM");
-			console.log(client.id, "in room ", newGame);
 			client.join(newGame.id);
-			status = false;
 			this.server.to(client.id).emit('setSide', "left");
-			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', status);
+			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', false);
 		}
 		else {
 			this.games[this.games.length - 1].socket2 = client.id;
 			this.games[this.games.length - 1].status = true;
 			client.join(this.games[this.games.length - 1].id);
-			status = true;
+			this.games[this.games.length - 1].user2 = data.id;
+			this.games[this.games.length - 1].login2 = data.login;
 			this.server.to(client.id).emit('setSide', "right");
-			this.games[this.games.length - 1].user2 = user;
-			console.log("JOIN ROOM");
-			console.log(client.id, "in room ", this.games[this.games.length - 1]);
-			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', status);
+			this.server.to(this.games[this.games.length - 1].socket1).emit('rightLogin', this.games[this.games.length - 1].login2);
+			this.server.to(this.games[this.games.length - 1].socket2).emit('leftLogin', this.games[this.games.length - 1].login1);
+			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', true);
 		}
 	}
 

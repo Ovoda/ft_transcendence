@@ -17,6 +17,7 @@ import GameCanvas, { setInitialGameCanvasState } from './interfaces/gameCanvas.i
 import { Store } from '../../app/store';
 import { useSelector } from 'react-redux';
 import UserData from 'features/user/interfaces/user.interface';
+import SetUserDto from './interfaces/SetUser.dto';
 
 function Game() {
 
@@ -26,7 +27,6 @@ function Game() {
 
 	const store: Store = useSelector((store: Store) => store);
 	const userData: UserData = store.user;
-	//const uiState = store.uiState;
 
 	/** Variables */
 	const [gameCanvas, setGameCanvas] = useState<GameCanvas>(setInitialGameCanvasState(canvaRef));
@@ -52,7 +52,11 @@ function Game() {
 			playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
 		})
 		setGameStatus({ ...gameStatus, start: false, win: "" });
-		mainSocket?.emit("joinGame", userData.id);
+		let userInfo : SetUserDto = {
+			id : userData.id,
+			login : userData.login,
+		}
+		mainSocket?.emit("joinGame", userInfo);
 	}
 
 	/** Update ball object */
@@ -146,7 +150,7 @@ function Game() {
 			<p></p>
 			{!gameStatus.start && gameStatus.ready && (
 				<div id="game_area">
-					<h1>{userData.login} {gameplay.playerLeft.score} : {gameplay.playerRight.score} {userData.login} </h1>
+					<h1>{gameplay.playerLeft.login} {gameplay.playerLeft.score} : {gameplay.playerRight.score} {gameplay.playerRight.login} </h1>
 					<canvas ref={canvaRef} height={gameCanvas.height} width={gameCanvas.width} id="canvas"></canvas>
 				</div>
 			)}

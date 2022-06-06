@@ -8,8 +8,14 @@ import Gameplay from "src/components/game/interfaces/gameplay.interface";
 import { resetPlayerLeftPosition, resetPlayerRightPosition } from '../components/game/interfaces/player.interface';
 import { setInitialBallState } from '../components/game/interfaces/ball.interface';
 import GameCanvas from "src/components/game/interfaces/gameCanvas.interface";
+import { login } from "services/auth.service";
+import { Store } from '../app/store';
+import { useSelector } from "react-redux";
+import UserData from "features/user/interfaces/user.interface";
 
 const scoreToWin: number = 10;
+
+
 
 interface Props {
 	setGameplay: Dispatch<SetStateAction<Gameplay>>,
@@ -22,6 +28,8 @@ interface Props {
 
 export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameStatus, gameCanvas, setGameCanvas }: Props) {
 
+	const store: Store = useSelector((store: Store) => store);
+	const userData: UserData = store.user;
 	const mainSocket = useContext(mainSocketContext);
 
 	useEffect(() => {
@@ -68,17 +76,59 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			}
 		})
 
+		mainSocket.on("leftLogin", (data: string) => {
+			setGameplay((gameplay: Gameplay) => {
+				return {
+					...gameplay,
+					playerLeft: {
+						...gameplay.playerLeft,
+						login: data,
+					}
+				}
+			})
+		})
+
+		mainSocket.on("rightLogin", (data: string) => {
+			setGameplay((gameplay: Gameplay) => {
+				return {
+					...gameplay,
+					playerRight: {
+						...gameplay.playerRight,
+						login: data,
+					}
+				}
+			})
+		})
+
 		mainSocket.on("setSide", (data: string) => {
 			if (data === "left") {
 				gameStatus.side = UserStatusEnum.PLAYER_LEFT;
 				setGameStatus((gameStatus: GameStatus) => {
 					return { ...gameStatus, side: UserStatusEnum.PLAYER_LEFT }
 				})
+				setGameplay((gameplay: Gameplay) => {
+					return {
+						...gameplay,
+						playerLeft: {
+							...gameplay.playerLeft,
+							login: userData.login,
+						}
+					}
+				})
 			}
 			else if (data === "right") {
 				gameStatus.side = UserStatusEnum.PLAYER_RIGHT;
 				setGameStatus((gameStatus: GameStatus) => {
 					return { ...gameStatus, side: UserStatusEnum.PLAYER_RIGHT }
+				})
+				setGameplay((gameplay: Gameplay) => {
+					return {
+						...gameplay,
+						playerRight: {
+							...gameplay.playerRight,
+							login: userData.login,
+						}
+					}
 				})
 			}
 		})
@@ -88,8 +138,14 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				return {
 					...gameplay,
 					ball: setInitialBallState(gameCanvas.width, gameCanvas.height),
-					playerLeft: resetPlayerLeftPosition(gameCanvas.width, gameCanvas.height, data.posX),
-					playerRight: resetPlayerRightPosition(gameCanvas.width, gameCanvas.height, data.posY),
+					playerLeft: {
+						...gameplay.playerLeft,
+						score: data.posX,
+					},
+					playerRight: {
+						...gameplay.playerRight,
+						score: data.posY,
+					},
 				}
 			})
 			if (data.posX === scoreToWin) {
