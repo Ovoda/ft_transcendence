@@ -1,17 +1,18 @@
 import { Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { mainSocketContext } from "../App";
 import UpdateBallDto from "./interfaces/UpdateBall.dto";
-import UpdateScoreDto from "./interfaces/UpdateScore.dto";
-import { handleKeyPressed, handleKeyUnpressed } from "../components/game/services/play.service";
-import GameStatus from "src/components/game/interfaces/gameStatus.interface";
-import { UserStatusEnum } from "../components/game/enums/userStatus.enum";
-import Gameplay from "src/components/game/interfaces/gameplay.interface";
-import { setInitialBallState } from '../components/game/interfaces/ball.interface';
-import GameCanvas from "src/components/game/interfaces/gameCanvas.interface";
-import { login } from "services/auth.service";
+import { getNewBallPos, handleKeyPressed, handleKeyUnpressed } from "../components/game/gamePlay/services/play.service";
+import GameStatus from "src/components/game/gamePlay/interfaces/gameStatus.interface";
+import { UserStatusEnum } from "../components/game/gamePlay/enums/userStatus.enum";
+import { PlayStatusEnum } from "../components/game/gamePlay/enums/playStatus.enum";
+import { ResultStatusEnum } from "../components/game/gamePlay/enums/resultStatus.enum";
+import Gameplay from "src/components/game/gamePlay/interfaces/gameplay.interface";
+import { setInitialBallState } from '../components/game/gamePlay/interfaces/ball.interface';
+import GameCanvas from "src/components/game/gamePlay/interfaces/gameCanvas.interface";
 import { Store } from '../app/store';
 import { useSelector } from "react-redux";
 import UserData from "features/user/interfaces/user.interface";
+import Position from "src/components/game/gamePlay/interfaces/position.interface";
 
 const scoreToWin: number = 50;
 
@@ -32,20 +33,16 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 	useEffect(() => {
 
-		/**  start watching game of user **/
-
 		/** Set keyboard listeners */
 		window.addEventListener("keydown",
 			(event: KeyboardEvent) => handleKeyPressed({
 				event,
 				setGameplay,
-				gameStatus,
 			}));
 		window.addEventListener("keyup",
 			(event: KeyboardEvent) => handleKeyUnpressed({
 				event,
 				setGameplay,
-				gameStatus,
 			}));
 
 
@@ -53,31 +50,29 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		/** Set socket listener */
 		mainSocket.on("gameStop", (stopclient: string) => {
-			const winResult = stopclient === mainSocket.socket.id ? "You Lost!" : "You Won!";
-
-			setGameStatus((gameStatus: GameStatus) => {
-				return { ...gameStatus, start: true, side: 0, win: winResult };
-			});
-
+			const Result = stopclient === mainSocket.socket.id ? ResultStatusEnum.LOOSE : ResultStatusEnum.WIN;
+			gameStatus.play = PlayStatusEnum.OFF;
+			setGameStatus({ ...gameStatus, play: PlayStatusEnum.OFF, user: UserStatusEnum.UNASSIGNED, result: Result });
 			mainSocket.emit("deleteRoom");
 		});
 
 		/**  Watcher joins game room **/
 		mainSocket.on("startWatching", (data: string) => {
-			console.log("Starting Watching: ");
-			console.log(data);
-			setGameStatus({ ...gameStatus, side: UserStatusEnum.WATCHER, start: false, win: "", watch: true, ready: true })
+			gameStatus.user = UserStatusEnum.WATCHER;
+			setGameStatus({ ...gameStatus, user: UserStatusEnum.WATCHER, play: PlayStatusEnum.ON });
 			mainSocket?.emit("joinGameAsWatcher", data);
 		})
 
 		/** Set status of Room */
 		mainSocket.on("gameStatus", (fullRoom: any) => {
-			setGameStatus((gameStatus: GameStatus) => {
-				return { ...gameStatus, ready: fullRoom };
-			});
-
-			if (fullRoom === true) {
-				if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+			if (fullRoom === false) {
+				setGameStatus((gameStatus: GameStatus) => {
+					return { ...gameStatus, play: PlayStatusEnum.PENDING };
+				})
+			} else {
+				setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
+				console.log(gameStatus.play);
+				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
 					mainSocket.emit("animateGame", {
 						posX: gameplay.ball.position.x,
 						posY: gameplay.ball.position.y
@@ -86,8 +81,25 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			}
 		})
 
+		/** Pause the game **/
+		mainSocket.on("pauseGame", () => {
+			console.log(gameStatus.user);
+			setGameStatus({ ...gameStatus, play: PlayStatusEnum.PAUSE, })
+		})
 
-		/** Set logins of players */
+		/** Resume the Game  **/
+		mainSocket.on("resumeGame", () => {
+			console.log("Game not in pause anymore");
+			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON })
+			console.log(gameStatus);
+			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+				console.log("Animation Request");
+				let newPos: Position = getNewBallPos(gameplay, gameStatus, gameCanvas.height, gameCanvas.width);
+				mainSocket?.emit("animateGame", { posX: newPos.x, posY: newPos.y } as UpdateBallDto);
+			}
+		})
+
+		/** Set logins of players **/
 		mainSocket.on("leftLogin", (data: string) => {
 			setGameplay((gameplay: Gameplay) => {
 				return {
@@ -116,9 +128,9 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		/** Set sides of players */
 		mainSocket.on("setSide", (data: string) => {
 			if (data === "left") {
-				gameStatus.side = UserStatusEnum.PLAYER_LEFT;
+				gameStatus.user = UserStatusEnum.PLAYER_LEFT;
 				setGameStatus((gameStatus: GameStatus) => {
-					return { ...gameStatus, side: UserStatusEnum.PLAYER_LEFT }
+					return { ...gameStatus, user: UserStatusEnum.PLAYER_LEFT }
 				})
 				setGameplay((gameplay: Gameplay) => {
 					return {
@@ -131,9 +143,9 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				})
 			}
 			else if (data === "right") {
-				gameStatus.side = UserStatusEnum.PLAYER_RIGHT;
+				gameStatus.user = UserStatusEnum.PLAYER_RIGHT;
 				setGameStatus((gameStatus: GameStatus) => {
-					return { ...gameStatus, side: UserStatusEnum.PLAYER_RIGHT }
+					return { ...gameStatus, user: UserStatusEnum.PLAYER_RIGHT }
 				})
 				setGameplay((gameplay: Gameplay) => {
 					return {
@@ -163,12 +175,12 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				}
 			})
 			if (data.posX === scoreToWin) {
-				if (gameStatus.side === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
+				if (gameStatus.user === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
 					mainSocket.emit('leaveGame', data);
 				}
 			}
 			else if (data.posY === scoreToWin) {
-				if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
 					mainSocket.emit('leaveGame', data);
 				}
 			}
@@ -181,6 +193,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		})
 
 		mainSocket.on("updateBall", (data: UpdateBallDto) => {
+			//setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
+			//gameStatus.play = PlayStatusEnum.ON;
 			setGameplay((gameplay: Gameplay) => {
 				return {
 					...gameplay,
@@ -231,13 +245,11 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				(event: KeyboardEvent) => handleKeyPressed({
 					event,
 					setGameplay,
-					gameStatus,
 				}));
 			window.addEventListener("keyup",
 				(event: KeyboardEvent) => handleKeyUnpressed({
 					event,
 					setGameplay,
-					gameStatus,
 				}));
 		};
 	}, []);

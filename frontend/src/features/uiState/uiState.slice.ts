@@ -6,6 +6,7 @@ const initialState: UiState = {
     logged: false,
     showTfaRegistration: false,
     showChat: false,
+	showGame: false,
 }
 
 const uiState = createSlice({

@@ -1,0 +1,17 @@
+.gameplay {
+	background-color: mediumvioletred;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	#canvas {
+		background-color: #282C34;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 80%;
+		height: 80%;
+	}
+}
+

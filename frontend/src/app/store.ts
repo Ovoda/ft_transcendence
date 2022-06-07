@@ -12,20 +12,20 @@ import Game from "src/features/game/interfaces/game.interface";
 import GameReducer from '../features/game/game.slice';
 
 export interface Store {
-    user: UserData;
-    uiState: UiState;
-    auth: Auth;
+	user: UserData;
+	uiState: UiState;
+	auth: Auth;
 	chat: Chat;
 	game: Game;
 }
 
 export default configureStore({
-    reducer: {
-        user: UserDataReducer,
-        uiState: UiStateReducer,
-        auth: AuthReducer,
+	reducer: {
+		user: UserDataReducer,
+		uiState: UiStateReducer,
+		auth: AuthReducer,
 		chat: ChatReducer,
 		game: GameReducer,
-    }
+	}
 })
 

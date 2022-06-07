@@ -2,36 +2,29 @@ import React, { Dispatch, SetStateAction } from "react";
 import Gameplay from "../interfaces/gameplay.interface";
 import Position from "../interfaces/position.interface";
 import GameStatus from "../interfaces/gameStatus.interface";
-import { UserStatusEnum } from "../enums/userStatus.enum";
 
 export interface handleKeysProps {
 	event: KeyboardEvent;
 	setGameplay: Dispatch<SetStateAction<Gameplay>>,
-	gameStatus: GameStatus,
 }
 
-export function handleKeyPressed({ event, setGameplay, gameStatus }: handleKeysProps) {
-	if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum || gameStatus.side === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
-		if (event.key === "ArrowDown") {
-			setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowDown: true } });
-		} else if (event.key === "ArrowUp") {
-			setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowUp: true } });
-		}
+export function handleKeyPressed({ event, setGameplay }: handleKeysProps) {
+	if (event.key === "ArrowDown") {
+		setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowDown: true } });
+	} else if (event.key === "ArrowUp") {
+		setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowUp: true } });
 	}
 }
 
-export function handleKeyUnpressed({ event, setGameplay, gameStatus }: handleKeysProps) {
-	if (gameStatus.side === UserStatusEnum.PLAYER_LEFT as UserStatusEnum || gameStatus.side === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
-		if (event.key === "ArrowDown") {
-			setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowDown: false } });
-		} else if (event.key === "ArrowUp") {
-			setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowUp: false } });
-		}
+export function handleKeyUnpressed({ event, setGameplay }: handleKeysProps) {
+	if (event.key === "ArrowDown") {
+		setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowDown: false } });
+	} else if (event.key === "ArrowUp") {
+		setGameplay((gameplay: Gameplay) => { return { ...gameplay, arrowUp: false } });
 	}
 }
 
-
-function wallHorizontalCollision(gameplay: Gameplay, gamestatus: GameStatus, height: number) {
+function wallHorizontalCollision(gameplay: Gameplay, height: number) {
 	if (gameplay.ball.position.y + gameplay.ball.velocity.y < 0) {
 		return true;
 	}
@@ -41,7 +34,7 @@ function wallHorizontalCollision(gameplay: Gameplay, gamestatus: GameStatus, hei
 	return false;
 }
 
-function wallVerticalCollision(gameplay: Gameplay, gamestatus: GameStatus, width: number) {
+function wallVerticalCollision(gameplay: Gameplay, width: number) {
 	if (gameplay.ball.position.x + gameplay.ball.velocity.x <= 0) {
 		gameplay.playerRight.score += 1;
 		return true;
@@ -53,7 +46,7 @@ function wallVerticalCollision(gameplay: Gameplay, gamestatus: GameStatus, width
 	return false;
 }
 
-function playerLeftCollision(gameplay: Gameplay, gamestatus: GameStatus) {
+function playerLeftCollision(gameplay: Gameplay) {
 	if (gameplay.ball.position.y + gameplay.ball.velocity.y >= gameplay.playerLeft.position.y) {
 		if (gameplay.ball.position.y + gameplay.ball.velocity.y <= gameplay.playerLeft.position.y + gameplay.playerLeft.height) {
 			if (gameplay.ball.position.x + gameplay.ball.velocity.x <= gameplay.playerLeft.position.x + gameplay.playerLeft.width) {
@@ -61,9 +54,10 @@ function playerLeftCollision(gameplay: Gameplay, gamestatus: GameStatus) {
 			}
 		}
 	}
+	return false;
 }
 
-function playerRightCollision(gameplay: Gameplay, gamestatus: GameStatus) {
+function playerRightCollision(gameplay: Gameplay) {
 	if (gameplay.ball.position.y + gameplay.ball.velocity.y >= gameplay.playerRight.position.y) {
 		if (gameplay.ball.position.y + gameplay.ball.velocity.y <= gameplay.playerRight.position.y + gameplay.playerRight.height) {
 			if (gameplay.ball.position.x + gameplay.ball.velocity.x >= gameplay.playerRight.position.x) {
@@ -71,6 +65,7 @@ function playerRightCollision(gameplay: Gameplay, gamestatus: GameStatus) {
 			}
 		}
 	}
+	return false;
 }
 
 export function getNewBallPos(gameplay: Gameplay, gamestatus: GameStatus, height: number, width: number) {
@@ -78,19 +73,19 @@ export function getNewBallPos(gameplay: Gameplay, gamestatus: GameStatus, height
 		x: -1,
 		y: -1,
 	};
-	if (wallVerticalCollision(gameplay, gamestatus, width)) {
+	if (wallVerticalCollision(gameplay, width)) {
 		return (newPos);
 	}
-	if (wallHorizontalCollision(gameplay, gamestatus, height)) {
+	if (wallHorizontalCollision(gameplay, height)) {
 		gameplay.ball.velocity.y = - gameplay.ball.velocity.y;
 	}
-	else if (playerLeftCollision(gameplay, gamestatus)) {
+	else if (playerLeftCollision(gameplay)) {
 		gameplay.ball.velocity.y = gameplay.ball.position.y - (gameplay.playerLeft.position.y + (gameplay.playerLeft.height / 2));
 		if (gameplay.ball.velocity.y !== 0)
 			gameplay.ball.velocity.y /= 100;
 		gameplay.ball.velocity.x = - gameplay.ball.velocity.x;
 	}
-	else if (playerRightCollision(gameplay, gamestatus)) {
+	else if (playerRightCollision(gameplay)) {
 		gameplay.ball.velocity.y = (gameplay.ball.position.y - (gameplay.playerRight.position.y + (gameplay.playerRight.height / 2)));
 		if (gameplay.ball.velocity.y !== 0)
 			gameplay.ball.velocity.y /= 100;

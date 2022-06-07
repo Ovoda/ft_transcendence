@@ -1,0 +1,12 @@
+#options_area {
+	position: absolute;
+	top: 30px;
+	right: 5%;
+	width: 20%;
+	padding: 1rem;
+	background-color: slateblue;
+
+	.options-list button {
+		display: block;
+	}
+}

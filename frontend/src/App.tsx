@@ -24,48 +24,48 @@ export const mainSocketContext = createContext<null | ClientSocket>(null);
 
 function App() {
 
-  /** Global Data */
-  const store: Store = useSelector((store: Store) => store);
-  const uiState: UiState = store.uiState;
-  const userData: UserData = store.user;
-  const chat = store.chat;
+	/** Global Data */
+	const store: Store = useSelector((store: Store) => store);
+	const uiState: UiState = store.uiState;
+	const userData: UserData = store.user;
+	const chat = store.chat;
 
-  /** Tools */
-  const dispatch = useDispatch();
+	/** Tools */
+	const dispatch = useDispatch();
 
-  /** Hooks */
-  useFetchSession();
+	/** Hooks */
+	useFetchSession();
 
-  useEffect(() => {
-    if (userData.login !== "") {
-      mainSocket.init(userData.id);
-      mainSocket.on("ServerMessage", (message: Message) => {
-        dispatch(addMessage(message));
-      });
-    }
-  }, [userData.login]);
+	useEffect(() => {
+		if (userData.login !== "") {
+			mainSocket.init(userData.id);
+			mainSocket.on("ServerMessage", (message: Message) => {
+				dispatch(addMessage(message));
+			});
+		}
+	}, [userData.login]);
 
-  useEffect(() => {
-    if (chat.currentRoom !== "") {
-      mainSocket.joinRoom(chat.currentRoom);
-    }
-  }, [chat.currentRoom]);
+	useEffect(() => {
+		if (chat.currentRoom !== "") {
+			mainSocket.joinRoom(chat.currentRoom);
+		}
+	}, [chat.currentRoom]);
 
-  return (
-    <div className="App">
-      <mainSocketContext.Provider value={mainSocket}>
-        <Navbar />
-        <TfaRegistration />
-        <Chat />
-        <UserSettings
-          settingsWindowState={uiState.openedSettings}
-          setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
-        <header className="App-header">
-          {userData.login !== "" && <Game />}
-        </header>
-      </mainSocketContext.Provider>
-    </div >
-  );
+	return (
+		<div className="App">
+			<mainSocketContext.Provider value={mainSocket}>
+				<Navbar />
+				<TfaRegistration />
+				<Chat />
+				<UserSettings
+					settingsWindowState={uiState.openedSettings}
+					setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
+				<header className="App-header">
+					{userData.login !== "" && <Game />}
+				</header>
+			</mainSocketContext.Provider>
+		</div >
+	);
 }
 
 export default App;

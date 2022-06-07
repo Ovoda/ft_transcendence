@@ -9,7 +9,7 @@ import { api } from "services/api.service";
 import ClientSocket from "services/websocket";
 import { useContext } from "react";
 import { mainSocketContext } from "../../../App";
-import { watchingRequest } from "../../game/services/watch.service";
+import { watchingRequest } from "../../game/gamePlay/services/watch.service";
 
 export default function DmPicker() {
 
