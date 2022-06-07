@@ -31,6 +31,36 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@WebSocketServer() server: Server;
 	private logger: Logger = new Logger('GameGateway')
 
+
+	/** Match Making Between Players **/
+
+
+	@SubscribeMessage('gameRequestToFriend')
+	handleGameRequest(client: Socket, user: any) {
+		this.server.to(user.socket).emit("gameRequestFromFriend", user);
+	}
+
+	@SubscribeMessage('createGame')
+	handleCreateGame(client: Socket, user1: any, user2: any) {
+		const newGame: GameRoom = {
+			id: "game" + user1.socket,
+			status: true,
+			socket1: user1.socket,
+			socket2: user2.socket,
+			login1: user1.login,
+			login2: user2.login,
+			user1: user1.id,
+			user2: user2.id,
+			watchers: [],
+		}
+		this.games.push(newGame);
+		user1.socket.join(newGame.id);
+		user2.socket.join(newGame.id);
+		this.server.to(user1.socket).emit('setSide', "left");
+		this.server.to(user2.socket).emit('setSide', "right");
+		this.server.to(newGame.id).emit('gameStatus', true);
+	}
+
 	@SubscribeMessage('joinGame')
 	handleJoinGame(client: Socket, data: any) {
 		this.logger.log(`New Game Request from: ${client.id}`);
@@ -50,7 +80,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			this.games.push(newGame);
 			client.join(newGame.id);
 			this.server.to(client.id).emit('setSide', "left");
-			this.server.to(this.games[this.games.length - 1].id).emit('gameStatus', false);
+			this.server.to(newGame.id).emit('gameStatus', false);
 		}
 		else {
 			const gameroom: GameRoom = this.games[this.games.length - 1];
@@ -66,6 +96,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		}
 	}
 
+	/** Watchers added to game room without role to move **/
 	@SubscribeMessage('watchingRequest')
 	handleWatchingRequest(client: Socket, data: string) {
 		console.log("Watching Request for player: ");
@@ -83,6 +114,28 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			client.join(this.games[index].id);
 		}
 	}
+
+
+	@SubscribeMessage('pauseGameRequest')
+	handlePauseRequest(client: Socket) {
+		const index = this.games.findIndex((game: GameRoom) => {
+			return (game.socket1 === client.id || game.socket2 === client.id);
+		})
+		if (index >= 0) {
+			this.server.to(this.games[index].id).emit("pauseGame");
+		}
+	}
+
+	@SubscribeMessage('resumeGameRequest')
+	handleResumeRequest(client: Socket) {
+		const index = this.games.findIndex((game: GameRoom) => {
+			return (game.socket1 === client.id || game.socket2 === client.id);
+		})
+		if (index >= 0) {
+			this.server.to(this.games[index].id).emit("resumeGame");
+		}
+	}
+
 
 	@SubscribeMessage('resetGame')
 	handleResetScore(client: Socket, data: any) {
@@ -118,7 +171,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				score2: data.posY,
 				winner: (client.id === this.games[index].socket1 ? this.games[index].user2 : this.games[index].user1),
 			}
-			return await this.gameService.saveNewGame(newdto);
+			//return await this.gameService.saveNewGame(newdto);
 		}
 	}
 
@@ -169,12 +222,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			}
 		}
 	}
-
-	//@SubscribeMessage('msgToServer')
-	//handleMessage(client: Socket, data: any): void {
-	// this.logger.log(`Client sent: ${data}`);
-	//	this.server.emit('msgToClient', data)
-	//}
 
 	afterInit(server: any) {
 		this.logger.log('Init');
