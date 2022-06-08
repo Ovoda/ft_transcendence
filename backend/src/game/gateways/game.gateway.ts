@@ -124,12 +124,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('resumeGameRequest')
-	handleResumeRequest(client: Socket) {
+	handleResumeRequest(client: Socket, data: any) {
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
 		if (index >= 0) {
-			this.server.to(this.games[index].id).emit("resumeGame");
+			this.server.to(this.games[index].id).emit("resumeGame", data);
 		}
 	}
 
