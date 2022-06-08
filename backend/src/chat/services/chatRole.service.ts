@@ -13,6 +13,9 @@ import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
 import { e_roleType } from "../types/role.type";
 import { ChatMessageService } from "./chatMessage.service";
 import { ChatGroupService } from "./chatGroup.service.ts";
+import { TransferPasswordDto } from "../dto/transferPassword.dto";
+import { WrongPassword } from "../exceptions/wrongPassword.exception";
+import { ChatPasswordService } from "./chatPassword.service";
 
 @Injectable()
 export class ChatRoleService extends CrudService<ChatRoleEntity>{
@@ -23,6 +26,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		@Inject(forwardRef(() => ChatGroupService))
 		private readonly chatGroupService: ChatGroupService,
 		private readonly chatMessageService: ChatMessageService,
+		private readonly chatPasswordService: ChatPasswordService,
 		protected readonly _log: Logger,
 	) {
 		super(_repository, _log);
@@ -72,7 +76,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	 * @param role_id the role trying to connect on the room.
 	 * @returns chatroom if given role is not banned, undefined either.
 	 */
-	async getRoomFromRole(user_id: string, role_id: string) {
+	async getRoomFromRole(user_id: string, role_id: string, dto?: TransferPasswordDto) {
 		const role = await this.findOneById(role_id, {
 			relations: ["user"],
 		});
@@ -83,7 +87,13 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 			throw new UserUnauthorized("User is banned from this room");
 		}
 		const room = await this.chatGroupService.findOneById(role.chatroom.id);
-		let otherName: string;
+		if (room.password){
+			if (!dto || !(dto.password)) {
+				throw new WrongPassword('password mendatory');
+			} else if (!this.chatPasswordService.verifyPassword(dto.password, room.password)){
+				throw new WrongPassword('you are giving the wrong password');
+			}
+		}
 		let obj = {
 			roomName: room.name,
 			chatRoom: room,
@@ -225,5 +235,14 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 
 	async getAllRolesFromUserId(userId: string) {
 		return await this.findMany({where: {user: userId}});
+	}
+
+	async GroupFromRolePasswordProtected(userId: string, roleId: string){
+		const rl = await this.findOneById(roleId, {relations: ['user']});
+		if (userId != rl.user.id) {
+			throw new UserUnauthorized("user and role don't match");
+		}
+		const group = await this.chatGroupService.findOne({where: {role: rl}});
+		return (group.password) ? true : false;
 	}
 }
