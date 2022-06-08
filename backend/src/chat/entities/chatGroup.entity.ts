@@ -4,7 +4,7 @@ import { RoomTypeEnum } from "../types/room.type";
 import { ChatRoleEntity } from "./chatRole.entity";
 
 @Entity()
-export class ChatRoomEntity {
+export class ChatGroupEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 

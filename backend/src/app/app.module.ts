@@ -17,7 +17,7 @@ import { RelationModule } from 'src/relation/relation.module';
 		AuthModule,
 		WebsocketsModule,
 		ChatModule,
-		RelationModule
+		RelationModule,
 	],
 	controllers: [AppController],
 	exports: [TypeOrmModule],

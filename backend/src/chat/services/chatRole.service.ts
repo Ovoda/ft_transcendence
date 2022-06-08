@@ -5,7 +5,7 @@ import { UserEntity } from "src/user/entities/user.entity";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
 import { ChangeRoleDto } from "../dto/changeRole.dto";
-import { CreateChatDto } from "../dto/createChat.dto";
+import { CreateGroupDto } from "../dto/createGroup.dto";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
 import { ChatRoleEntity } from "../entities/chatRole.entity";
 import { OwnerError } from "../exceptions/ownerError.exception";
@@ -13,7 +13,7 @@ import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
 import { e_roleType } from "../types/role.type";
 import { RoomTypeEnum } from "../types/room.type";
 import { ChatMessageService } from "./chatMessage.service";
-import { ChatRoomService } from "./chatRoom.service";
+import { ChatGroupService } from "./chatGroup.service.ts";
 
 @Injectable()
 export class ChatRoleService extends CrudService<ChatRoleEntity>{
@@ -21,8 +21,8 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		@InjectRepository(ChatRoleEntity)
 		protected readonly _repository: Repository<ChatRoleEntity>,
 		protected readonly userService: UserService,
-		@Inject(forwardRef(() => ChatRoomService))
-		private readonly chatRoomService: ChatRoomService,
+		@Inject(forwardRef(() => ChatGroupService))
+		private readonly chatGroupService: ChatGroupService,
 		private readonly chatMessageService: ChatMessageService,
 		protected readonly _log: Logger,
 	) {
@@ -49,10 +49,10 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 
 	/**
 	 * Create all associated roles when chatroom is created.
-	 * @param dto CreateChatDto
+	 * @param dto CreateGroupDto
 	 * @returns array of created roles.
 	 */
-	public async createRoles(dto: CreateChatDto) {
+	public async createRoles(dto: CreateGroupDto) {
 		let roles: ChatRoleEntity[] = [];
 		for (let i = 0; i < dto.ids.length; i++) {
 			let role = await this.create({
@@ -83,7 +83,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (role.role === e_roleType.BANNED) {
 			throw new UserUnauthorized("User is banned from this room");
 		}
-		const room = await this.chatRoomService.findOneById(role.chatroom.id);
+		const room = await this.chatGroupService.findOneById(role.chatroom.id);
 		let otherName: string;
 		let obj = {
 			roomName: room.name,
@@ -131,7 +131,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		await this.chatMessageService.updateById(message.id, {
 			prev_message: prev,
 		})
-		return await this.chatRoomService.updateLastMessage(role.chatroom.id, message.id);
+		return await this.chatGroupService.updateLastMessage(role.chatroom.id, message.id);
 	}
 
 	/**
@@ -146,13 +146,13 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		}
 		const callerRole = await this.findOne({
 			where: {
-				chatroom: await this.chatRoomService.findOneById(changeRoleDto.chatroom_id),
+				chatroom: await this.chatGroupService.findOneById(changeRoleDto.chatroom_id),
 				user: await this.userService.findOne({ where: { id: user_id } }),
 			}
 		});
 		const roleModified = await this.findOne({
 			where: {
-				chatroom: await this.chatRoomService.findOneById(changeRoleDto.chatroom_id),
+				chatroom: await this.chatGroupService.findOneById(changeRoleDto.chatroom_id),
 				user: await this.userService.findOne({ where: { id: changeRoleDto.user_id } }),
 			}
 		})
@@ -195,7 +195,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 			throw new UserUnauthorized("You are not admin or owner of this chatroom");
 		}
 		const newUser = await this.userService.findOneById(userIdAdded);
-		const chatroom = await this.chatRoomService.findOneById(roomId, {relations: ['users']});
+		const chatroom = await this.chatGroupService.findOneById(roomId, {relations: ['users']});
 		const newRole = await this.save({
 			expires: null,
 			role: e_roleType.LAMBDA,
@@ -203,7 +203,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 			chatroom: chatroom,
 		})
 		chatroom.users.push(newRole);
-		return await this.chatRoomService.save(chatroom);
+		return await this.chatGroupService.save(chatroom);
 	}
 
 	async kickUserAndRole(userIdCaller: string, roomId: string, KickRoleId: string) {
@@ -212,7 +212,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (callerRole.role !== e_roleType.OWNER && callerRole.role !== e_roleType.ADMIN) {
 			throw new UserUnauthorized("You are not admin or owner of this chatroom");
 		}
-		const chatroom = await this.chatRoomService.findOneById(roomId, {relations: ['users']});
+		const chatroom = await this.chatGroupService.findOneById(roomId, {relations: ['users']});
 		let oldUsers = chatroom.users;
 		let newUsers = [];
 		for (let i = 0; i < oldUsers.length; i++) {
@@ -221,6 +221,10 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 			}
 		}
 		chatroom.users = newUsers;
-		return await this.chatRoomService.save(chatroom);
+		return await this.chatGroupService.save(chatroom);
+	}
+
+	async getAllRolesFromUserId(userId: string) {
+		return await this.findMany({where: {user: userId}});
 	}
 }

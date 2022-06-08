@@ -2,7 +2,7 @@ import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 import { RoomTypeEnum } from "../types/room.type";
 
-export class CreateChatDto {
+export class CreateGroupDto {
 	@IsNotEmpty()
 	ids: string[];
 

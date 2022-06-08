@@ -2,17 +2,17 @@ import { Controller, Get, Post, Body, Patch, Param, UseGuards, HttpCode, Query, 
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
 import { ChangeRoleDto } from './dto/changeRole.dto';
-import { CreateChatDto } from './dto/createChat.dto';
+import { CreateGroupDto } from './dto/createGroup.dto';
 import { CreateChatMessageDto } from './dto/createChatMessage.dto';
 import { CreatePasswordDto } from './dto/createPassword.dto';
 import { ChatMessageService } from './services/chatMessage.service';
 import { ChatRoleService } from './services/chatRole.service';
-import { ChatRoomService } from './services/chatRoom.service';
+import { ChatGroupService } from './services/chatGroup.service.ts';
 
 @Controller('chat')
 export class ChatController {
 	constructor(
-		private readonly chatRoomService: ChatRoomService,
+		private readonly chatGroupService: ChatGroupService,
 		private readonly chatRoleService: ChatRoleService,
 		private readonly chatMessageService: ChatMessageService,
 	) { }
@@ -20,20 +20,21 @@ export class ChatController {
 	@UseGuards(JwtAuthGuard)
 	@Post('create')
 	@HttpCode(201)
-	async createChat(@Body() dto: CreateChatDto) {
+	async createChat(@Body() dto: CreateGroupDto) {
 		const roles = await this.chatRoleService.createRoles(dto);
-		return await this.chatRoomService.createChat(dto, roles);
+		return await this.chatGroupService.createGroup(dto, roles);
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('many/roles/:userId')
+	@Get('all/roles/:userId')
 	@HttpCode(200)
-	async getAllRolesOfUser() {
+	async getAllRolesOfUser(@Param('userId') userId: string) {
 		// RETURN AN ARRAY OF A ROLE OF GIVEN USER.
+		return await this.chatRoleService.getAllRolesFromUserId(userId);
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('room/:role_id')
+	@Get('group/:role_id')
 	@HttpCode(200)
 	async getRoomFromRole(@Request() req, @Param('role_id') role_id: string) {
 		return await this.chatRoleService.getRoomFromRole(req.user.id, role_id);
@@ -52,7 +53,7 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('many/messages/:role_id/:message_id')
+	@Get('many/messages/group/:role_id/:message_id')
 	@HttpCode(200)
 	async getManyMessages(
 		@Request() req,
@@ -75,7 +76,7 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Post('change/role')
+	@Post('change/group/role')
 	@HttpCode(201)
 	async changeRole(@Request() req, @Body() changeRoleDto: ChangeRoleDto) {
 		return await this.chatRoleService.changeRole(req.user.id, changeRoleDto);
@@ -107,7 +108,7 @@ export class ChatController {
 	@Post('protect/:roomId/')
 	@HttpCode(201)
 	async addPasswordToRoom(@Request() req, @Param('roomId') roomId: string, @Body() createPass: CreatePasswordDto){
-		return await this.chatRoomService.createPassword(req, roomId, createPass);
+		return await this.chatGroupService.createPassword(req, roomId, createPass);
 	}
 
 }
