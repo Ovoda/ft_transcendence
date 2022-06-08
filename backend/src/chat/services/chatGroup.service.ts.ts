@@ -36,7 +36,6 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 
 	async createGroup(dto: CreateGroupDto, roles: ChatRoleEntity[]) {
 		const chat = await this.save({
-
 			name: dto.name,
 			users: roles,
 		})

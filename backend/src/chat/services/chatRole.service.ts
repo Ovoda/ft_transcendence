@@ -245,4 +245,14 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		const group = await this.chatGroupService.findOne({where: {role: rl}});
 		return (group.password) ? true : false;
 	}
+
+	async isBanned(roleId: string) {
+		const role = await this.findOneById(roleId);
+		return (role.role === e_roleType.BANNED) ? true : false;
+	}
+
+	async isMuted(roleId: string) {
+		const role = await this.findOneById(roleId);
+		return (role.role === e_roleType.MUTE) ? true : false;
+	}
 }
