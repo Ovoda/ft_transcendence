@@ -4,6 +4,7 @@ import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
 import { ChangeRoleDto } from './dto/changeRole.dto';
 import { CreateChatDto } from './dto/createChat.dto';
 import { CreateChatMessageDto } from './dto/createChatMessage.dto';
+import { CreatePasswordDto } from './dto/createPassword.dto';
 import { ChatMessageService } from './services/chatMessage.service';
 import { ChatRoleService } from './services/chatRole.service';
 import { ChatRoomService } from './services/chatRoom.service';
@@ -22,6 +23,13 @@ export class ChatController {
 	async createChat(@Body() dto: CreateChatDto) {
 		const roles = await this.chatRoleService.createRoles(dto);
 		return await this.chatRoomService.createChat(dto, roles);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('many/roles/:userId')
+	@HttpCode(200)
+	async getAllRolesOfUser() {
+		// RETURN AN ARRAY OF A ROLE OF GIVEN USER.
 	}
 
 	@UseGuards(JwtAuthGuard)
@@ -95,5 +103,11 @@ export class ChatController {
 		return await this.chatRoleService.kickUserAndRole(req.user.id, roomId, roleId);
 	}
 
+	@UseGuards(JwtAuthGuard)
+	@Post('protect/:roomId/')
+	@HttpCode(201)
+	async addPasswordToRoom(@Request() req, @Param('roomId') roomId: string, @Body() createPass: CreatePasswordDto){
+		return await this.chatRoomService.createPassword(req, roomId, createPass);
+	}
 
 }

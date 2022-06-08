@@ -5,12 +5,17 @@ import { use } from "passport";
 import { CrudService } from "src/app/templates/crud.service";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
+import { ChangePasswordDto } from "../dto/changePassword.dto";
 import { CreateChatDto } from "../dto/createChat.dto";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
+import { CreatePasswordDto } from "../dto/createPassword.dto";
 import { ChatRoleEntity } from "../entities/chatRole.entity";
 import { ChatRoomEntity } from "../entities/chatRoom.entity";
 import { noMessagesYet } from "../exceptions/noMessagesYet.exception";
+import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
+import { e_roleType } from "../types/role.type";
 import { ChatMessageService } from "./chatMessage.service";
+import { ChatPasswordService } from "./chatPassword.service";
 import { ChatRoleService } from "./chatRole.service";
 
 @Injectable()
@@ -21,6 +26,7 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 		@Inject(forwardRef(() => ChatRoleService))
 		private readonly chatRoleService: ChatRoleService,
 		private readonly chatMessageService: ChatMessageService,
+		private readonly chatPasswordService: ChatPasswordService,
 		protected readonly userService: UserService,
 		protected readonly _log: Logger,
 	) {
@@ -79,5 +85,27 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 		return await this.updateById(room_id, {
 			lastMessage: message.id,
 		})
+	}
+
+	async createPassword(userId: string, roomId: string, createPassword: CreatePasswordDto) {
+		const role = await this.chatRoleService.findOneById(createPassword.roleId, {relations: ['user']});
+		if (role.user.id !== userId || role.role !== e_roleType.OWNER) {
+			throw new UserUnauthorized("This user cannot change password")
+		}
+		const room = await this.findOneById(roomId);
+		room.password = await this.chatPasswordService.encryptPassword(createPassword.password);
+		return await this.save(room);
+	}
+
+	async updatePassword(userId: string, roomId: string, changePassword: ChangePasswordDto) {
+		const role = await this.chatRoleService.findOneById(changePassword.roleId, {relations: ['user']});
+		if (role.user.id !== userId || role.role !== e_roleType.OWNER) {
+			throw new UserUnauthorized("This user cannot change password");
+		}
+		const room = await this.findOneById(roomId);
+		if (!this.chatPasswordService.verifyPassword(changePassword.oldPassword, room.password)) {
+			//throw new WrongPassword();
+		}
+
 	}
 }
