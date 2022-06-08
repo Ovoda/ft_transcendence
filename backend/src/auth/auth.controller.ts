@@ -22,7 +22,7 @@ export class AuthController {
 
     @Get("42/callback")
     @UseGuards(FtAuthGuard)
-    async ftCallback(@Query("code") code: string, @Req() req: any, @Res() res: Response) {
+    async ftCallback(@Query("code") code: string, @Req() req: JwtRequest, @Res() res: Response) {
         const { access_token } = await this.authService.login(req.user);
         const user = await this.userService.findOne({
             where: {

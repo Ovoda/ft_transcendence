@@ -5,6 +5,7 @@ import './ChatSender.scss';
 import { Store } from "src/app/store";
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
+import UserRelation from "src/shared/interfaces/userRelation";
 
 export default function ChatSender() {
 
@@ -23,22 +24,19 @@ export default function ChatSender() {
 		let today = new Date();
 		let time = today.toString();
 
-		console.log(chat.currentRole);
-		mainSocket?.sendMessage({
+		mainSocket?.sendDm({
 			content: newMessage,
 			login: user.login,
 			date: time,
-			room: chat.currentRoom,
 			avatar: user.avatar,
-			roleId: chat.currentRole,
-			userId: user.id,
+			relation: chat.currentRelation as UserRelation,
 		});
 		setNewMessage("");
 		return false;
 	}
 
 	return (
-		<form className="chat_sender" onClick={sendMessage}>
+		<form className="chat_sender">
 			<TextInput text={newMessage} setText={setNewMessage} type="text" />
 			<Button onClick={sendMessage}>Send</Button>
 		</form>

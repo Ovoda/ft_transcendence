@@ -2,10 +2,20 @@ import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMes
 import { Server, Socket } from "socket.io";
 import { JoinRoomDto } from "./dtos/JoinRoom.dto";
 import ClientSocket from "./interfaces/Socket.interface";
-import { remove } from 'lodash';
 import { LeaveRoomDto } from "./dtos/LeaveRoom.dto";
 import ClientMessageDto from "./dtos/ClientMessage.dto";
 import { ChatRoleService } from "src/chat/services/chatRole.service";
+
+import * as _ from "lodash";
+import { ChatMessageService } from "src/chat/services/chatMessage.service";
+import ClientDmDto from "./dtos/clientDm.dto";
+import { RelationService } from "src/relation/relation.service";
+import AddFriendDto from "./dtos/addFriend.dto";
+import { Req, UseGuards } from "@nestjs/common";
+import { TfaGuard } from "src/auth/guards/tfa.auth.guard";
+import { JwtRequest } from "src/auth/interfaces/jwtRequest.interface";
+import RelationEntity from "src/relation/entities/relation.entity";
+import { UserService } from "src/user/user.service";
 
 /**
  * This class is a websocket gateway.
@@ -27,8 +37,10 @@ import { ChatRoleService } from "src/chat/services/chatRole.service";
 })
 export class SocketGateway implements OnGatewayDisconnect {
     constructor(
-        //private readonly chatRoomService: ChatRoomService,
-		private readonly chatRoleService: ChatRoleService,
+        private readonly chatRoleService: ChatRoleService,
+        private readonly chatMessageService: ChatMessageService,
+        private readonly relationService: RelationService,
+        private readonly userService: UserService,
     ) { }
 
     /** Websocket server */
@@ -54,7 +66,9 @@ export class SocketGateway implements OnGatewayDisconnect {
      */
     @SubscribeMessage("RegisterClient")
     public registerClientSocket(socket: Socket, userId: string) {
+        this.userService.setUserAsConnected(userId);
         this.events.push({ socket, userId });
+        this.server.emit("FriendConnection", userId);
     }
 
     /**
@@ -64,10 +78,15 @@ export class SocketGateway implements OnGatewayDisconnect {
      */
     @SubscribeMessage("RemoveClient")
     public removeClientSocket(socket: Socket) {
+        const event = this.events.find((event: ClientSocket) => {
+            return event.socket.id === socket.id;
+        });
 
-        remove(this.events, (event) => {
-            event.socket.id === socket.id
-        })
+        if (!event) return;
+
+        this.userService.setUserAsDisconnected(event.userId);
+        this.server.emit("FriendDisconnection", event.userId);
+        _.remove(this.events, event);
     }
 
     /**
@@ -79,18 +98,39 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("ClientMessage")
     public async sendMessage(socket: Socket, body: ClientMessageDto) {
         this.server.to(body.room).emit("ServerMessage", body);
-        // await this.chatRoomService.postChatRoomMessage({
-        //     content: body.content,
-        //     login: body.login,
-        //     date: body.date,
-        //     avatar: body.avatar,
-        // }, body.room);
-		await this.chatRoleService.postMessageFromRole(body.userId, body.roleId, {
-			content: body.content,
-			login: body.login,
-			avatar: body.avatar,
-			date: body.date,
-		});
+        await this.chatRoleService.postMessageFromRole(body.userId, body.roleId, {
+            content: body.content,
+            login: body.login,
+            avatar: body.avatar,
+            date: body.date,
+        });
+    }
+
+    /**
+     * Handles clients chat DM messages post requests
+     * @listens
+     * @param socket client's socket
+     * @param body request content
+     */
+    @SubscribeMessage("ClientDm")
+    public async sendDmMessage(socket: Socket, body: ClientDmDto) {
+        this.server.to(body.relation.id).emit("ServerMessage", body);
+
+        const relation = await this.relationService.findOneById(body.relation.id);
+
+        const newDm = await this.chatMessageService.save({
+            content: body.content,
+            login: body.login,
+            date: body.date,
+            prev_message: relation.lastMessage,
+            avatar: body.avatar,
+        });
+
+        await this.relationService.updateById(body.relation.id, {
+            lastMessage: newDm.id,
+        });
+
+        return newDm;
     }
 
     /**
@@ -113,5 +153,17 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("LeaveRoom")
     public leaveRoom(socket: Socket, body: LeaveRoomDto) {
         socket.leave(body.roomId);
+    }
+
+    async addFriend(relation: RelationEntity) {
+        const clients = this.events.filter((event: ClientSocket) =>
+            (event.userId === relation.users[0].id) || (event.userId === relation.users[1].id)
+        );
+
+        clients.map((client: ClientSocket) => {
+            this.server.to(client.socket.id).emit("NewFriend", {
+                ...relation, counterPart: this.relationService.getCounterPart(relation.users, client.userId)
+            });
+        })
     }
 }

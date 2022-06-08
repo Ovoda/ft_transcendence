@@ -10,9 +10,7 @@ export class ChatRoleEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
-	//@Column()
-	//login: string; // TO find role, maybe better.
-	@Column({nullable: true})
+	@Column({ nullable: true })
 	expires?: Date;
 
 	@Column()

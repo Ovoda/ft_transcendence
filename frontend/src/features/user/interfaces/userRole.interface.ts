@@ -7,4 +7,5 @@ export default interface UserRole {
     role: UserRoleEnum;
     user: UserData;
     chatroom: Room;
+    connected: boolean;
 }

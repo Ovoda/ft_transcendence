@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query, Request, UnauthorizedException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { ChangeRoleDto } from './dto/changeRole.dto';
 import { CreateChatDto } from './dto/createChat.dto';
 import { CreateChatMessageDto } from './dto/createChatMessage.dto';
@@ -59,6 +61,16 @@ export class ChatController {
 	) {
 		await this.chatRoleService.uploadRoleFromExpiration(role_id);
 		return await this.chatRoleService.getManyMessagesFromRole(req.user.id, role_id, message_id, limit);
+	}
+
+	@Get("many/message/dm/:message_id")
+	@HttpCode(200)
+	@UseGuards(TfaGuard)
+	async getManyDmMessages(
+		@Param("message_id") messageId: string,
+		@Query("limit") limit: number,
+	) {
+		return await this.chatMessageService.getManyMessagesFromId(messageId, 10);
 	}
 
 	@UseGuards(JwtAuthGuard)

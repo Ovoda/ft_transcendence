@@ -1,16 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 import Chat, { e_roomtype } from "./interfaces/chat.interface";
 import Message from '../../shared/interfaces/Message';
+import OpenChatRoom from "./interfaces/openChatGroup.interface";
+import OpenChatDm from "./interfaces/openChatDm.interface";
 
 const initialState: Chat = {
 	messages: [],
 	currentRoom: "",
 	currentRole: "",
+	currentRelation: null,
 	currentLastMessage: "",
-	displayChat: false,
+	displayChatBox: false,
 	displayOptions: false,
 	roomtype: e_roomtype.DM,
-	displayChatSelector: true,
 	displayRoomCreationModal: false,
 };
 
@@ -18,32 +20,34 @@ const chat = createSlice({
 	name: "chat",
 	initialState,
 	reducers: {
-		updateChatSelector(state, action) {
-			return { ...state, displayChatSelector: action.payload }
-		},
 		updateRoomtype(state, action) {
 			return { ...state, roomtype: action.payload }
 		},
 		updateDisplayOptions(state, action) {
 			return { ...state, displayOptions: action.payload }
 		},
-		openChatDm(state, action) {
+		openChatRoom(state, action: OpenChatRoom) {
 			return {
 				...state,
-				displayChat: true,
-				displayChatSelector: false,
+				displayChatBox: true,
 				currentRoom: action.payload.roomId,
 				currentRole: action.payload.roleId,
-				currentLastMessage: action.payload.lastmessage,
+				messages: action.payload.messages,
 			};
 		},
-		closeChatDms(state) {
+		openChatDm(state, action: OpenChatDm) {
 			return {
 				...state,
-				displayChat: false,
-				displayChatSelector: true,
-				currentRole: "",
-				currentRoom: "",
+				displayChatBox: true,
+				currentRelation: action.payload.relation,
+				messages: action.payload.messages,
+			};
+		},
+		closeChatDm(state) {
+			return {
+				...state,
+				displayChatBox: false,
+				currentRelation: null,
 				messages: [],
 			};
 		},
@@ -64,11 +68,11 @@ const chat = createSlice({
 });
 
 export const {
-	updateChatSelector,
 	updateRoomtype,
 	updateDisplayOptions,
 	openChatDm,
-	closeChatDms,
+	openChatRoom,
+	closeChatDm,
 	addMessage,
 	setMessages,
 	openChatRoomCreationModal,

@@ -1,4 +1,4 @@
-export enum e_userRelations {
+export enum RelationTypeEnum {
 	FRIEND = 'FRIEND',
 	BLOCKED = 'BLOCKED',
 }

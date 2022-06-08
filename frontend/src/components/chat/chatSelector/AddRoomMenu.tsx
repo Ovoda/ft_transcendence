@@ -29,7 +29,7 @@ export default function AddRoomMenu() {
         return (
             <div id="room_creation_modal_container">
                 <div id="room_creation_menu" >
-                    <img onClick={() => dispatch(closeChatRoomCreationModal())} src={close} alt="Close modal icon" />
+                    <img id="close_button_img" onClick={() => dispatch(closeChatRoomCreationModal())} src={close} alt="Close modal icon" />
                     <div id="room_creation_container">
                         <AddFriend className={pos} swap={swapCreation} />
                         <AddGroup className={pos} swap={swapCreation} />

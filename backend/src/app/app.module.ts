@@ -7,6 +7,7 @@ import { UserModule } from '../user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { WebsocketsModule } from 'src/websockets/websockets.module';
 import { ChatModule } from 'src/chat/chat.module';
+import { RelationModule } from 'src/relation/relation.module';
 
 @Module({
 	imports: [
@@ -16,6 +17,7 @@ import { ChatModule } from 'src/chat/chat.module';
 		AuthModule,
 		WebsocketsModule,
 		ChatModule,
+		RelationModule
 	],
 	controllers: [AppController],
 	exports: [TypeOrmModule],

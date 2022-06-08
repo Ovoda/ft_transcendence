@@ -1,4 +1,5 @@
 import { Socket, io } from "socket.io-client";
+import Dm from "src/shared/interfaces/dm";
 import SendChatMessageDto from "src/shared/interfaces/Message";
 
 /**
@@ -25,9 +26,7 @@ export default class ClientSocket {
 	 * @param userId current user id
 	 */
 	public init(userId: string) {
-		this.socket.on("connect", () => {
-			this.socket.emit("RegisterClient", userId);
-		});
+		this.socket.emit("RegisterClient", userId);
 	}
 
 	/**
@@ -46,6 +45,14 @@ export default class ClientSocket {
 	 */
 	public emit(event: string, data?: any) {
 		this.socket.emit(event, data);
+	}
+
+	/**
+	 * Sends a message to the websocket server
+	 * @param message message to send
+	 */
+	public sendDm(message: Dm) {
+		this.socket.emit("ClientDm", message);
 	}
 
 	/**

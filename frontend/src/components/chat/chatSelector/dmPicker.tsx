@@ -1,35 +1,47 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import { openChatDm, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
+import { closeChatDm, openChatDm, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
 import './dmPicker.scss';
 import "./RoomCreation.scss";
 import Button from "assets/Button/Button";
 import AddRoomMenu from "./AddRoomMenu";
 import { api } from "services/api.service";
-import ClientSocket from "services/websocket";
+import ClientSocket from "services/websocket.service";
 import { useContext } from "react";
 import { mainSocketContext } from "../../../App";
+import { watchingRequest } from "../../game/gamePlay/services/watch.service";
+import UserRelation from "src/shared/interfaces/userRelation";
+import { UserConnectionStatusEnum } from "enums/userConnectionStatus.enum";
 
 export default function DmPicker() {
 
 	/** Global Data */
-	const { chat, user } = useSelector((store: Store) => store);
+	const { chat, user, relations } = useSelector((store: Store) => store);
 	const mainSocket: ClientSocket | null = useContext(mainSocketContext);
 
 	/** Tools */
 	const dispatch = useDispatch();
 
-	async function selectDmRoom(roomId: string, roleId: string) {
-		console.log(roomId);
-
-		if (chat.currentRoom) {
+	async function selectDmRoom(relation: UserRelation) {
+		if (chat.currentRelation) {
 			mainSocket?.leaveRoom(chat.currentRoom);
 		}
 
-		const ret = await api.get(`/chat/room/${roleId}`);
+		if (chat.currentRelation?.id === relation.id) {
+			dispatch(closeChatDm());
+			return;
+		}
 
-
-		dispatch(openChatDm({ roomId, roleId, lastmessage: ret.data.lastmessage }));
+		let messages;
+		/** Todo get relation last message, not just last message */
+		if (relation.lastMessage) {
+			const response = await api.get(`chat/many/message/dm/${relation.lastMessage}`);
+			messages = response.data;
+			console.log(messages);
+		} else {
+			messages = [];
+		}
+		dispatch(openChatDm({ messages, relation }));
 	}
 
 	/** Opens a modal to create rooms */
@@ -41,15 +53,22 @@ export default function DmPicker() {
 	return (
 		<div id="dm_picker">
 			{
-				user.roles.map((role) =>
-					<div key={role.id} onClick={() => selectDmRoom(role.chatroom.id, role.id)} className="dm_picker_room">
-						<img src={user.avatar} alt="" />
-						<p className="dm_picker_room_name">{role.chatroom.name}</p>
+				relations.relations &&
+				relations.relations.map((relation: UserRelation, index: number) =>
+					<div key={index} onClick={() => selectDmRoom(relation)} className="dm_picker_room">
+						<img src={relation.counterPart.avatar} alt="" />
+						{/* <button onClick={() => watchingRequest(role.chatroom.name, mainSocket)}>Watch Game</button> */}
+						<p className="dm_picker_room_name">{relation.counterPart.login}</p>
+
+						<span id="friend_log_status"
+							className={relation.counterPart.connectionStatus === UserConnectionStatusEnum.CONNECTED
+								? "connected" : ""}>
+						</span>
 					</div>
 				)
 			}
 			<Button id="add_room_button" onClick={handleRoomCreationModal}>&#43;</Button>
 			<AddRoomMenu />
-		</div>
+		</div >
 	);
 }

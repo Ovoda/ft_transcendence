@@ -1,8 +1,9 @@
+import { setRelations } from "features/relations/relations.slice";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../features/user/user.slice";
-import { getUserData } from "../services/api.service";
+import { getRelations, getUserData } from "../services/api.service";
 
 export default function useFetchSession() {
 
@@ -12,13 +13,17 @@ export default function useFetchSession() {
     useEffect(() => {
         if (!Cookies.get("authentication")) return;
 
-        async function fetchUserData() {
-            const userData = await getUserData();
-
+        async function fetchSession() {
+            const userData = await getUserData(true);
+            const userRelations = await getRelations();
             if (userData) {
                 dispatch(updateUser(userData));
             }
+            if (userRelations.data) {
+                console.log(userRelations.data);
+                dispatch(setRelations(userRelations.data));
+            }
         }
-        fetchUserData();
+        fetchSession();
     }, []);
 }

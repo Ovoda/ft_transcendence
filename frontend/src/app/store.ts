@@ -10,22 +10,26 @@ import ChatReducer from "../features/chat/chat.slice"
 import Chat from "src/features/chat/interfaces/chat.interface";
 import Game from "src/features/game/interfaces/game.interface";
 import GameReducer from '../features/game/game.slice';
+import RelationsReducer from '../features/relations/relations.slice';
+import RelationSlice from "features/relations/relations.interface";
 
 export interface Store {
-	user: UserData;
-	uiState: UiState;
-	auth: Auth;
-	chat: Chat;
-	game: Game;
+    user: UserData;
+    uiState: UiState;
+    auth: Auth;
+    chat: Chat;
+    game: Game;
+    relations: RelationSlice,
 }
 
 export default configureStore({
-	reducer: {
-		user: UserDataReducer,
-		uiState: UiStateReducer,
-		auth: AuthReducer,
-		chat: ChatReducer,
-		game: GameReducer,
-	}
+    reducer: {
+        user: UserDataReducer,
+        uiState: UiStateReducer,
+        auth: AuthReducer,
+        chat: ChatReducer,
+        game: GameReducer,
+        relations: RelationsReducer,
+    }
 })
 

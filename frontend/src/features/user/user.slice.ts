@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { UdpateUserAction } from "./interfaces/updateUserAction.interface";
 import UserData from "./interfaces/user.interface";
+import UserRole from "./interfaces/userRole.interface";
 
 const initialState: UserData = {
     id: "",
@@ -8,6 +9,7 @@ const initialState: UserData = {
     avatar: "",
     tfaEnabled: false,
     roles: [],
+    relations: [],
 }
 
 const UserDataSlice = createSlice({
@@ -19,9 +21,18 @@ const UserDataSlice = createSlice({
         },
         updateTfaEnabled(state, action) {
             return { ...state, tfaEnabled: action.payload };
+        },
+        setFriendConnected(state, action) {
+        },
+        setFriendDisconnected(state, action) {
         }
     }
 })
 
-export const { updateUser, updateTfaEnabled } = UserDataSlice.actions;
+export const {
+    updateUser,
+    updateTfaEnabled,
+    setFriendConnected,
+    setFriendDisconnected
+} = UserDataSlice.actions;
 export default UserDataSlice.reducer;

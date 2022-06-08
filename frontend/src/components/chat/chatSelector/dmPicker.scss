@@ -59,6 +59,21 @@
             }
         }
 
+        #friend_log_status {
+            height: 13px;
+            width: 13px;
+            border-radius: 100%;
+            background-color: rgba(125, 125, 125);
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 2px solid #efefef;
+        }
+
+        #friend_log_status.connected {
+            animation: bounce-in 1s ease forwards;
+            background-color: green;
+        }
     }
 
     #add_room_button {
@@ -87,5 +102,25 @@
 
     100% {
         opacity: 1;
+    }
+}
+
+@keyframes bounce-in {
+    0% {
+        opacity: 0;
+        transform: scale(.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    70% {
+        transform: scale(.9);
+    }
+
+    100% {
+        transform: scale(1);
     }
 }

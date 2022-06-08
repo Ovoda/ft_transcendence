@@ -1,5 +1,5 @@
+import UserRelation from "../../../shared/interfaces/userRelation";
 import UserRole from "./userRole.interface";
-
 
 export default interface UserData {
     id: string;
@@ -7,4 +7,5 @@ export default interface UserData {
     avatar: string;
     tfaEnabled: boolean;
     roles: UserRole[];
+    relations: UserRelation[];
 }

@@ -4,13 +4,12 @@ import { ChatRoomEntity } from "src/chat/entities/chatRoom.entity";
 import { ChatMessageEntity } from "src/chat/entities/chatMessage.entity";
 import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
 import { UserEntity } from "src/user/entities/user.entity";
-import { UserRelationsEntity } from "src/user/entities/userRelations.entity";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { INestApplication } from "@nestjs/common";
 import { GameEntity } from "src/game/entities/game.entity";
+import RelationEntity from "src/relation/entities/relation.entity";
 
 export class ConfigService {
-
 	private database_entities;
 
 	constructor() {
@@ -26,7 +25,7 @@ export class ConfigService {
 		)
 		this.database_entities = [
 			UserEntity,
-			UserRelationsEntity,
+			RelationEntity,
 			ChatRoleEntity,
 			ChatRoomEntity,
 			ChatMessageEntity,

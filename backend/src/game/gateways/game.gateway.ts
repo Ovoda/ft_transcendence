@@ -12,7 +12,6 @@ import { GameRoom } from '../types/gameRoom.interface';
 import { CannotPlay } from "../exceptions/cannotPlay.exception";
 import { GameService } from "../services/game.service";
 import { CreateGameDto } from "../dto/createGame.dto";
-import { forEach } from "lodash";
 
 @WebSocketGateway({
 	cors: {
@@ -99,8 +98,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	/** Watchers added to game room without role to move **/
 	@SubscribeMessage('watchingRequest')
 	handleWatchingRequest(client: Socket, data: string) {
-		console.log("Watching Request for player: ");
-		console.log(data);
 		this.server.to(client.id).emit("startWatching", data);
 	}
 

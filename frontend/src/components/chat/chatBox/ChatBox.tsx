@@ -1,16 +1,12 @@
-import React, { MouseEvent, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import '../Chat.scss';
-import SubmitPassword from "./submitPassword";
-import ChatButton from "../utils/ChatButton";
-import { closeChatDms, setMessages } from "../../../features/chat/chat.slice";
+import { setMessages } from "../../../features/chat/chat.slice";
 import ChatSender from "./ChatSender";
 import './ChatBox.scss';
-import ClientSocket from "services/websocket";
-import { mainSocketContext } from "../../../App";
 import { getPreviousMessages } from "services/api.service";
 import settings_image from 'images/settings.png';
+import block_user_image from 'images/block_user.png';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
 import { watchingRequest } from "../../game/gamePlay/services/watch.service";
@@ -28,19 +24,6 @@ export default function ChatBox() {
 	/** Variables */
 	const [openSettings, setOpenSettings] = useState<string>("");
 	const [roomPassword, setRoomPassword] = useState<string>("");
-
-	/** TODO: Fetch previous messages */
-	useEffect(() => {
-		async function fetchPreviousMessages() {
-			const ret = await getPreviousMessages(chat.currentRole, chat.currentLastMessage);
-
-			if (ret) {
-				dispatch(setMessages(ret));
-			}
-		}
-		fetchPreviousMessages();
-	}, [chat.currentLastMessage]);
-
 
 	function handleOpenSettings() {
 		setOpenSettings((settings: string) => {
@@ -76,6 +59,7 @@ export default function ChatBox() {
 				<h3>ndemont</h3>
 				<Button onClick={() => watchingRequest("ndemont", null)}>Watch Game</Button>
 				<img onClick={handleOpenSettings} src={settings_image} alt="" />
+				<img onClick={handleOpenSettings} src={block_user_image} alt="" />
 			</div>
 			<div className={"chat_box_settings " + openSettings}>
 				<p>Set room password</p>

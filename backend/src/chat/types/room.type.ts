@@ -1,4 +1,4 @@
-export enum e_roomType {
+export enum RoomTypeEnum {
 	DM = 'DM',
 	ROOM = 'ROOM',
 }

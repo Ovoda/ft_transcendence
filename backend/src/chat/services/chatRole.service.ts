@@ -10,7 +10,7 @@ import { ChatRoleEntity } from "../entities/chatRole.entity";
 import { OwnerError } from "../exceptions/ownerError.exception";
 import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
 import { e_roleType } from "../types/role.type";
-import { e_roomType } from "../types/room.type";
+import { RoomTypeEnum } from "../types/room.type";
 import { ChatMessageService } from "./chatMessage.service";
 import { ChatRoomService } from "./chatRoom.service";
 
@@ -89,7 +89,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		}
 		const room = await this.chatRoomService.findOneById(role.chatroom.id);
 		let otherName: string;
-		if (room.room_type === e_roomType.DM) {
+		if (room.room_type === RoomTypeEnum.DM) {
 			//const currentUsr = await this.userService.findOneById(user_id);
 			const othrole = await this.findMany({ where: { chatroom: room.id }, relations: ['user'] });
 			otherName = (othrole.items[0].user.id === user_id) ? othrole.items[1].user.login : othrole.items[0].user.login;
@@ -128,23 +128,19 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	 * @returns returns the updated chatroom.
 	 */
 	async postMessageFromRole(user_id: string, role_id: string, createMessageChatDto: CreateChatMessageDto) {
-		console.log("roleId", role_id);
-		const role = await this.findOneById(role_id, {relations: ['chatroom', 'user']});
+		const role = await this.findOneById(role_id, { relations: ['chatroom', 'user'] });
 		if (user_id !== role.user.id) {
 			throw new UserUnauthorized("this user cannot post message to this room");
 		}
 		if (role.role === e_roleType.MUTE) {
 			throw new UserUnauthorized("User is muted on this room");
-			//return null;
 		}
 		const message = await this.chatMessageService.postMessage(createMessageChatDto);
-		const prev = (role.chatroom.lastmessage) ? role.chatroom.lastmessage : null;
+		const prev = (role.chatroom.lastMessage) ? role.chatroom.lastMessage : null;
 		await this.chatMessageService.updateById(message.id, {
 			prev_message: prev,
 		})
-		const chatroom = role.chatroom;
-		await this.chatRoomService.updateLastMessage(chatroom.id, message.id);
-		return chatroom;
+		return await this.chatRoomService.updateLastMessage(role.chatroom.id, message.id);
 	}
 
 	/**
@@ -163,14 +159,12 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 				user: await this.userService.findOne({ where: { id: user_id } }),
 			}
 		});
-		console.log(callerRole);
 		const roleModified = await this.findOne({
 			where: {
 				chatroom: await this.chatRoomService.findOneById(changeRoleDto.chatroom_id),
 				user: await this.userService.findOne({ where: { login: changeRoleDto.login } }),
 			}
 		})
-		console.log(roleModified);
 		if (
 			callerRole.role === e_roleType.LAMBDA
 			|| callerRole.role === e_roleType.MUTE
