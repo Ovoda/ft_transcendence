@@ -8,6 +8,7 @@ import { CreatePasswordDto } from './dto/createPassword.dto';
 import { ChatMessageService } from './services/chatMessage.service';
 import { ChatRoleService } from './services/chatRole.service';
 import { ChatGroupService } from './services/chatGroup.service.ts';
+import { TransferPasswordDto } from './dto/transferPassword.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -33,11 +34,28 @@ export class ChatController {
 		return await this.chatRoleService.getAllRolesFromUserId(req.user.id);
 	}
 
+	// return true or false.
 	@UseGuards(JwtAuthGuard)
-	@Get('group/:role_id')
+	@Get('ispassword/group/:roleId')
 	@HttpCode(200)
-	async getRoomFromRole(@Request() req, @Param('role_id') role_id: string) {
-		return await this.chatRoleService.getRoomFromRole(req.user.id, role_id);
+	async roleIdRequirePassword(@Request() req, @Param('roleId') roleId: string){
+		return await this.chatRoleService.GroupFromRolePasswordProtected(req.user.id, roleId);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('ispassword/:groupId')
+	@HttpCode(200)
+	async groupRequirePassword(@Request() req, @Param('groupId') groupId: string){
+		return await this.chatGroupService.GroupPasswordProtected(groupId)
+	}
+
+
+	@UseGuards(JwtAuthGuard)
+	@Post('group/:role_id')
+	@HttpCode(201)
+	async getRoomFromRole(@Request() req, @Param('role_id') role_id: string, @Body() dto?: TransferPasswordDto) {
+		await this.chatRoleService.uploadRoleFromExpiration(role_id);
+		return await this.chatRoleService.getRoomFromRole(req.user.id, role_id, dto);
 	}
 
 	@UseGuards(JwtAuthGuard)
@@ -94,21 +112,31 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Patch('kick/group/:roomId/:roleId')
+	@Patch('kick/group/:groupIs/:roleId')
 	@HttpCode(200)
 	async kickUserFromRoom(
 		@Request() req,
-		@Param('roomId') roomId: string,
+		@Param('groupId') groupId: string,
 		@Param('roleId') roleId: string,
 	){
-		return await this.chatRoleService.kickUserAndRole(req.user.id, roomId, roleId);
+		return await this.chatRoleService.kickUserAndRole(req.user.id, groupId, roleId);
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Post('protect/:roomId/')
+	@Post('protect/:groupId/')
 	@HttpCode(201)
-	async addPasswordToRoom(@Request() req, @Param('roomId') roomId: string, @Body() createPass: CreatePasswordDto){
-		return await this.chatGroupService.createPassword(req, roomId, createPass);
+	async addPasswordToRoom(@Request() req, @Param('groupId') groupId: string, @Body() createPass: CreatePasswordDto){
+		return await this.chatGroupService.createPassword(req, groupId, createPass);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('roles/all/:groupId')
+	@HttpCode(200)
+	async getAllRolesFromGroup(
+		@Request() req,
+		@Param('groupId') groupId: string,
+		) {
+		return await this.chatGroupService.getAllRolesFromGroupId(req.user.id, groupId);
 	}
 
 }

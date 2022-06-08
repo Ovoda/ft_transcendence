@@ -18,4 +18,7 @@ export class CreateChatMessageDto {
 	@IsNotEmpty()
 	date: string;
 
+	@IsOptional()
+	password?: string;
+
 }

@@ -17,6 +17,7 @@ import { e_roleType } from "../types/role.type";
 import { ChatMessageService } from "./chatMessage.service";
 import { ChatPasswordService } from "./chatPassword.service";
 import { ChatRoleService } from "./chatRole.service";
+import { WrongPassword } from "../exceptions/wrongPassword.exception";
 
 @Injectable()
 export class ChatGroupService extends CrudService<ChatGroupEntity>{
@@ -104,8 +105,26 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		}
 		const room = await this.findOneById(roomId);
 		if (!this.chatPasswordService.verifyPassword(changePassword.oldPassword, room.password)) {
-			//throw new WrongPassword();
+			throw new WrongPassword('Old password is wrong');
 		}
+		room.password = await this.chatPasswordService.encryptPassword(changePassword.newPassword);
+		const newGroup = await this.save(room);
+		return newGroup;
+	}
 
+	async getAllRolesFromGroupId(userId: string, groupId: string){
+		const usr = await this.userService.findOneById(userId);
+		const role = await this.chatRoleService.findOne({where: {user: usr}});
+		if (role.role === e_roleType.BANNED) {
+			throw new UserUnauthorized("User is banned.")
+		}
+		const group = await this.findOneById(groupId);
+		const roles = await this.chatRoleService.findMany({where: {chatroom: group}});
+		return roles;
+	}
+
+	async GroupPasswordProtected(groupId: string) {
+		const gp = await this.findOneById(groupId);
+		return (gp.password) ? true : false;
 	}
 }
