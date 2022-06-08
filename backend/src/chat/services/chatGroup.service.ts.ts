@@ -6,11 +6,11 @@ import { CrudService } from "src/app/templates/crud.service";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
 import { ChangePasswordDto } from "../dto/changePassword.dto";
-import { CreateChatDto } from "../dto/createChat.dto";
+import { CreateGroupDto } from "../dto/createGroup.dto";
 import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
 import { CreatePasswordDto } from "../dto/createPassword.dto";
 import { ChatRoleEntity } from "../entities/chatRole.entity";
-import { ChatRoomEntity } from "../entities/chatRoom.entity";
+import { ChatGroupEntity } from "../entities/chatGroup.entity";
 import { noMessagesYet } from "../exceptions/noMessagesYet.exception";
 import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
 import { e_roleType } from "../types/role.type";
@@ -19,10 +19,10 @@ import { ChatPasswordService } from "./chatPassword.service";
 import { ChatRoleService } from "./chatRole.service";
 
 @Injectable()
-export class ChatRoomService extends CrudService<ChatRoomEntity>{
+export class ChatGroupService extends CrudService<ChatGroupEntity>{
 	constructor(
-		@InjectRepository(ChatRoomEntity)
-		protected readonly _repository: Repository<ChatRoomEntity>,
+		@InjectRepository(ChatGroupEntity)
+		protected readonly _repository: Repository<ChatGroupEntity>,
 		@Inject(forwardRef(() => ChatRoleService))
 		private readonly chatRoleService: ChatRoleService,
 		private readonly chatMessageService: ChatMessageService,
@@ -33,7 +33,7 @@ export class ChatRoomService extends CrudService<ChatRoomEntity>{
 		super(_repository, _log);
 	}
 
-	async createChat(dto: CreateChatDto, roles: ChatRoleEntity[]) {
+	async createGroup(dto: CreateGroupDto, roles: ChatRoleEntity[]) {
 		const chat = await this.save({
 			room_type: dto.roomType,
 			name: dto.name,

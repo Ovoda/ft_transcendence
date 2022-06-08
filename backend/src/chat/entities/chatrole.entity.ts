@@ -3,7 +3,7 @@ import { UserEntity } from "src/user/entities/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { e_roleType } from "../types/role.type";
 import { ChatMessageEntity } from "./chatMessage.entity";
-import { ChatRoomEntity } from "./chatRoom.entity";
+import { ChatGroupEntity } from "./chatGroup.entity";
 
 @Entity()
 export class ChatRoleEntity {
@@ -19,6 +19,6 @@ export class ChatRoleEntity {
 	@ManyToOne(() => UserEntity, user => user.roles)
 	user: UserEntity;
 
-	@ManyToOne(() => ChatRoomEntity, { nullable: true, eager: true })
-	chatroom: ChatRoomEntity;
+	@ManyToOne(() => ChatGroupEntity, { nullable: true, eager: true })
+	chatroom: ChatGroupEntity;
 }
