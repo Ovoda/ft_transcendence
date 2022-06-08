@@ -1,5 +1,5 @@
 import { RelationTypeEnum } from "enums/relationType.enum";
-import { UserConnectionStatusEnum } from "enums/userConnectionStatus.enum";
+import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import CounterPart from "src/shared/interfaces/counterPart";
 import UserData from "../../features/user/interfaces/user.interface";
 

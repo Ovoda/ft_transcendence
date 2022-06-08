@@ -48,6 +48,6 @@ export class AuthService {
     }
 
     createAuthCookie(access_token: string) {
-        return (`authentication=${access_token}; Path=/; Max-Age=6h`);
+        return (`authentication=${access_token}; Path=/; Max-Age=21600`);
     }
 }

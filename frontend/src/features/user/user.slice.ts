@@ -8,8 +8,6 @@ const initialState: UserData = {
     login: "",
     avatar: "",
     tfaEnabled: false,
-    roles: [],
-    relations: [],
 }
 
 const UserDataSlice = createSlice({
@@ -21,10 +19,6 @@ const UserDataSlice = createSlice({
         },
         updateTfaEnabled(state, action) {
             return { ...state, tfaEnabled: action.payload };
-        },
-        setFriendConnected(state, action) {
-        },
-        setFriendDisconnected(state, action) {
         }
     }
 })
@@ -32,7 +26,5 @@ const UserDataSlice = createSlice({
 export const {
     updateUser,
     updateTfaEnabled,
-    setFriendConnected,
-    setFriendDisconnected
 } = UserDataSlice.actions;
 export default UserDataSlice.reducer;

@@ -32,12 +32,11 @@ export class TfaStrategy extends PassportStrategy(Strategy, "user-tfa") {
             throw new InvalidTokenException();
         }
 
-        const user = await this.userService.findOneById(payload.id, {
-            relations: ["relations"],
-        })
+        const user = await this.userService.findOneById(payload.id)
             .catch(() => {
                 throw new InvalidTokenException("User not found");
             })
+
         if (!user.tfaEnabled) {
             return user;
         }

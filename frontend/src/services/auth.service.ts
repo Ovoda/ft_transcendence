@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import { config } from "../app/config";
 import { api } from "./api.service";
 

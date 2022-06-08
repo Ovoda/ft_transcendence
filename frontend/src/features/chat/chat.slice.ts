@@ -11,8 +11,6 @@ const initialState: Chat = {
 	currentRelation: null,
 	currentLastMessage: "",
 	displayChatBox: false,
-	displayOptions: false,
-	roomtype: e_roomtype.DM,
 	displayRoomCreationModal: false,
 };
 
@@ -22,9 +20,6 @@ const chat = createSlice({
 	reducers: {
 		updateRoomtype(state, action) {
 			return { ...state, roomtype: action.payload }
-		},
-		updateDisplayOptions(state, action) {
-			return { ...state, displayOptions: action.payload }
 		},
 		openChatRoom(state, action: OpenChatRoom) {
 			return {
@@ -69,7 +64,6 @@ const chat = createSlice({
 
 export const {
 	updateRoomtype,
-	updateDisplayOptions,
 	openChatDm,
 	openChatRoom,
 	closeChatDm,

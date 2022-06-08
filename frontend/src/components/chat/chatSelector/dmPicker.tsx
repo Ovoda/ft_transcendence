@@ -9,9 +9,8 @@ import { api } from "services/api.service";
 import ClientSocket from "services/websocket.service";
 import { useContext } from "react";
 import { mainSocketContext } from "../../../App";
-import { watchingRequest } from "../../game/gamePlay/services/watch.service";
 import UserRelation from "src/shared/interfaces/userRelation";
-import { UserConnectionStatusEnum } from "enums/userConnectionStatus.enum";
+import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 
 export default function DmPicker() {
 
@@ -37,7 +36,6 @@ export default function DmPicker() {
 		if (relation.lastMessage) {
 			const response = await api.get(`chat/many/message/dm/${relation.lastMessage}`);
 			messages = response.data;
-			console.log(messages);
 		} else {
 			messages = [];
 		}
@@ -61,7 +59,7 @@ export default function DmPicker() {
 						<p className="dm_picker_room_name">{relation.counterPart.login}</p>
 
 						<span id="friend_log_status"
-							className={relation.counterPart.connectionStatus === UserConnectionStatusEnum.CONNECTED
+							className={relation.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED
 								? "connected" : ""}>
 						</span>
 					</div>

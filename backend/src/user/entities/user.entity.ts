@@ -4,7 +4,7 @@ import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
 import { GameEntity } from 'src/game/entities/game.entity';
 import RelationEntity from 'src/relation/entities/relation.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { UserConnectionStatusEnum } from '../enums/userConnectionStatus.enum';
+import { UserActivityStatusEnum } from '../enums/userConnectionStatus.enum';
 
 @Entity()
 export class UserEntity {
@@ -24,8 +24,8 @@ export class UserEntity {
 	@Column({ default: false })
 	tfaEnabled: boolean;
 
-	@Column({ default: UserConnectionStatusEnum.DISCONNECTED })
-	connectionStatus: UserConnectionStatusEnum;
+	@Column({ default: UserActivityStatusEnum.DISCONNECTED })
+	activityStatus: UserActivityStatusEnum;
 
 	@ManyToMany(() => GameEntity, games => games, { nullable: true })
 	@JoinTable()

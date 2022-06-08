@@ -15,7 +15,6 @@ import Chat from './components/chat/chat';
 import ClientSocket from './services/websocket.service';
 import { addMessage } from './features/chat/chat.slice';
 import Message from './shared/interfaces/Message';
-import { setFriendConnected, setFriendDisconnected } from 'features/user/user.slice';
 import { addRelation, setRelations } from 'features/relations/relations.slice';
 import { getRelations } from 'services/api.service';
 

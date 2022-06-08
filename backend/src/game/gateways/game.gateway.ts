@@ -12,6 +12,9 @@ import { GameRoom } from '../types/gameRoom.interface';
 import { CannotPlay } from "../exceptions/cannotPlay.exception";
 import { GameService } from "../services/game.service";
 import { CreateGameDto } from "../dto/createGame.dto";
+import { UserService } from "src/user/user.service";
+import { UserActivityStatusEnum } from "src/user/enums/userConnectionStatus.enum";
+import * as _ from 'lodash';
 
 @WebSocketGateway({
 	cors: {
@@ -23,6 +26,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	constructor(
 		@Inject(forwardRef(() => GameService))
 		private readonly gameService: GameService,
+		private readonly userService: UserService,
 	) { }
 
 	private games: GameRoom[] = [];
@@ -61,7 +65,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('joinGame')
-	handleJoinGame(client: Socket, data: any) {
+	async handleJoinGame(client: Socket, data: any) {
 		this.logger.log(`New Game Request from: ${client.id}`);
 		this.logger.log(`Current Games: ${this.games.length}`);
 		if (!this.games.length || this.games[this.games.length - 1].status === true) {
@@ -77,6 +81,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				watchers: [],
 			}
 			this.games.push(newGame);
+
+			await this.userService.setUserAsQueuing(data.id);
+
 			client.join(newGame.id);
 			this.server.to(client.id).emit('setSide', "left");
 			this.server.to(newGame.id).emit('gameStatus', false);
@@ -87,6 +94,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			gameroom.user2 = data.id;
 			gameroom.login2 = data.login;
 			gameroom.status = true;
+
+			await this.userService.setUserAsPlaying(gameroom.user1);
+			await this.userService.setUserAsPlaying(gameroom.user2);
+
 			client.join(gameroom.id);
 			this.server.to(client.id).emit('setSide', "right");
 			this.server.to(gameroom.socket1).emit('rightLogin', gameroom.login2);
@@ -102,14 +113,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('joinGameAsWatcher')
-	handleNewWatcher(client: Socket, data: string) {
-		const index = this.games.findIndex((game: GameRoom) => {
-			return (game.login1 === data || game.login2 === data);
+	handleNewWatcher(client: Socket, data: any) {
+
+		const watched = data.watched;
+		const watcher = data.watcher;
+
+		const game = this.games.find((game: GameRoom) => {
+			return (game.user1 === watched || game.user2 === watched);
 		})
-		if (index >= 0) {
-			this.games[index].watchers.push(client.id);
-			client.join(this.games[index].id);
-		}
+		if (!game) { return; }
+		game.watchers.push(client.id);
+		this.userService.setUserAsWatching(watcher);
+		client.join(game.id);
 	}
 
 
@@ -187,21 +202,24 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('deleteRoom')
-	handleDeleteRoom(client: Socket) {
-		const index = this.games.findIndex((game: GameRoom) => {
+	async handleDeleteRoom(client: Socket) {
+		const game = this.games.find((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
-		})
-		if (index >= 0) {
-			client.leave(this.games[index].id);
-			if (this.games[index].socket1 === client.id) {
-				this.games[index].socket1 = null;
-			}
-			else if (this.games[index].socket2 === client.id) {
-				this.games[index].socket2 = null;
-			}
-			if (this.games[index].socket1 === null && this.games[index].socket2 === null) {
-				this.games = [...this.games.slice(0, index), ...this.games.slice(index + 1)];
-			}
+		});
+
+		if (!game) { return; }
+
+		client.leave(game.id);
+		if (game.socket1 === client.id) {
+			game.socket1 = null;
+		}
+		else if (game.socket2 === client.id) {
+			game.socket2 = null;
+		}
+		if (game.socket1 === null && game.socket2 === null) {
+			await this.userService.setUserAsConnected(game.user1);
+			await this.userService.setUserAsConnected(game.user2);
+			_.remove(this.games, game);
 		}
 	}
 

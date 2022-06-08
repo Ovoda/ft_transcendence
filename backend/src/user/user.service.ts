@@ -4,7 +4,7 @@ import { CrudService } from 'src/app/templates/crud.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserEntity } from './entities/user.entity';
-import { UserConnectionStatusEnum } from './enums/userConnectionStatus.enum';
+import { UserActivityStatusEnum } from './enums/userConnectionStatus.enum';
 
 @Injectable()
 export class UserService extends CrudService<UserEntity> {
@@ -47,14 +47,32 @@ export class UserService extends CrudService<UserEntity> {
     }
 
     async setUserAsConnected(userId: string) {
-        return await this.updateById(userId, {
-            connectionStatus: UserConnectionStatusEnum.CONNECTED,
-        });
+        // return await this.updateById(userId, {
+        //     activityStatus: UserActivityStatusEnum.CONNECTED,
+        // });
     }
 
     async setUserAsDisconnected(userId: string) {
-        return await this.updateById(userId, {
-            connectionStatus: UserConnectionStatusEnum.DISCONNECTED,
-        });
+        // return await this.updateById(userId, {
+        //     activityStatus: UserActivityStatusEnum.DISCONNECTED,
+        // });
+    }
+
+    async setUserAsPlaying(userId: string) {
+        // return await this.updateById(userId, {
+        //     activityStatus: UserActivityStatusEnum.PLAYING,
+        // });
+    }
+
+    async setUserAsWatching(userId: string) {
+        // return await this.updateById(userId, {
+        //     activityStatus: UserActivityStatusEnum.WATCHING,
+        // });
+    }
+
+    async setUserAsQueuing(userId: string) {
+        // return await this.updateById(userId, {
+        //     activityStatus: UserActivityStatusEnum.QUEUING,
+        // });
     }
 }
