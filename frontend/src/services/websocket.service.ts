@@ -84,4 +84,9 @@ export default class ClientSocket {
 		this.socket.emit("leaveGame", data);
 	}
 
+	/** Watching request on given friend */
+	public watchingRequest(data: any) {
+		this.socket.emit("watchingRequest", data);
+
+	}
 }

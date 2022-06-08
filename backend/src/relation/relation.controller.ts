@@ -41,7 +41,7 @@ export class RelationController {
     @HttpCode(201)
     @UseGuards(TfaGuard)
     async createRelation(@Body() createRelationDto: CreateRelationDto, @Req() request: JwtRequest) {
-        const newRelation = await this.relationService.createRelation(createRelationDto, request.user);
+        const newRelation = await this.relationService.createRelation(createRelationDto, request.user.id);
         this.socketGateway.addFriend(newRelation);
         return newRelation;
     }

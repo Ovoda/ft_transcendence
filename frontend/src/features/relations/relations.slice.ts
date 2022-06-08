@@ -20,9 +20,6 @@ const relations = createSlice({
             return ({
                 ...state, relations: [...state.relations, action.payload],
             })
-        },
-        friendConnection(state, action) {
-
         }
     }
 });

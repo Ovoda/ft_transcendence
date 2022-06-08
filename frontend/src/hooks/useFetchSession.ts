@@ -11,11 +11,15 @@ export default function useFetchSession() {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        console.log(document.cookie);
+
         if (!Cookies.get("authentication")) return;
 
         async function fetchSession() {
             const userData = await getUserData(true);
             const userRelations = await getRelations();
+            console.log(userData);
+
             if (userData) {
                 dispatch(updateUser(userData));
             }

@@ -27,10 +27,15 @@ export class RelationService extends CrudService<RelationEntity>{
      * @param currentUser - current user entity
      * @returns the newly created relation entity
      */
-    async createRelation(createRelationDto: CreateRelationDto, currentUser: UserEntity) {
-        if (createRelationDto.userId === currentUser.id) {
+    async createRelation(createRelationDto: CreateRelationDto, currentUserId: string) {
+        if (createRelationDto.userId === currentUserId) {
             throw new selfRelationException();
         }
+
+        const currentUser = await this.userService.findOneById(currentUserId, {
+            relations: ["relations"],
+        });
+
         currentUser.relations.find((relation: RelationEntity) => {
             if (createRelationDto.userId === this.getCounterPart(relation.users, currentUser.id).id) {
                 throw new redondantRelationException();

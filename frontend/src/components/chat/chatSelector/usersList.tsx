@@ -39,6 +39,7 @@ export default function UsersList() {
                         <img className="users_list_item_img" src={user.avatar} alt={user.login + "'s avatar"} />
                         <p>{user.login}</p>
                         <Button onClick={async () => { return handleAddFriend(user.id) }}>+</Button>
+                        <Button id="block_button" onClick={async () => { return handleAddFriend(user.id) }}>x</Button>
                     </div>
                 )
             }

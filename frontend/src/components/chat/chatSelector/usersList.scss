@@ -33,7 +33,17 @@
             max-height: 50px;
             min-height: 50px;
             height: 50px;
-            border-radius: 100%;
+        }
+
+        button#block_button {
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            align-items: center;
+            // transform: rotate(45deg);
+            font-size: 2rem;
+            background-color: black;
+            border: 1px solid rgba(0, 0, 0, 0);
         }
     }
 }

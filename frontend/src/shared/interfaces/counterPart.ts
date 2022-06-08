@@ -1,10 +1,10 @@
-import { UserConnectionStatusEnum } from "enums/userConnectionStatus.enum";
+import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 
 export default interface CounterPart {
     id: string;
     login: string;
     avatar: string;
-    connectionStatus: UserConnectionStatusEnum;
+    activityStatus: UserActivityStatusEnum;
     tfaSecret: string | null;
     tfaEnabled: boolean;
 }

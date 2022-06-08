@@ -1,9 +1,8 @@
-import { Body, Controller, Get, HttpCode, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, Query, Req, UseGuards } from '@nestjs/common';
 import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
 import { UserService } from './user.service';
 import { UserEntity } from './entities/user.entity';
 import { JwtRequest } from 'src/auth/interfaces/jwtRequest.interface';
-import { request } from 'http';
 
 @Controller('user')
 export class UserController {
@@ -15,28 +14,9 @@ export class UserController {
 	@UseGuards(TfaGuard)
 	async getCurrentUser(
 		@Req() req: JwtRequest,
-		@Query("relations") relations: string
 	) {
-		if (relations) {
-			return await this.userService.findOneById(req.user.id, {
-				relations: ["relations"],
-			})
-		}
 		return req.user;
 	}
-
-	/** TODO: what ? */
-	@Get('all')
-	@HttpCode(200)
-	async getGames(
-		@Query() limit: number,
-		@Query() pages: number,
-	) {
-		return await this.userService.findMany({
-			limit: limit,
-			page: pages
-		});
-	} s
 
 	@Get("many")
 	@HttpCode(200)

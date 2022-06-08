@@ -17,6 +17,8 @@ export const api = axios.create({
 export async function getUserData(relations?: boolean): Promise<UserData | null | undefined> {
     try {
         const response = await api.get("/user");
+        console.log(response.data);
+
         return response.data as UserData;
     } catch (error: any) {
         // console.log(error.response);

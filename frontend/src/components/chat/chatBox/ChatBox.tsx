@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import { setMessages } from "../../../features/chat/chat.slice";
@@ -9,14 +9,15 @@ import settings_image from 'images/settings.png';
 import block_user_image from 'images/block_user.png';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
-import { watchingRequest } from "../../game/gamePlay/services/watch.service";
+import { mainSocketContext } from "../../../App";
 
 
 export default function ChatBox() {
 
 	/** Global data */
-	const { chat } = useSelector((store: Store) => store);
+	const { chat, relations, user } = useSelector((store: Store) => store);
 	const messages = chat.messages;
+	const mainSocket = useContext(mainSocketContext);
 
 	/** Tools */
 	const dispatch = useDispatch();
@@ -53,11 +54,20 @@ export default function ChatBox() {
 		return "Today " + hour + ":" + minutes;
 	}
 
+	async function handleWatchRequest() {
+		mainSocket?.watchingRequest(
+			{
+				watched: chat.currentRelation?.counterPart.id as string,
+				watcher: user.id,
+			});
+		return false;
+	}
+
 	return (
 		<div className='chat_box'>
 			<div className={"chat_box_header"}>
-				<h3>ndemont</h3>
-				<Button onClick={() => watchingRequest("ndemont", null)}>Watch Game</Button>
+				<h3>{chat.currentRelation?.counterPart.login}</h3>
+				<Button onClick={handleWatchRequest}>Watch Game</Button>
 				<img onClick={handleOpenSettings} src={settings_image} alt="" />
 				<img onClick={handleOpenSettings} src={block_user_image} alt="" />
 			</div>
