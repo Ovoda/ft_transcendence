@@ -36,14 +36,14 @@ export class ChatController {
 
 	// return true or false.
 	@UseGuards(JwtAuthGuard)
-	@Get('ispassword/group/:roleId')
+	@Get('haspassword/role/:roleId')
 	@HttpCode(200)
 	async roleIdRequirePassword(@Request() req, @Param('roleId') roleId: string){
 		return await this.chatRoleService.GroupFromRolePasswordProtected(req.user.id, roleId);
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('ispassword/:groupId')
+	@Get('haspassword/group/:groupId')
 	@HttpCode(200)
 	async groupRequirePassword(@Request() req, @Param('groupId') groupId: string){
 		return await this.chatGroupService.GroupPasswordProtected(groupId)
@@ -59,7 +59,7 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Post('message/:role_id')
+	@Post('postmessage/:role_id')
 	@HttpCode(201)
 	async postMessage(
 		@Request() req,
