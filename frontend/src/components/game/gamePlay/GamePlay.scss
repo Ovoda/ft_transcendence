@@ -1,17 +1,32 @@
 .gameplay {
-	background-color: mediumvioletred;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 
 	#canvas {
-		background-color: #282C34;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		width: 80%;
 		height: 80%;
 	}
-}
 
+	#play_game_button {
+		height: 60px;
+		width: 60px;
+		min-width: 60px;
+
+		box-sizing: border-box;
+
+		font-size: 4rem;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		padding: 0;
+		border-radius: 100%;
+
+	}
+}

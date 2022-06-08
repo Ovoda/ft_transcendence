@@ -10,7 +10,7 @@ export default interface Gameplay {
 }
 
 export function setInitialGameplayState(windowWidth: number, windowHeight: number) {
-    return ({
+	return ({
         arrowUp: false,
         arrowDown: false,
         ball: setInitialBallState(windowWidth, windowHeight),

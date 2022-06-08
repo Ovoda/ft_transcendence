@@ -8,7 +8,7 @@ import GameStatus, { initialGameStatus } from './interfaces/gameStatus.interface
 import Gameplay, { setInitialGameplayState } from './interfaces/gameplay.interface';
 import GameCanvas, { setInitialGameCanvasState } from './interfaces/gameCanvas.interface';
 import { PlayStatusEnum } from "./enums/playStatus.enum";
-
+import SwitchButton from "assets/SwitchButton/SwitchButton";
 import UserData from 'features/user/interfaces/user.interface';
 import UpdateBallDto from '../../../hooks/interfaces/UpdateBall.dto';
 import SetUserDto from "./interfaces/SetUser.dto";
@@ -21,7 +21,9 @@ import { useGameListeners } from '../../../hooks/useGame.hook';
 import { UserStatusEnum } from './enums/userStatus.enum';
 import Button from "assets/Button/Button";
 import { ResultStatusEnum } from "./enums/resultStatus.enum";
-import GameOptions from "../gameOptions/gameOptions";
+
+const defaultBackgroundColor: string = '#4285F4';
+const defaultElementsColor: string = 'white';
 
 function GamePlay() {
 
@@ -55,6 +57,7 @@ function GamePlay() {
 			playerLeft: setInitialPlayerLeftState(gameCanvas.width, gameCanvas.height),
 			playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
 		})
+		console.log(gameplay.ball.velocity);
 		let userInfo: SetUserDto = {
 			id: userData.id,
 			login: userData.login,
@@ -69,12 +72,18 @@ function GamePlay() {
 		return true;
 	}
 
+	/**  enable Dark Mode */
+	async function darkMode() {
+
+	}
+
 	/**  pausehe game **/
 	async function pauseGame() {
 		mainSocket?.emit("pauseGameRequest");
 		return true;
 	}
 
+	/** Resume Game */
 	async function resumeGame() {
 		let ballPos: UpdateBallDto = {
 			posX: gameplay.ball.position.x,
@@ -165,11 +174,33 @@ function GamePlay() {
 		}
 	});
 
+	const [darkModeActivated, setDarkModeActivated] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (darkModeActivated) {
+			setGameCanvas({
+				...gameCanvas,
+				background_color: 'black',
+				elements_color: 'darkgrey'
+			})
+		}
+		else {
+			setGameCanvas({
+				...gameCanvas,
+				background_color: defaultBackgroundColor,
+				elements_color: defaultElementsColor,
+			})
+		}
+	}, [darkModeActivated]);
+
 	/** Render game */
 	function animate() {
 		if (gameStatus.play === PlayStatusEnum.ON) {
 			gameCanvas.context = canvaRef.current?.getContext('2d');
 			gameCanvas.context?.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+			if (!gameCanvas.context) { return; }
+			gameCanvas.context.fillStyle = gameCanvas.background_color;
+			gameCanvas.context?.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 			drawBall(gameCanvas, gameplay.ball);
 			drawPlayer(gameCanvas, gameplay.playerLeft);
 			drawPlayer(gameCanvas, gameplay.playerRight);
@@ -202,6 +233,11 @@ function GamePlay() {
 					<canvas ref={canvaRef} height={gameCanvas.height} width={gameCanvas.width} id="canvas"></canvas>
 				</div>
 			)}
+			<h3>Game Options</h3>
+			<ul className="play." >
+				<p>Dark Mode</p>
+				<SwitchButton value={darkModeActivated} setValue={setDarkModeActivated} />
+			</ul>
 		</div>
 	);
 }

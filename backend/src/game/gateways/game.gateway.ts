@@ -168,6 +168,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				score2: data.posY,
 				winner: (client.id === this.games[index].socket1 ? this.games[index].user2 : this.games[index].user1),
 			}
+			// REPLACE BY SAVE VICTORY / DEFEAT TO USERS
 			//return await this.gameService.saveNewGame(newdto);
 		}
 	}
