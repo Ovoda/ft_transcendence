@@ -21,9 +21,7 @@ import { useGameListeners } from '../../../hooks/useGame.hook';
 import { UserStatusEnum } from './enums/userStatus.enum';
 import Button from "assets/Button/Button";
 import { ResultStatusEnum } from "./enums/resultStatus.enum";
-import { showColorOptions, showScoreOptions, showSizeOptions, showSpeedOptions } from "../gameOptions/options.service";
 import GameOptions from "../gameOptions/gameOptions";
-
 
 function GamePlay() {
 
@@ -78,7 +76,11 @@ function GamePlay() {
 	}
 
 	async function resumeGame() {
-		mainSocket?.emit("resumeGameRequest");
+		let ballPos: UpdateBallDto = {
+			posX: gameplay.ball.position.x,
+			posY: gameplay.ball.position.y,
+		}
+		mainSocket?.emit("resumeGameRequest", ballPos);
 		return true;
 	}
 

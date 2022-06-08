@@ -88,14 +88,10 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		})
 
 		/** Resume the Game  **/
-		mainSocket.on("resumeGame", () => {
-			console.log("Game not in pause anymore");
+		mainSocket.on("resumeGame", (data: UpdateBallDto) => {
 			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON })
-			console.log(gameStatus);
 			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-				console.log("Animation Request");
-				let newPos: Position = getNewBallPos(gameplay, gameStatus, gameCanvas.height, gameCanvas.width);
-				mainSocket?.emit("animateGame", { posX: newPos.x, posY: newPos.y } as UpdateBallDto);
+				mainSocket?.emit("animateGame", data);
 			}
 		})
 
@@ -193,8 +189,6 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		})
 
 		mainSocket.on("updateBall", (data: UpdateBallDto) => {
-			//setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
-			//gameStatus.play = PlayStatusEnum.ON;
 			setGameplay((gameplay: Gameplay) => {
 				return {
 					...gameplay,
