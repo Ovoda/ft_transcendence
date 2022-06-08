@@ -11,7 +11,6 @@ import { ChatRoleEntity } from "../entities/chatRole.entity";
 import { OwnerError } from "../exceptions/ownerError.exception";
 import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
 import { e_roleType } from "../types/role.type";
-import { RoomTypeEnum } from "../types/room.type";
 import { ChatMessageService } from "./chatMessage.service";
 import { ChatGroupService } from "./chatGroup.service.ts";
 
@@ -146,13 +145,13 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		}
 		const callerRole = await this.findOne({
 			where: {
-				chatroom: await this.chatGroupService.findOneById(changeRoleDto.chatroom_id),
+				chatroom: await this.chatGroupService.findOneById(changeRoleDto.groupId),
 				user: await this.userService.findOne({ where: { id: user_id } }),
 			}
 		});
 		const roleModified = await this.findOne({
 			where: {
-				chatroom: await this.chatGroupService.findOneById(changeRoleDto.chatroom_id),
+				chatroom: await this.chatGroupService.findOneById(changeRoleDto.groupId),
 				user: await this.userService.findOne({ where: { id: changeRoleDto.user_id } }),
 			}
 		})

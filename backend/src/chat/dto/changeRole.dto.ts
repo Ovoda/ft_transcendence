@@ -6,7 +6,7 @@ import { e_roleType } from '../types/role.type';
 export class ChangeRoleDto {
 	@IsNotEmpty()
 	@IsUUID()
-	chatroom_id: string;
+	groupId: string;
 
 	@IsNotEmpty()
 	user_id: string;

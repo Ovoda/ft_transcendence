@@ -26,11 +26,11 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('all/roles/:userId')
+	@Get('all/roles/')
 	@HttpCode(200)
-	async getAllRolesOfUser(@Param('userId') userId: string) {
+	async getAllRolesOfUser(@Request() req) {
 		// RETURN AN ARRAY OF A ROLE OF GIVEN USER.
-		return await this.chatRoleService.getAllRolesFromUserId(userId);
+		return await this.chatRoleService.getAllRolesFromUserId(req.user.id);
 	}
 
 	@UseGuards(JwtAuthGuard)
@@ -83,7 +83,7 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Patch('add/:roomId/:userIdAdded')
+	@Patch('add/group/:roomId/:userIdAdded')
 	@HttpCode(200)
 	async addUserToRoom(
 		@Request() req, 
@@ -94,7 +94,7 @@ export class ChatController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Patch('kick/:roomId/:roleId')
+	@Patch('kick/group/:roomId/:roleId')
 	@HttpCode(200)
 	async kickUserFromRoom(
 		@Request() req,

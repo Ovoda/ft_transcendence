@@ -98,6 +98,7 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("ClientMessage")
     public async sendMessage(socket: Socket, body: ClientMessageDto) {
         this.server.to(body.room).emit("ServerMessage", body);
+		await this.chatRoleService.uploadRoleFromExpiration(body.roleId);
         await this.chatRoleService.postMessageFromRole(body.userId, body.roleId, {
             content: body.content,
             login: body.login,
