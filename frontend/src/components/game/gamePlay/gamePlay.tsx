@@ -8,7 +8,6 @@ import GameStatus, { initialGameStatus } from './interfaces/gameStatus.interface
 import Gameplay, { setInitialGameplayState } from './interfaces/gameplay.interface';
 import GameCanvas, { setInitialGameCanvasState } from './interfaces/gameCanvas.interface';
 import { PlayStatusEnum } from "./enums/playStatus.enum";
-import SwitchButton from "assets/SwitchButton/SwitchButton";
 import UserData from 'features/user/interfaces/user.interface';
 import UpdateBallDto from '../../../hooks/interfaces/UpdateBall.dto';
 import SetUserDto from "./interfaces/SetUser.dto";
@@ -21,6 +20,7 @@ import { useGameListeners } from '../../../hooks/useGame.hook';
 import { UserStatusEnum } from './enums/userStatus.enum';
 import Button from "assets/Button/Button";
 import { ResultStatusEnum } from "./enums/resultStatus.enum";
+import SwitchButton from "assets/SwitchButton/SwitchButton";
 
 const defaultBackgroundColor: string = '#4285F4';
 const defaultElementsColor: string = 'white';
@@ -70,11 +70,6 @@ function GamePlay() {
 	async function leaveGame(data: number[]) {
 		mainSocket?.emit("leaveGame", data);
 		return true;
-	}
-
-	/**  enable Dark Mode */
-	async function darkMode() {
-
 	}
 
 	/**  pausehe game **/
@@ -181,7 +176,7 @@ function GamePlay() {
 			setGameCanvas({
 				...gameCanvas,
 				background_color: 'black',
-				elements_color: 'darkgrey'
+				elements_color: 'white'
 			})
 		}
 		else {
@@ -191,11 +186,12 @@ function GamePlay() {
 				elements_color: defaultElementsColor,
 			})
 		}
+		requestAnimationFrame(animate);
 	}, [darkModeActivated]);
 
 	/** Render game */
 	function animate() {
-		if (gameStatus.play === PlayStatusEnum.ON) {
+		if (gameStatus.play !== PlayStatusEnum.OFF) {
 			gameCanvas.context = canvaRef.current?.getContext('2d');
 			gameCanvas.context?.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 			if (!gameCanvas.context) { return; }
@@ -228,16 +224,19 @@ function GamePlay() {
 				<Button onClick={() => stopWatching()}>Stop Watching</Button>
 			)}
 			{(gameStatus.play === PlayStatusEnum.ON || gameStatus.play === PlayStatusEnum.PAUSE) && (
-				<div id="game_area">
-					<h1>{gameplay.playerLeft.login} {gameplay.playerLeft.score} : {gameplay.playerRight.score} {gameplay.playerRight.login} </h1>
+				<>
+					<div id="score_container">
+						<h2 className="score_player1">{gameplay.playerLeft.login}  {gameplay.playerLeft.score}</h2>
+						<h2 className="score">:</h2>
+						<h2 className="score_player2">{gameplay.playerRight.score}   {gameplay.playerRight.login}</h2>
+					</div>
 					<canvas ref={canvaRef} height={gameCanvas.height} width={gameCanvas.width} id="canvas"></canvas>
-				</div>
+					<ul id="dark_button">
+						<p>Dark Mode</p>
+						<SwitchButton value={darkModeActivated} setValue={setDarkModeActivated} />
+					</ul>
+				</>
 			)}
-			<h3>Game Options</h3>
-			<ul className="play." >
-				<p>Dark Mode</p>
-				<SwitchButton value={darkModeActivated} setValue={setDarkModeActivated} />
-			</ul>
 		</div>
 	);
 }
