@@ -13,6 +13,8 @@ import { getPreviousMessages } from "services/api.service";
 import settings_image from 'images/settings.png';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
+import { watchingRequest } from "../../game/gamePlay/services/watch.service";
+
 
 export default function ChatBox() {
 
@@ -71,6 +73,8 @@ export default function ChatBox() {
 	return (
 		<div className='chat_box'>
 			<div className={"chat_box_header"}>
+				<h3>ndemont</h3>
+				<Button onClick={() => watchingRequest("ndemont", null)}>Watch Game</Button>
 				<img onClick={handleOpenSettings} src={settings_image} alt="" />
 			</div>
 			<div className={"chat_box_settings " + openSettings}>

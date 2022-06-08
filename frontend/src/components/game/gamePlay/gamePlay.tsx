@@ -85,6 +85,7 @@ function GamePlay() {
 	/**  stop watching game **/
 	async function stopWatching() {
 		setGameStatus({ ...gameStatus, user: UserStatusEnum.UNASSIGNED, result: ResultStatusEnum.UNDEFINED, play: PlayStatusEnum.OFF })
+		setGameplay(setInitialGameplayState(gameCanvas.width, gameCanvas.height));
 		mainSocket?.emit("stopWatching");
 		return true;
 	}
