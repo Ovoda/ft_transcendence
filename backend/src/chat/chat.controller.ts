@@ -1,8 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, HttpCode, Query, Request } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { RelationQueryBuilder } from 'typeorm';
 import { ChangeRoleDto } from './dto/changeRole.dto';
 import { CreateChatDto } from './dto/createChat.dto';
 import { CreateChatMessageDto } from './dto/createChatMessage.dto';
@@ -96,4 +94,6 @@ export class ChatController {
 	){
 		return await this.chatRoleService.kickUserAndRole(req.user.id, roomId, roleId);
 	}
+
+
 }

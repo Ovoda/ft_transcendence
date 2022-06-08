@@ -4,13 +4,13 @@ import { RoomTypeEnum } from "../types/room.type";
 
 export class CreateChatDto {
 	@IsNotEmpty()
-	logins: string[];
+	ids: string[];
 
 	@IsNotEmpty()
 	roomType: RoomTypeEnum;
 
-	@IsOptional()
-	name?: string;
+	@IsNotEmpty()
+	name: string;
 
 	@IsOptional()
 	password?: string;

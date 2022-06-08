@@ -54,19 +54,14 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	 */
 	public async createRoles(dto: CreateChatDto) {
 		let roles: ChatRoleEntity[] = [];
-		for (let i = 0; i < dto.logins.length; i++) {
+		for (let i = 0; i < dto.ids.length; i++) {
 			let role = await this.create({
-				user: await this.userService.findOne(
-					{
-						where: {
-							login: dto.logins[i]
-						}
-					}),
+				user: await this.userService.findOneById(dto.ids[i]),
 				role: (i == 0) ? e_roleType.OWNER : e_roleType.LAMBDA,
 			});
 			roles.push(role);
 		}
-		for (let i = 0; i < dto.logins.length; i++) {
+		for (let i = 0; i < dto.ids.length; i++) {
 			await this.save(roles[i]);
 		}
 		return roles;
@@ -90,13 +85,8 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		}
 		const room = await this.chatRoomService.findOneById(role.chatroom.id);
 		let otherName: string;
-		if (room.room_type === RoomTypeEnum.DM) {
-			//const currentUsr = await this.userService.findOneById(user_id);
-			const othrole = await this.findMany({ where: { chatroom: room.id }, relations: ['user'] });
-			otherName = (othrole.items[0].user.id === user_id) ? othrole.items[1].user.login : othrole.items[0].user.login;
-		}
 		let obj = {
-			roomName: (room.name) ? room.name : otherName,
+			roomName: room.name,
 			chatRoom: room,
 		}
 		return obj;
@@ -163,7 +153,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		const roleModified = await this.findOne({
 			where: {
 				chatroom: await this.chatRoomService.findOneById(changeRoleDto.chatroom_id),
-				user: await this.userService.findOne({ where: { login: changeRoleDto.login } }),
+				user: await this.userService.findOne({ where: { id: changeRoleDto.user_id } }),
 			}
 		})
 		if (

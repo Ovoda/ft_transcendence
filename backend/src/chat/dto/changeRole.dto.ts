@@ -9,7 +9,7 @@ export class ChangeRoleDto {
 	chatroom_id: string;
 
 	@IsNotEmpty()
-	login: string;
+	user_id: string;
 
 	@IsNotEmpty()
 	newRole: e_roleType;
