@@ -1,4 +1,4 @@
-import ClientSocket from "services/websocket";
+import ClientSocket from "services/websocket.service";
 
 export async function watchingRequest(login: string, socket: ClientSocket | null) {
 
