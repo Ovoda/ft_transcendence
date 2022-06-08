@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
+import { UserEntity } from "src/user/entities/user.entity";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
 import { ChangeRoleDto } from "../dto/changeRole.dto";
@@ -183,7 +184,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		else if (
 			callerRole.role === e_roleType.ADMIN
 			&& roleModified.role !== e_roleType.OWNER
-			&& roleModified.role !== e_roleType.ADMIN
+			//&& roleModified.role !== e_roleType.ADMIN // ADMIN can change status of others admins.
 		) {
 			await this.updateById(roleModified.id, {
 				role: changeRoleDto.newRole,
@@ -194,5 +195,42 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 			throw new UserUnauthorized("Unexpected change.");
 		}
 		return roleModified;
+	}
+
+	async addUserAndRole(userIdCaller: string, roomId: string, userIdAdded: string){
+		//const room = await this.findOneById(roomId, {relations: ['roles']});
+		const caller = await this.userService.findOneById(userIdCaller);
+		const callerRole: ChatRoleEntity = await this.findOne({where: {user: caller}});
+		if (callerRole.role !== e_roleType.OWNER && callerRole.role !== e_roleType.ADMIN) {
+			throw new UserUnauthorized("You are not admin or owner of this chatroom");
+		}
+		const newUser = await this.userService.findOneById(userIdAdded);
+		const chatroom = await this.chatRoomService.findOneById(roomId, {relations: ['users']});
+		const newRole = await this.save({
+			expires: null,
+			role: e_roleType.LAMBDA,
+			user: newUser,
+			chatroom: chatroom,
+		})
+		chatroom.users.push(newRole);
+		return await this.chatRoomService.save(chatroom);
+	}
+
+	async kickUserAndRole(userIdCaller: string, roomId: string, KickRoleId: string) {
+		const caller = await this.userService.findOneById(userIdCaller);
+		const callerRole: ChatRoleEntity = await this.findOne({where: {user: caller}});
+		if (callerRole.role !== e_roleType.OWNER && callerRole.role !== e_roleType.ADMIN) {
+			throw new UserUnauthorized("You are not admin or owner of this chatroom");
+		}
+		const chatroom = await this.chatRoomService.findOneById(roomId, {relations: ['users']});
+		let oldUsers = chatroom.users;
+		let newUsers = [];
+		for (let i = 0; i < oldUsers.length; i++) {
+			if (KickRoleId !== oldUsers[i].id) {
+				newUsers.push(oldUsers[i]);
+			}
+		}
+		chatroom.users = newUsers;
+		return await this.chatRoomService.save(chatroom);
 	}
 }
