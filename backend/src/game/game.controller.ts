@@ -1,7 +1,5 @@
 import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query } from '@nestjs/common';
-import { CreateGameDto } from './dto/createGame.dto';
-import { UpdateGameDto } from './dto/updateGame.dto';
 import { GameService } from './services/game.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 

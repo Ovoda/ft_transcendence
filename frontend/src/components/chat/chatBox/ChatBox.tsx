@@ -64,6 +64,7 @@ export default function ChatBox() {
 		return false;
 	}
 
+<<<<<<< HEAD
 	function handleScroll(event: UIEvent<HTMLDivElement>) {
 		const target = event.target as HTMLInputElement;
 		const top = target.scrollHeight + target.scrollTop;
@@ -87,11 +88,25 @@ export default function ChatBox() {
 		}
 	}, [chat.messages]);
 
+=======
+	async function handlePlayRequest() {
+		console.log("Playing Request");
+		return false;
+	}
+
+>>>>>>> 10d2be5 (Synchronise data when watching a game, saving scores in db, displaying scores in profile)
 	return (
 		<div className='chat_box'>
 			<div className={"chat_box_header"}>
 				<h3>{chat.currentRelation?.counterPart.login}</h3>
-				<Button onClick={handleWatchRequest}>Watch Game</Button>
+				{
+					chat.currentRelation?.counterPart.activityStatus === UserActivityStatusEnum.PLAYING &&
+					<Button onClick={handleWatchRequest}>Watch</Button>
+				}
+				{
+					chat.currentRelation?.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED &&
+					<Button onClick={handlePlayRequest}>Play</Button>
+				}
 				<img onClick={handleOpenSettings} src={settings_image} alt="" />
 				<img onClick={handleOpenSettings} src={block_user_image} alt="" />
 			</div>
