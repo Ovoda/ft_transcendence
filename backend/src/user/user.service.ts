@@ -47,32 +47,32 @@ export class UserService extends CrudService<UserEntity> {
     }
 
     async setUserAsConnected(userId: string) {
-        // return await this.updateById(userId, {
-        //     activityStatus: UserActivityStatusEnum.CONNECTED,
-        // });
+         return await this.updateById(userId, {
+             activityStatus: UserActivityStatusEnum.CONNECTED,
+         });
     }
 
     async setUserAsDisconnected(userId: string) {
-        // return await this.updateById(userId, {
-        //     activityStatus: UserActivityStatusEnum.DISCONNECTED,
-        // });
+         return await this.updateById(userId, {
+             activityStatus: UserActivityStatusEnum.DISCONNECTED,
+         });
     }
 
     async setUserAsPlaying(userId: string) {
-        // return await this.updateById(userId, {
-        //     activityStatus: UserActivityStatusEnum.PLAYING,
-        // });
+         return await this.updateById(userId, {
+             activityStatus: UserActivityStatusEnum.PLAYING,
+         });
     }
 
     async setUserAsWatching(userId: string) {
-        // return await this.updateById(userId, {
-        //     activityStatus: UserActivityStatusEnum.WATCHING,
-        // });
+         return await this.updateById(userId, {
+             activityStatus: UserActivityStatusEnum.WATCHING,
+         });
     }
 
     async setUserAsQueuing(userId: string) {
-        // return await this.updateById(userId, {
-        //     activityStatus: UserActivityStatusEnum.QUEUING,
-        // });
+         return await this.updateById(userId, {
+             activityStatus: UserActivityStatusEnum.QUEUING,
+         });
     }
 }

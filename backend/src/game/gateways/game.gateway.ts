@@ -212,8 +212,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.leave(game.id);
 		if (game.socket1 === client.id) {
 			game.socket1 = null;
-		}
-		else if (game.socket2 === client.id) {
+		} else if (game.socket2 === client.id) {
 			game.socket2 = null;
 		}
 		if (game.socket1 === null && game.socket2 === null) {
@@ -225,17 +224,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('movePlayer')
 	handleArrow(client: Socket, data: number): void {
-		const index = this.games.findIndex((game: GameRoom) => {
+		const game = this.games.find((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
 
-		if (index >= 0) {
-			if (this.games[index].socket1 === client.id) {
-				this.server.to(this.games[index].id).emit('updateLeftPlayer', data);
-			}
-			else if (this.games[index].socket2 === client.id) {
-				this.server.to(this.games[index].id).emit('updateRightPlayer', data);
-			}
+		if (!game) { return; }
+
+		if (game.socket1 === client.id) {
+			this.server.to(game.id).emit('updateLeftPlayer', data);
+		} else if (game.socket2 === client.id) {
+			this.server.to(game.id).emit('updateRightPlayer', data);
 		}
 	}
 
@@ -248,16 +246,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	handleDisconnect(client: Socket, ...args: any[]) {
-		const index = this.games.findIndex((game: GameRoom) => {
+		const game = this.games.find((game: GameRoom) => {
 			return game.socket1 === client.id || game.socket2 === client.id;
 		})
-		if (index >= 0) {
-			if (this.games[index].socket1 === client.id)
-				this.server.to(this.games[index].socket2).emit('gameStop', this.games[index].socket1);
-			else if (this.games[index].socket2 === client.id)
-				this.server.to(this.games[index].socket1).emit('gameStop', this.games[index].socket2);
-			this.logger.log(`Client disconnected: ${client.id}`);
-			this.handleDeleteRoom(client);
+
+		if (!game) { return; }
+
+		if (game.socket1 === client.id) {
+			this.server.to(game.socket2).emit('gameStop', game.socket1);
+		} else if (game.socket2 === client.id) {
+			this.server.to(game.socket1).emit('gameStop', game.socket2);
 		}
+		this.logger.log(`Client disconnected: ${client.id}`);
+		this.handleDeleteRoom(client);
 	}
 }
