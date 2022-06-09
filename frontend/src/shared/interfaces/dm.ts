@@ -8,6 +8,7 @@ import UserRelation from "./userRelation";
  * @field room: string - room ID where message should be sent
  */
 export default interface Dm {
+    id?: string;
     date: string;
     login: string;
     avatar: string;

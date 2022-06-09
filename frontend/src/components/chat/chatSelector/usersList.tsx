@@ -1,14 +1,10 @@
 import Button from "assets/Button/Button";
 import UserData from "features/user/interfaces/user.interface";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { addFriend, getAllUsers } from "services/api.service";
-import { mainSocketContext } from "../../../App";
 import './usersList.scss';
 
 export default function UsersList() {
-
-    /** Global Data */
-    const mainSocket = useContext(mainSocketContext);
 
     /** Variables */
     const [users, setUsers] = useState<any[]>([]);

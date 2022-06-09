@@ -1,19 +1,14 @@
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { JoinRoomDto } from "./dtos/JoinRoom.dto";
 import ClientSocket from "./interfaces/Socket.interface";
 import { LeaveRoomDto } from "./dtos/LeaveRoom.dto";
 import ClientMessageDto from "./dtos/ClientMessage.dto";
 import { ChatRoleService } from "src/chat/services/chatRole.service";
-
 import * as _ from "lodash";
 import { ChatMessageService } from "src/chat/services/chatMessage.service";
 import ClientDmDto from "./dtos/clientDm.dto";
 import { RelationService } from "src/relation/relation.service";
-import AddFriendDto from "./dtos/addFriend.dto";
-import { Req, UseGuards } from "@nestjs/common";
-import { TfaGuard } from "src/auth/guards/tfa.auth.guard";
-import { JwtRequest } from "src/auth/interfaces/jwtRequest.interface";
 import RelationEntity from "src/relation/entities/relation.entity";
 import { UserService } from "src/user/user.service";
 
@@ -115,7 +110,6 @@ export class SocketGateway implements OnGatewayDisconnect {
      */
     @SubscribeMessage("ClientDm")
     public async sendDmMessage(socket: Socket, body: ClientDmDto) {
-        this.server.to(body.relation.id).emit("ServerMessage", body);
 
         const relation = await this.relationService.findOneById(body.relation.id);
 
@@ -125,6 +119,11 @@ export class SocketGateway implements OnGatewayDisconnect {
             date: body.date,
             prev_message: relation.lastMessage,
             avatar: body.avatar,
+        });
+
+        this.server.to(body.relation.id).emit("ServerMessage", {
+            ...newDm,
+            relation: body.relation,
         });
 
         await this.relationService.updateById(body.relation.id, {
@@ -154,6 +153,17 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("LeaveRoom")
     public leaveRoom(socket: Socket, body: LeaveRoomDto) {
         socket.leave(body.roomId);
+    }
+
+
+    @SubscribeMessage("JoinDm")
+    public joinDm(socket: Socket, relationId: string) {
+        socket.join(relationId);
+    }
+
+    @SubscribeMessage("LeaveDm")
+    public leaveDm(socket: Socket, relationId: string) {
+        socket.leave(relationId);
     }
 
     async addFriend(relation: RelationEntity) {

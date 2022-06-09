@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { UIEvent, useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import { setMessages } from "../../../features/chat/chat.slice";
+import { addMessageFromBack, setMessages } from "../../../features/chat/chat.slice";
 import ChatSender from "./ChatSender";
 import './ChatBox.scss';
-import { getPreviousMessages } from "services/api.service";
+import { api, getPreviousMessages } from "services/api.service";
 import settings_image from 'images/settings.png';
 import block_user_image from 'images/block_user.png';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
-import { mainSocketContext } from "../../../App";
+import { mainSocketContext } from "src";
 
 
 export default function ChatBox() {
@@ -25,6 +25,8 @@ export default function ChatBox() {
 	/** Variables */
 	const [openSettings, setOpenSettings] = useState<string>("");
 	const [roomPassword, setRoomPassword] = useState<string>("");
+	const [scrolledToTop, setScrolledToTop] = useState<boolean>(false);
+	const [firstMessage, setFirstMessage] = useState<string>("");
 
 	function handleOpenSettings() {
 		setOpenSettings((settings: string) => {
@@ -34,7 +36,6 @@ export default function ChatBox() {
 			return ("");
 		})
 	}
-
 
 	function translateDate(dateStr: string): string {
 		const now = new Date();
@@ -63,6 +64,29 @@ export default function ChatBox() {
 		return false;
 	}
 
+	function handleScroll(event: UIEvent<HTMLDivElement>) {
+		const target = event.target as HTMLInputElement;
+		const top = target.scrollHeight + target.scrollTop;
+		setScrolledToTop(top <= target.clientHeight + 10 && top >= target.clientHeight - 10);
+	}
+
+	useEffect(() => {
+		async function fetchPreviousMessages() {
+			const response = await api.get(`chat/many/message/dm/${firstMessage}`);
+			const messages = response.data;
+			dispatch(addMessageFromBack(messages));
+		}
+		if (scrolledToTop === true && firstMessage) {
+			fetchPreviousMessages();
+		}
+	}, [scrolledToTop]);
+
+	useEffect(() => {
+		if (chat.messages.length > 0) {
+			setFirstMessage(chat.messages[0].id);
+		}
+	}, [chat.messages]);
+
 	return (
 		<div className='chat_box'>
 			<div className={"chat_box_header"}>
@@ -76,8 +100,8 @@ export default function ChatBox() {
 				<TextInput text={roomPassword} setText={setRoomPassword} type="password" name="room_password" placeholder="Password" />
 				<Button onClick={async () => { return false }}>Next</Button>
 			</div>
-			<div id="chat_messages_container">
-				<div id="chat_messages">
+			<div id="chat_messages_container" onScroll={handleScroll}>
+				<div id="chat_messages" onScroll={handleScroll}>
 					{
 						messages &&
 						messages.map((message, index) => {

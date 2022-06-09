@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, useContext, useEffect } from "react";
-import { mainSocketContext } from "../App";
 import UpdateBallDto from "./interfaces/UpdateBall.dto";
 import { getNewBallPos, handleKeyPressed, handleKeyUnpressed } from "../components/game/gamePlay/services/play.service";
 import GameStatus from "src/components/game/gamePlay/interfaces/gameStatus.interface";
@@ -12,7 +11,7 @@ import GameCanvas from "src/components/game/gamePlay/interfaces/gameCanvas.inter
 import { Store } from '../app/store';
 import { useSelector } from "react-redux";
 import UserData from "features/user/interfaces/user.interface";
-import Position from "src/components/game/gamePlay/interfaces/position.interface";
+import { mainSocketContext } from "src";
 
 const scoreToWin: number = 50;
 

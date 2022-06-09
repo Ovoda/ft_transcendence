@@ -11,7 +11,6 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		@InjectRepository(ChatMessageEntity)
 		protected readonly _repository: Repository<ChatMessageEntity>,
 		protected readonly _log: Logger,
-		// private readonly chatRoomService: ChatRoomService,
 	) {
 		super(_repository, _log);
 	}
@@ -26,19 +25,16 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		let messages: ChatMessageEntity[] = [];
 		let message = await this.findOneById(messageId);
 
-		console.log(`message: ${message}`);
-
-
 		if (!message) {
 			return messages;
 		}
 		messages.push(message);
 		let lim: number;
 		if (!message.prev_message) {
-			return messages;
+			return [];
 		} else {
 			lim = (!limit) ? 10 : limit;
-			for (let i = 0; i < lim; i++) {
+			for (let i = 0; i < lim - 1; i++) {
 				if (!message.prev_message) {
 					break;
 				}

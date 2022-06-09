@@ -11,7 +11,7 @@ import Chat from "src/features/chat/interfaces/chat.interface";
 import Game from "src/features/game/interfaces/game.interface";
 import GameReducer from '../features/game/game.slice';
 import RelationsReducer from '../features/relations/relations.slice';
-import RelationSlice from "features/relations/relations.interface";
+import RelationSlice from "features/relations/interfaces/relations.interface";
 
 export interface Store {
     user: UserData;

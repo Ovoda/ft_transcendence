@@ -114,4 +114,12 @@ export class RelationService extends CrudService<RelationEntity>{
             return { ...relation, counterPart: this.getCounterPart(relation.users, currentUserId) };
         });
     }
+
+    async getRelation(relationId: string, currentUserId: string) {
+        const relation = await this.findOneById(relationId, {
+            relations: ["users"],
+        });
+
+        return { ...relation, counterPart: this.getCounterPart(relation.users, currentUserId) }
+    }
 }

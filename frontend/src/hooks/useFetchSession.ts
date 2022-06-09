@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../features/user/user.slice";
-import { getRelations, getUserData } from "../services/api.service";
+import { getAllRelations, getUserData } from "../services/api.service";
 
 export default function useFetchSession() {
 
@@ -11,20 +11,16 @@ export default function useFetchSession() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        console.log(document.cookie);
-
         if (!Cookies.get("authentication")) return;
 
         async function fetchSession() {
-            const userData = await getUserData(true);
-            const userRelations = await getRelations();
-            console.log(userData);
+            const userData = await getUserData();
+            const userRelations = await getAllRelations();
 
             if (userData) {
                 dispatch(updateUser(userData));
             }
             if (userRelations.data) {
-                console.log(userRelations.data);
                 dispatch(setRelations(userRelations.data));
             }
         }

@@ -1,3 +1,5 @@
+import { AnyAction, Dispatch } from "@reduxjs/toolkit";
+import Chat from "features/chat/interfaces/chat.interface";
 import { Socket, io } from "socket.io-client";
 import Dm from "src/shared/interfaces/dm";
 import SendChatMessageDto from "src/shared/interfaces/Message";
@@ -21,6 +23,10 @@ export default class ClientSocket {
 	/** Current client socket id */
 	public id = this.socket.id;
 
+	public chat: Chat | null = null;
+
+	public dispatch: Dispatch<AnyAction> | null = null;
+
 	/**
 	 * Initialize a socket registering it on the server for chat, user and game events
 	 * @param userId current user id
@@ -38,6 +44,10 @@ export default class ClientSocket {
 		this.socket.on(event, fun);
 	}
 
+	public off(event: string, fun: any) {
+		this.socket.off(event, fun);
+	}
+
 	/**
 	 * Emits a specific websocket event
 	 * @param event event to send
@@ -52,6 +62,7 @@ export default class ClientSocket {
 	 * @param message message to send
 	 */
 	public sendDm(message: Dm) {
+		console.log(message);
 		this.socket.emit("ClientDm", message);
 	}
 
@@ -79,6 +90,14 @@ export default class ClientSocket {
 		this.socket.emit("LeaveRoom", { roomId })
 	}
 
+	public joinDm(relationId: string) {
+		this.socket.emit("JoinDm", relationId);
+	}
+
+	public leaveDm(relationId: string) {
+		this.socket.emit("LeaveDm", relationId);
+	}
+
 	/** Leaves the current game */
 	public leaveGame(data: number[]) {
 		this.socket.emit("leaveGame", data);
@@ -87,6 +106,5 @@ export default class ClientSocket {
 	/** Watching request on given friend */
 	public watchingRequest(data: any) {
 		this.socket.emit("watchingRequest", data);
-
 	}
 }

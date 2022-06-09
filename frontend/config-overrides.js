@@ -10,6 +10,7 @@ module.exports = function override(config) {
             'features': path.resolve(__dirname, 'src/features'),
             'assets': path.resolve(__dirname, 'src/assets'),
             'images': path.resolve(__dirname, 'src/shared/images'),
+            'src': path.resolve(__dirname, 'src'),
         },
     };
     return config;

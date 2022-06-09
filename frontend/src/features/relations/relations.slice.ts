@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import RelationSlice from "./relations.interface";
+import RelationSlice from "./interfaces/relations.interface";
 
 const initialState: RelationSlice = {
     currentRelation: null,

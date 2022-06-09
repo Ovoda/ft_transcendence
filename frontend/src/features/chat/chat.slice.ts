@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import Chat, { e_roomtype } from "./interfaces/chat.interface";
-import Message from '../../shared/interfaces/Message';
+import Chat from "./interfaces/chat.interface";
 import OpenChatRoom from "./interfaces/openChatGroup.interface";
 import OpenChatDm from "./interfaces/openChatDm.interface";
 
@@ -55,6 +54,11 @@ const chat = createSlice({
 		addMessage(state, action) {
 			return { ...state, messages: [...state.messages, action.payload] };
 		},
+		addMessageFromBack(state, action) {
+			const newMessages = action.payload;
+			newMessages.reverse();
+			return { ...state, messages: [...newMessages, ...state.messages] };
+		},
 		setMessages(state, action) {
 			const array = action.payload.reverse();
 			return { ...state, messages: array };
@@ -69,6 +73,7 @@ export const {
 	closeChatDm,
 	addMessage,
 	setMessages,
+	addMessageFromBack,
 	openChatRoomCreationModal,
 	closeChatRoomCreationModal,
 } = chat.actions;

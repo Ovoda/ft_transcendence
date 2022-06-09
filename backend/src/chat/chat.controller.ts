@@ -38,14 +38,14 @@ export class ChatController {
 	@UseGuards(JwtAuthGuard)
 	@Get('haspassword/role/:roleId')
 	@HttpCode(200)
-	async roleIdRequirePassword(@Request() req, @Param('roleId') roleId: string){
+	async roleIdRequirePassword(@Request() req, @Param('roleId') roleId: string) {
 		return await this.chatRoleService.GroupFromRolePasswordProtected(req.user.id, roleId);
 	}
 
 	@UseGuards(JwtAuthGuard)
 	@Get('haspassword/group/:groupId')
 	@HttpCode(200)
-	async groupRequirePassword(@Request() req, @Param('groupId') groupId: string){
+	async groupRequirePassword(@Request() req, @Param('groupId') groupId: string) {
 		return await this.chatGroupService.GroupPasswordProtected(groupId)
 	}
 
@@ -90,7 +90,7 @@ export class ChatController {
 		@Param("message_id") messageId: string,
 		@Query("limit") limit: number,
 	) {
-		return await this.chatMessageService.getManyMessagesFromId(messageId, 10);
+		return await this.chatMessageService.getManyMessagesFromId(messageId, 20);
 	}
 
 	@UseGuards(JwtAuthGuard)
@@ -104,7 +104,7 @@ export class ChatController {
 	@Patch('add/group/:roomId/:userIdAdded')
 	@HttpCode(200)
 	async addUserToRoom(
-		@Request() req, 
+		@Request() req,
 		@Param('roomId') roomId: string,
 		@Param('userId') userIdAdded: string
 	) {
@@ -118,14 +118,14 @@ export class ChatController {
 		@Request() req,
 		@Param('groupId') groupId: string,
 		@Param('roleId') roleId: string,
-	){
+	) {
 		return await this.chatRoleService.kickUserAndRole(req.user.id, groupId, roleId);
 	}
 
 	@UseGuards(JwtAuthGuard)
 	@Post('protect/:groupId/')
 	@HttpCode(201)
-	async addPasswordToRoom(@Request() req, @Param('groupId') groupId: string, @Body() createPass: CreatePasswordDto){
+	async addPasswordToRoom(@Request() req, @Param('groupId') groupId: string, @Body() createPass: CreatePasswordDto) {
 		return await this.chatGroupService.createPassword(req, groupId, createPass);
 	}
 
@@ -135,7 +135,7 @@ export class ChatController {
 	async getAllRolesFromGroup(
 		@Request() req,
 		@Param('groupId') groupId: string,
-		) {
+	) {
 		return await this.chatGroupService.getAllRolesFromGroupId(req.user.id, groupId);
 	}
 

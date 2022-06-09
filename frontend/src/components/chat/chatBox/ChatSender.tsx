@@ -1,11 +1,11 @@
 import React, { ChangeEvent, FormEvent, MouseEvent, useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { mainSocketContext } from "../../../App";
 import './ChatSender.scss';
 import { Store } from "src/app/store";
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
 import UserRelation from "src/shared/interfaces/userRelation";
+import { mainSocketContext } from "src";
 
 export default function ChatSender() {
 

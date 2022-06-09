@@ -5,12 +5,12 @@ import './dmPicker.scss';
 import "./RoomCreation.scss";
 import Button from "assets/Button/Button";
 import AddRoomMenu from "./AddRoomMenu";
-import { api } from "services/api.service";
+import { api, getAllRelations, getRelation } from "services/api.service";
 import ClientSocket from "services/websocket.service";
 import { useContext } from "react";
-import { mainSocketContext } from "../../../App";
 import UserRelation from "src/shared/interfaces/userRelation";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
+import { mainSocketContext } from "src";
 
 export default function DmPicker() {
 
@@ -22,24 +22,25 @@ export default function DmPicker() {
 	const dispatch = useDispatch();
 
 	async function selectDmRoom(relation: UserRelation) {
-		if (chat.currentRelation) {
-			mainSocket?.leaveRoom(chat.currentRoom);
-		}
+		// if (chat.currentRelation) {
+		// 	mainSocket?.leaveRoom(chat.currentRoom);
+		// }
 
 		if (chat.currentRelation?.id === relation.id) {
 			dispatch(closeChatDm());
 			return;
 		}
 
-		let messages;
-		/** Todo get relation last message, not just last message */
-		if (relation.lastMessage) {
-			const response = await api.get(`chat/many/message/dm/${relation.lastMessage}`);
+		let messages: any[] = [];
+
+		const updatedRelation = await getRelation(relation.id);
+
+		if (updatedRelation.data.lastMessage) {
+			const response = await api.get(`chat/many/message/dm/${updatedRelation.data.lastMessage}`);
 			messages = response.data;
-		} else {
-			messages = [];
 		}
-		dispatch(openChatDm({ messages, relation }));
+
+		dispatch(openChatDm({ messages: messages.reverse(), relation: updatedRelation.data }));
 	}
 
 	/** Opens a modal to create rooms */

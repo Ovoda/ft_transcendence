@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
 import { JwtRequest } from 'src/auth/interfaces/jwtRequest.interface';
 import { SocketGateway } from 'src/websockets/socket.gateway';
+import { RelationId } from 'typeorm';
 import CreateRelationDto from './dtos/createRelation.dto';
 import UpdateRelationDto from './dtos/updateRelation.dto';
 import { RelationTypeEnum } from './enums/relationType.enum';
@@ -19,6 +20,15 @@ export class RelationController {
     @UseGuards(TfaGuard)
     async getAllRelations(@Req() request: JwtRequest) {
         return await this.relationService.getAllRelations(request.user.id);
+    }
+
+    @Get("/:relation_id")
+    @HttpCode(200)
+    @UseGuards(TfaGuard)
+    async getRelation(
+        @Req() request: JwtRequest,
+        @Param("relation_id") relationId: string) {
+        return await this.relationService.getRelation(relationId, request.user.id);
     }
 
     @Get("counterpart/many")

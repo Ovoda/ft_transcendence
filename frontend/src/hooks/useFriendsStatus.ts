@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { mainSocketContext } from "../App";
+import { mainSocketContext } from "src";
 
 export default function useFriendsStatus() {
 

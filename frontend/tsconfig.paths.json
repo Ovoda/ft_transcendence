@@ -20,6 +20,9 @@
             "images/*": [
                 "./src/shared/images/*"
             ],
+            "src/*": [
+                "./src/*"
+            ],
         }
     }
 }

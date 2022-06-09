@@ -15,12 +15,12 @@ import drawPlayer from './services/player.service';
 import drawBall from './services/ball.service';
 import { getNewBallPos } from './services/play.service';
 import { Store } from '../../../app/store';
-import { mainSocketContext } from '../../../App';
 import { useGameListeners } from '../../../hooks/useGame.hook';
 import { UserStatusEnum } from './enums/userStatus.enum';
 import Button from "assets/Button/Button";
 import { ResultStatusEnum } from "./enums/resultStatus.enum";
 import SwitchButton from "assets/SwitchButton/SwitchButton";
+import { mainSocketContext } from "src";
 
 const defaultBackgroundColor: string = '#4285F4';
 const defaultElementsColor: string = 'white';

@@ -14,11 +14,9 @@ export const api = axios.create({
  * Fetch current user data from api
  * @returns user data if successfull requests, null otherwise
  */
-export async function getUserData(relations?: boolean): Promise<UserData | null | undefined> {
+export async function getUserData(): Promise<UserData | null | undefined> {
     try {
         const response = await api.get("/user");
-        console.log(response.data);
-
         return response.data as UserData;
     } catch (error: any) {
         // console.log(error.response);
@@ -91,11 +89,20 @@ export async function addFriend(userId: string) {
  * Get current user's friends list
  * @returns current user's friend list or null with an error message
  */
-export async function getRelations() {
+export async function getAllRelations() {
     try {
         const ret = await api.get("/relation/many");
         return { data: ret.data, error: "" }
     } catch (error: any) {
         return { data: null, error: error.response.data.message }
+    }
+}
+
+export async function getRelation(relationId: string) {
+    try {
+        const ret = await api.get(`/relation/${relationId}`);
+        return { data: ret.data, error: "" }
+    } catch (error: any) {
+        return { data: null, error: error.response.data.message };
     }
 }
