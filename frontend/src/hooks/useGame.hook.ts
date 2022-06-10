@@ -248,6 +248,10 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			})
 		})
 
+		mainSocket.on("PlayingRequest", (data: any) => {
+			console.log("Game request received");
+		})
+
 		/** Keyboard event listeners cleanup */
 		return () => {
 			window.addEventListener("keydown",

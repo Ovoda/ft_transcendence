@@ -99,11 +99,15 @@ export default class ClientSocket {
 
 	/** Leaves the current game */
 	public leaveGame(data: number[]) {
-		this.socket.emit("leaveGame", data);
+		this.socket.emit("LeaveGame", data);
 	}
 
 	/** Watching request on given friend */
 	public watchingRequest(data: any) {
-		this.socket.emit("watchingRequest", data);
+		this.socket.emit("WatchingRequest", data);
+	}
+
+	public playingRequest(data: any) {
+		this.socket.emit("PlayingRequest", data);
 	}
 }

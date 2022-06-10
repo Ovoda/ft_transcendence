@@ -15,6 +15,7 @@ import { UserService } from "src/user/user.service";
 import { UserActivityStatusEnum } from "src/user/enums/userConnectionStatus.enum";
 import * as _ from 'lodash';
 import { UpdateStatsDto } from "../dtos/updateStats.dto";
+import { emit } from "process";
 
 @WebSocketGateway({
 	cors: {
@@ -36,6 +37,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
 	/** Match Making Between Players **/
+
 
 
 	@SubscribeMessage('gameRequestToFriend')
@@ -109,7 +111,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	/** Watchers added to game room without role to move **/
-	@SubscribeMessage('watchingRequest')
+	@SubscribeMessage('WatchingRequest')
 	handleWatchingRequest(client: Socket, data: string) {
 		this.server.to(client.id).emit("startWatching", data);
 	}

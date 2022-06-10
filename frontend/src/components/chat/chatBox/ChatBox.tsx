@@ -1,4 +1,4 @@
-import React, { UIEvent, useContext, useState } from "react";
+import React, { UIEvent, useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import './chatBox.scss';
@@ -9,8 +9,12 @@ import Button from "assets/Button/Button";
 import { mainSocketContext } from "src";
 import useLoadMessagesOnScroll from "src/hooks/useLoadMessagesOnScroll";
 import { translateMessageDate } from "services/utils.service";
-import ChatSender from "./chatSender";
+import ChatSender from "./ChatSender";
 import GroupUserList from "./groupUsersList";
+import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
+import { api } from "services/api.service";
+import { addMessageFromBack } from "features/chat/chat.slice";
+
 
 export default function ChatBox() {
 
@@ -46,15 +50,23 @@ export default function ChatBox() {
 		return false;
 	}
 
-<<<<<<< HEAD
+	async function handlePlayRequest() {
+		mainSocket?.playingRequest(
+			{
+				userRequested: chat.currentRelation?.counterPart.id as string,
+				userRequesting: user.id,
+			}
+		)
+		return false;
+	}
+
+
 	function handleScroll(event: UIEvent<HTMLDivElement>) {
 		const target = event.target as HTMLInputElement;
 		const top = target.scrollHeight + target.scrollTop;
 		setScrolledToTop(top <= target.clientHeight + 10 && top >= target.clientHeight - 10);
 	}
 
-<<<<<<< HEAD
-=======
 	useEffect(() => {
 		async function fetchPreviousMessages() {
 			const response = await api.get(`chat/many/message/dm/${firstMessage}`);
@@ -72,14 +84,7 @@ export default function ChatBox() {
 		}
 	}, [chat.messages]);
 
-=======
-	async function handlePlayRequest() {
-		console.log("Playing Request");
-		return false;
-	}
 
->>>>>>> 10d2be5 (Synchronise data when watching a game, saving scores in db, displaying scores in profile)
->>>>>>> 4fa0ba376cf4e3207ef9729a6319c3477eabd70e
 	return (
 		<div className='chat_box'>
 			<div className={"chat_box_header"}>
