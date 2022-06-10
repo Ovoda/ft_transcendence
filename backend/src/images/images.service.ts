@@ -1,25 +1,25 @@
-import { Injectable } from "@nestjs/common";
-import { extname } from "path";
+import { Injectable, Logger } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { CrudService } from "src/app/templates/crud.service";
+import { Repository } from "typeorm";
+import { CreateImageDto } from "./dtos/createImage.dto";
+import { ImagesEntity } from "./entities/images.entity";
 
 @Injectable()
-export class ImagesService {
-	constructor() {}
+export class ImagesService extends CrudService<ImagesEntity>{
+	constructor(
+		@InjectRepository(ImagesEntity)
+		protected readonly _repository: Repository<ImagesEntity>,
+		protected readonly _log: Logger,
+	) {
+		super(_repository, _log);
+	}
 
+	async saveImage(createImageDto: CreateImageDto) {
+		return await this.save(createImageDto);
+	}
 
-	imageFileFilter(req, file, callback) {
-		if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-		  return callback(new Error('Only image files are allowed!'), false);
-		}
-		callback(null, true);
-	  };
-	
-	editFileName(req, file, callback) {
-		const name = file.originalname.split('.')[0];
-		const fileExtName = extname(file.originalname);
-		const randomName = Array(4)
-		  .fill(null)
-		  .map(() => Math.round(Math.random() * 16).toString(16))
-		  .join('');
-		callback(null, `${name}-${randomName}${fileExtName}`);
-	  };
+	async getImage(imageId: string) {
+		return await this.findOneById(imageId);
+	}
 }
