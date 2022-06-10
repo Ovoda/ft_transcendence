@@ -8,6 +8,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { WebsocketsModule } from 'src/websockets/websockets.module';
 import { ChatModule } from 'src/chat/chat.module';
 import { RelationModule } from 'src/relation/relation.module';
+import { ImagesModule } from 'src/images/images.module';
 
 @Module({
 	imports: [
@@ -18,6 +19,7 @@ import { RelationModule } from 'src/relation/relation.module';
 		WebsocketsModule,
 		ChatModule,
 		RelationModule,
+		ImagesModule,
 	],
 	controllers: [AppController],
 	exports: [TypeOrmModule],
