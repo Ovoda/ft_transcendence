@@ -1,46 +1,46 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import { closeChatDm, openChatDm, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
+import { closeChatDm, openChatDm, openChatGroup, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
 import './dmPicker.scss';
 import "./RoomCreation.scss";
 import Button from "assets/Button/Button";
 import AddRoomMenu from "./AddRoomMenu";
-import { api, getAllRelations, getRelation } from "services/api.service";
-import ClientSocket from "services/websocket.service";
-import { useContext } from "react";
+import { getMessages, getRelation, getRole } from "services/api.service";
 import UserRelation from "src/shared/interfaces/userRelation";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
-import { mainSocketContext } from "src";
+import UserRole from "src/shared/interfaces/role.interface";
 
 export default function DmPicker() {
 
 	/** Global Data */
-	const { chat, user, relations } = useSelector((store: Store) => store);
-	const mainSocket: ClientSocket | null = useContext(mainSocketContext);
+	const { chat, relations, roleSlice } = useSelector((store: Store) => store);
 
 	/** Tools */
 	const dispatch = useDispatch();
 
 	async function selectDmRoom(relation: UserRelation) {
-		// if (chat.currentRelation) {
-		// 	mainSocket?.leaveRoom(chat.currentRoom);
-		// }
-
 		if (chat.currentRelation?.id === relation.id) {
 			dispatch(closeChatDm());
 			return;
 		}
-
-		let messages: any[] = [];
-
 		const updatedRelation = await getRelation(relation.id);
+		const { messages } = await getMessages(updatedRelation.data.lastMessage);
+		if (messages)
+			dispatch(openChatDm({ messages: messages.reverse(), relation: updatedRelation.data }));
+	}
 
-		if (updatedRelation.data.lastMessage) {
-			const response = await api.get(`chat/many/message/dm/${updatedRelation.data.lastMessage}`);
-			messages = response.data;
+	async function selectGroupRoom(role: UserRole) {
+		if (chat.currentRole?.id === role.id) {
+			dispatch(closeChatDm());
+			return;
 		}
 
-		dispatch(openChatDm({ messages: messages.reverse(), relation: updatedRelation.data }));
+		const updatedRole = await getRole(role.id);
+		const group = updatedRole.data.chatGroup;
+
+		const { messages } = await getMessages(group.lastMessage, updatedRole.data.id);
+		if (messages)
+			dispatch(openChatGroup({ messages: messages.reverse(), role: updatedRole.data }));
 	}
 
 	/** Opens a modal to create rooms */
@@ -63,6 +63,16 @@ export default function DmPicker() {
 							className={relation.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED
 								? "connected" : ""}>
 						</span>
+					</div>
+				)
+			}
+			{
+				roleSlice.roles &&
+				roleSlice.roles.map((role: UserRole, index: number) =>
+					<div key={index} onClick={() => selectGroupRoom(role)} className="dm_picker_room">
+						{/* TODO : image */}
+						<img src="https://42.fr/wp-content/uploads/2021/08/42.jpg" alt="" />
+						<p className="dm_picker_room_name">{role.chatGroup.name}</p>
 					</div>
 				)
 			}

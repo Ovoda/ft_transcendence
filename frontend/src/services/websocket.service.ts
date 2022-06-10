@@ -1,8 +1,8 @@
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import Chat from "features/chat/interfaces/chat.interface";
 import { Socket, io } from "socket.io-client";
-import Dm from "src/shared/interfaces/dm";
-import SendChatMessageDto from "src/shared/interfaces/Message";
+import Dm from "src/shared/interfaces/dm.interface";
+import GroupMessage from "src/shared/interfaces/groupMessage.interface";
 
 /**
  * @class ClientSocket
@@ -10,7 +10,6 @@ import SendChatMessageDto from "src/shared/interfaces/Message";
  * @function init
  * @function on
  * @function emit
- * @function sendMessage
  * @function joinRoom
  * @function leaveRoom
  * @function leaveGame
@@ -70,7 +69,7 @@ export default class ClientSocket {
 	 * Sends a message to the websocket server
 	 * @param message message to send
 	 */
-	public sendMessage(message: SendChatMessageDto) {
+	public sendGroupMessage(message: GroupMessage) {
 		this.socket.emit("ClientMessage", message);
 	}
 

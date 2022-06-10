@@ -1,11 +1,12 @@
 import React, { ChangeEvent, FormEvent, MouseEvent, useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import './ChatSender.scss';
+import './chatSender.scss';
 import { Store } from "src/app/store";
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
 import UserRelation from "src/shared/interfaces/userRelation";
 import { mainSocketContext } from "src";
+import UserRole from "src/shared/interfaces/role.interface";
 
 export default function ChatSender() {
 
@@ -24,13 +25,24 @@ export default function ChatSender() {
 		let today = new Date();
 		let time = today.toString();
 
-		mainSocket?.sendDm({
-			content: newMessage,
-			login: user.login,
-			date: time,
-			avatar: user.avatar,
-			relation: chat.currentRelation as UserRelation,
-		});
+		if (chat.currentRelation) {
+			mainSocket?.sendDm({
+				content: newMessage,
+				login: user.login,
+				date: time,
+				avatar: user.avatar,
+				relation: chat.currentRelation as UserRelation,
+			});
+		} else if (chat.currentRole) {
+			mainSocket?.sendGroupMessage({
+				content: newMessage,
+				login: user.login,
+				date: time,
+				avatar: user.avatar,
+				role: chat.currentRole as UserRole,
+			});
+		}
+
 		setNewMessage("");
 		return false;
 	}

@@ -33,7 +33,7 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		if (!message.prev_message) {
 			return [];
 		} else {
-			lim = (!limit) ? 10 : limit;
+			lim = (!limit) ? 20 : limit;
 			for (let i = 0; i < lim - 1; i++) {
 				if (!message.prev_message) {
 					break;

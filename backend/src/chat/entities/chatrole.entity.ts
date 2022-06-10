@@ -1,7 +1,7 @@
 import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { UserEntity } from "src/user/entities/user.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { e_roleType } from "../types/role.type";
+import { RoleTypeEnum } from "../types/role.type";
 import { ChatMessageEntity } from "./chatMessage.entity";
 import { ChatGroupEntity } from "./chatGroup.entity";
 
@@ -14,11 +14,11 @@ export class ChatRoleEntity {
 	expires?: Date;
 
 	@Column()
-	role: e_roleType;
+	role: RoleTypeEnum;
 
 	@ManyToOne(() => UserEntity, user => user.roles)
 	user: UserEntity;
 
 	@ManyToOne(() => ChatGroupEntity, { nullable: true, eager: true })
-	chatroom: ChatGroupEntity;
+	chatGroup: ChatGroupEntity;
 }

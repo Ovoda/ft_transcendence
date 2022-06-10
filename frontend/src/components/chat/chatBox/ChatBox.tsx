@@ -1,26 +1,23 @@
-import React, { UIEvent, useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { UIEvent, useContext, useState } from "react";
+import { useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import { addMessageFromBack, setMessages } from "../../../features/chat/chat.slice";
-import ChatSender from "./ChatSender";
-import './ChatBox.scss';
-import { api, getPreviousMessages } from "services/api.service";
+import './chatBox.scss';
 import settings_image from 'images/settings.png';
 import block_user_image from 'images/block_user.png';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
 import { mainSocketContext } from "src";
-
+import useLoadMessagesOnScroll from "src/hooks/useLoadMessagesOnScroll";
+import { translateMessageDate } from "services/utils.service";
+import ChatSender from "./chatSender";
+import GroupUserList from "./groupUsersList";
 
 export default function ChatBox() {
 
 	/** Global data */
-	const { chat, relations, user } = useSelector((store: Store) => store);
+	const { chat, user } = useSelector((store: Store) => store);
 	const messages = chat.messages;
 	const mainSocket = useContext(mainSocketContext);
-
-	/** Tools */
-	const dispatch = useDispatch();
 
 	/** Variables */
 	const [openSettings, setOpenSettings] = useState<string>("");
@@ -28,31 +25,16 @@ export default function ChatBox() {
 	const [scrolledToTop, setScrolledToTop] = useState<boolean>(false);
 	const [firstMessage, setFirstMessage] = useState<string>("");
 
+	/** Hooks */
+	useLoadMessagesOnScroll({ firstMessage, setFirstMessage, scrolledToTop });
+
 	function handleOpenSettings() {
 		setOpenSettings((settings: string) => {
 			if (settings === "") {
-				return ("chat_box_settings_open");
+				return ("chat_box_settings_container_open");
 			}
 			return ("");
 		})
-	}
-
-	function translateDate(dateStr: string): string {
-		const now = new Date();
-		const date = new Date(dateStr);
-
-		var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-		var year = date.getFullYear();
-		var month = date.getMonth();
-		var day = date.getDate();
-		var hour = date.getHours();
-		var minutes = date.getMinutes();
-
-		if (now.getTime() - date.getTime() > 86400000) { /** one day in ms */
-			return months[month] + ' ' + day + ', ' + year;
-		}
-		return "Today " + hour + ":" + minutes;
 	}
 
 	async function handleWatchRequest() {
@@ -70,37 +52,24 @@ export default function ChatBox() {
 		setScrolledToTop(top <= target.clientHeight + 10 && top >= target.clientHeight - 10);
 	}
 
-	useEffect(() => {
-		async function fetchPreviousMessages() {
-			const response = await api.get(`chat/many/message/dm/${firstMessage}`);
-			const messages = response.data;
-			dispatch(addMessageFromBack(messages));
-		}
-		if (scrolledToTop === true && firstMessage) {
-			fetchPreviousMessages();
-		}
-	}, [scrolledToTop]);
-
-	useEffect(() => {
-		if (chat.messages.length > 0) {
-			setFirstMessage(chat.messages[0].id);
-		}
-	}, [chat.messages]);
-
 	return (
 		<div className='chat_box'>
 			<div className={"chat_box_header"}>
 				<h3>{chat.currentRelation?.counterPart.login}</h3>
 				<Button onClick={handleWatchRequest}>Watch Game</Button>
 				<img onClick={handleOpenSettings} src={settings_image} alt="" />
-				<img onClick={handleOpenSettings} src={block_user_image} alt="" />
-			</div>
-			<div className={"chat_box_settings " + openSettings}>
-				<p>Set room password</p>
-				<TextInput text={roomPassword} setText={setRoomPassword} type="password" name="room_password" placeholder="Password" />
-				<Button onClick={async () => { return false }}>Next</Button>
 			</div>
 			<div id="chat_messages_container" onScroll={handleScroll}>
+				<div className={"chat_box_settings_container " + openSettings}>
+					<div className="chat_box_settings">
+						<div className="chat_box_settings_password">
+							<p>Set room password</p>
+							<TextInput text={roomPassword} setText={setRoomPassword} type="password" name="room_password" placeholder="Password" />
+							<Button onClick={async () => { return false }}>Next</Button>
+						</div>
+						<GroupUserList />
+					</div>
+				</div>
 				<div id="chat_messages" onScroll={handleScroll}>
 					{
 						messages &&
@@ -110,7 +79,7 @@ export default function ChatBox() {
 									<img src={message.avatar} alt="" />
 									<div className="message_content">
 										<p>{message.login} <span>{
-											translateDate(message.date)
+											translateMessageDate(message.date)
 										}</span></p>
 										<p className="message_text">{message.content}</p>
 									</div>

@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { UdpateUserAction } from "./interfaces/updateUserAction.interface";
 import UserData from "./interfaces/user.interface";
-import UserRole from "./interfaces/userRole.interface";
 
 const initialState: UserData = {
     id: "",
     login: "",
     avatar: "",
     tfaEnabled: false,
+    roles: [],
 }
 
 const UserDataSlice = createSlice({

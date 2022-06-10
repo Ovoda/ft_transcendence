@@ -1,4 +1,3 @@
-import UserData from "../../features/user/interfaces/user.interface";
 import SwitchButton from "../../assets/SwitchButton/SwitchButton";
 import './UserSettings.scss';
 import { useDispatch, useSelector } from "react-redux";
@@ -15,12 +14,11 @@ interface Props {
 export default function UserSettings({ settingsWindowState, setSettingsWindowAction }: Props) {
 
     /** Global data */
-    const store: Store = useSelector((store: Store) => store);
-    const userData: UserData = store.user;
+    const { user, uiState }: Store = useSelector((store: Store) => store);
 
     /** Variables */
     const [windowClass, setWindowClass] = useState<string>("");
-    const [tfaEnabled, setTfaEnabled] = useState<boolean>(userData.tfaEnabled);
+    const [tfaEnabled, setTfaEnabled] = useState<boolean>(user.tfaEnabled);
 
     /** Tools */
     const dispatch = useDispatch();
@@ -34,7 +32,7 @@ export default function UserSettings({ settingsWindowState, setSettingsWindowAct
     }, [settingsWindowState]);
 
     useEffect(() => {
-        if (userData.tfaEnabled !== tfaEnabled) {
+        if (user.tfaEnabled !== tfaEnabled) {
             toggleTfa({
                 dispatch,
                 uiTfaEnabled: tfaEnabled,
@@ -43,14 +41,14 @@ export default function UserSettings({ settingsWindowState, setSettingsWindowAct
     }, [tfaEnabled]);
 
     useEffect(() => {
-        setTfaEnabled(userData.tfaEnabled);
-    }, []);
+        setTfaEnabled(user.tfaEnabled);
+    }, [uiState.showTfaRegistration]);
 
     return (
         <div id="user_settings" className={windowClass}>
             <div id="close_settings"><FaChevronRight onClick={() => setSettingsWindowAction()} /></div>
-            <img src={userData.avatar} alt={userData.login + "'s profile picture"} />
-            <p>{userData.login}</p>
+            <img src={user.avatar} alt={user.login + "'s profile picture"} />
+            <p>{user.login}</p>
             <div id="user_settings_stats">
                 <p>50% win rate</p>
                 <p>21 victories</p>

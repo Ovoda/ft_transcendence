@@ -9,9 +9,14 @@ import { ChatGroupService } from './services/chatGroup.service.ts';
 import { ChatMessageEntity } from './entities/chatMessage.entity';
 import { UserModule } from 'src/user/user.module';
 import { ChatPasswordService } from './services/chatPassword.service';
+import { WebsocketsModule } from 'src/websockets/websockets.module';
+import { SocketGateway } from 'src/websockets/socket.gateway';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([ChatRoleEntity, ChatGroupEntity, ChatMessageEntity]), UserModule],
+	imports: [
+		TypeOrmModule.forFeature([ChatRoleEntity, ChatGroupEntity, ChatMessageEntity]),
+		UserModule,
+		forwardRef(() => WebsocketsModule)],
 	providers: [ChatPasswordService, ChatGroupService, ChatRoleService, ChatMessageService, Logger],
 	controllers: [ChatController],
 	exports: [ChatGroupService, ChatRoleService, ChatMessageService],

@@ -46,6 +46,7 @@ export default function TfaRegistration() {
             if (res) {
                 setCode("");
                 dispatch(closeTfaRegistration());
+                dispatch(updateTfaEnabled(true));
             } else {
                 setCodeValidity(false);
             }

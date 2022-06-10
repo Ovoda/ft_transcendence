@@ -1,0 +1,29 @@
+#notification_container {
+    box-sizing: border-box;
+    background-color: #1F66CA;
+    right: 0;
+    top: 0;
+    height: 100%;
+    padding: 1rem;
+    font-size: 1.6rem;
+    font-family: "Lato", sans-serif;
+    color: white;
+
+
+    #notification {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 1rem;
+
+        img {
+            max-width: 10px;
+            max-height: 10px;
+            cursor: pointer;
+        }
+
+        p {
+            margin: 0;
+        }
+    }
+}

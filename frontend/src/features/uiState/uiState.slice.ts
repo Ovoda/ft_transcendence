@@ -5,8 +5,8 @@ const initialState: UiState = {
     openedSettings: false,
     logged: false,
     showTfaRegistration: false,
-    showChat: false,
-	showGame: false,
+    showGame: false,
+    notification: "",
 }
 
 const uiState = createSlice({
@@ -28,11 +28,8 @@ const uiState = createSlice({
         closeTfaRegistration(state) {
             return { ...state, showTfaRegistration: false };
         },
-        openChat(state) {
-            return { ...state, showChat: true }
-        },
-        closeChat(state) {
-            return { ...state, showChat: false }
+        setNotification(state, action) {
+            return { ...state, notification: action.payload };
         }
     }
 })
@@ -43,8 +40,7 @@ export const {
     openSettingWindow,
     openTfaRegistration,
     closeTfaRegistration,
-    openChat,
-    closeChat,
+    setNotification,
 } = uiState.actions;
 
 export default uiState.reducer;

@@ -1,4 +1,4 @@
-export enum e_roleType {
+export enum RoleTypeEnum {
 	LAMBDA = 'LAMBDA',
 	OWNER = 'OWNER',
 	ADMIN = 'ADMIN',

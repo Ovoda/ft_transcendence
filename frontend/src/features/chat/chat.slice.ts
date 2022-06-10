@@ -2,11 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 import Chat from "./interfaces/chat.interface";
 import OpenChatRoom from "./interfaces/openChatGroup.interface";
 import OpenChatDm from "./interfaces/openChatDm.interface";
+import OpenChatGroup from "./interfaces/openChatGroup.interface";
 
 const initialState: Chat = {
 	messages: [],
 	currentRoom: "",
-	currentRole: "",
+	currentRole: null,
 	currentRelation: null,
 	currentLastMessage: "",
 	displayChatBox: false,
@@ -20,20 +21,21 @@ const chat = createSlice({
 		updateRoomtype(state, action) {
 			return { ...state, roomtype: action.payload }
 		},
-		openChatRoom(state, action: OpenChatRoom) {
-			return {
-				...state,
-				displayChatBox: true,
-				currentRoom: action.payload.roomId,
-				currentRole: action.payload.roleId,
-				messages: action.payload.messages,
-			};
-		},
 		openChatDm(state, action: OpenChatDm) {
 			return {
 				...state,
 				displayChatBox: true,
+				currentRole: null,
 				currentRelation: action.payload.relation,
+				messages: action.payload.messages,
+			};
+		},
+		openChatGroup(state, action: OpenChatGroup) {
+			return {
+				...state,
+				displayChatBox: true,
+				currentRole: action.payload.role,
+				currentRelation: null,
 				messages: action.payload.messages,
 			};
 		},
@@ -42,6 +44,7 @@ const chat = createSlice({
 				...state,
 				displayChatBox: false,
 				currentRelation: null,
+				currentRole: null,
 				messages: [],
 			};
 		},
@@ -52,6 +55,8 @@ const chat = createSlice({
 			return { ...state, displayRoomCreationModal: false };
 		},
 		addMessage(state, action) {
+			console.log(action.payload);
+
 			return { ...state, messages: [...state.messages, action.payload] };
 		},
 		addMessageFromBack(state, action) {
@@ -69,7 +74,7 @@ const chat = createSlice({
 export const {
 	updateRoomtype,
 	openChatDm,
-	openChatRoom,
+	openChatGroup,
 	closeChatDm,
 	addMessage,
 	setMessages,

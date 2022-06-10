@@ -16,7 +16,7 @@ export class ChatGroupEntity {
 	@Exclude()
 	password: string;
 
-	@OneToMany(() => ChatRoleEntity, role => role.chatroom)
+	@OneToMany(() => ChatRoleEntity, role => role.chatGroup)
 	@JoinTable()
 	users: ChatRoleEntity[];
 }

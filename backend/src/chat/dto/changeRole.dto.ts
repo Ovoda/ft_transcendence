@@ -1,7 +1,7 @@
 import { ApiProperty, ApiBody } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { Timestamp } from 'typeorm';
-import { e_roleType } from '../types/role.type';
+import { RoleTypeEnum } from '../types/role.type';
 
 export class ChangeRoleDto {
 	@IsNotEmpty()
@@ -9,10 +9,10 @@ export class ChangeRoleDto {
 	groupId: string;
 
 	@IsNotEmpty()
-	user_id: string;
+	userId: string;
 
 	@IsNotEmpty()
-	newRole: e_roleType;
+	newRole: RoleTypeEnum;
 
 	@IsOptional()
 	expires?: Date;

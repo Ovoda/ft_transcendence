@@ -1,9 +1,8 @@
+import UserRole from "src/shared/interfaces/role.interface";
 
-
-export default interface OpenChatRoom {
+export default interface OpenChatGroup {
     payload: {
-        roomId: string;
-        roleId: string;
+        role: UserRole;
         messages: any[];
     },
     type: string;

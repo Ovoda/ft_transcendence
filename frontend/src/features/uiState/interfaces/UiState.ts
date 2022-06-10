@@ -3,6 +3,6 @@ export default interface UiState {
     openedSettings: boolean;
     logged: boolean;
     showTfaRegistration: boolean;
-    showChat: boolean;
-	showGame: boolean;
+    showGame: boolean;
+    notification: string;
 }

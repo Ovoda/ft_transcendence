@@ -13,7 +13,7 @@ import { ChatRoleEntity } from "../entities/chatRole.entity";
 import { ChatGroupEntity } from "../entities/chatGroup.entity";
 import { noMessagesYet } from "../exceptions/noMessagesYet.exception";
 import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
-import { e_roleType } from "../types/role.type";
+import { RoleTypeEnum } from "../types/role.type";
 import { ChatMessageService } from "./chatMessage.service";
 import { ChatPasswordService } from "./chatPassword.service";
 import { ChatRoleService } from "./chatRole.service";
@@ -40,10 +40,12 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 			users: roles,
 		})
 		for (let i = 0; i < roles.length; i++) {
-			const role = await this.chatRoleService.updateById(roles[i].id, {
-				chatroom: chat,
+			await this.chatRoleService.updateById(roles[i].id, {
+				chatGroup: chat,
 			});
-			const user = await this.userService.findOneById(roles[i].user.id);
+			const user = await this.userService.findOneById(roles[i].user.id, {
+				relations: ["roles"],
+			});
 			user.roles.push(roles[i]);
 		}
 		return chat;
@@ -65,7 +67,7 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		return chat;
 	}
 
-	async getChatRoomManyMessages(room_id: string, limit: number) {
+	async getChatGroupManyMessages(room_id: string, limit: number) {
 		const lastMessageId = await this.checkLastMessage(room_id);
 		if (!lastMessageId) {
 			throw new noMessagesYet("No message in chat room yet.");
@@ -78,7 +80,7 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		return obj;
 	}
 
-	async postChatRoomMessage(dto: CreateChatMessageDto, room_id: string) {
+	async postChatGroupMessage(dto: CreateChatMessageDto, room_id: string) {
 		const room = await this.findOneById(room_id);
 		dto.prevMessage = room.lastMessage;
 		const message = await this.chatMessageService.postMessage(dto);
@@ -88,8 +90,8 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 	}
 
 	async createPassword(userId: string, roomId: string, createPassword: CreatePasswordDto) {
-		const role = await this.chatRoleService.findOneById(createPassword.roleId, {relations: ['user']});
-		if (role.user.id !== userId || role.role !== e_roleType.OWNER) {
+		const role = await this.chatRoleService.findOneById(createPassword.roleId, { relations: ['user'] });
+		if (role.user.id !== userId || role.role !== RoleTypeEnum.OWNER) {
 			throw new UserUnauthorized("This user cannot change password")
 		}
 		const room = await this.findOneById(roomId);
@@ -98,8 +100,8 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 	}
 
 	async updatePassword(userId: string, roomId: string, changePassword: ChangePasswordDto) {
-		const role = await this.chatRoleService.findOneById(changePassword.roleId, {relations: ['user']});
-		if (role.user.id !== userId || role.role !== e_roleType.OWNER) {
+		const role = await this.chatRoleService.findOneById(changePassword.roleId, { relations: ['user'] });
+		if (role.user.id !== userId || role.role !== RoleTypeEnum.OWNER) {
 			throw new UserUnauthorized("This user cannot change password");
 		}
 		const room = await this.findOneById(roomId);
@@ -111,14 +113,14 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		return newGroup;
 	}
 
-	async getAllRolesFromGroupId(userId: string, groupId: string){
+	async getAllRolesFromGroupId(userId: string, groupId: string) {
 		const usr = await this.userService.findOneById(userId);
-		const role = await this.chatRoleService.findOne({where: {user: usr}});
-		if (role.role === e_roleType.BANNED) {
+		const role = await this.chatRoleService.findOne({ where: { user: usr } });
+		if (role.role === RoleTypeEnum.BANNED) {
 			throw new UserUnauthorized("User is banned.")
 		}
 		const group = await this.findOneById(groupId);
-		const roles = await this.chatRoleService.findMany({where: {chatroom: group}});
+		const roles = await this.chatRoleService.findMany({ where: { chatGroup: group } });
 		return roles;
 	}
 

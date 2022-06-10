@@ -3,7 +3,6 @@ import { Server, Socket } from "socket.io";
 import { JoinRoomDto } from "./dtos/JoinRoom.dto";
 import ClientSocket from "./interfaces/Socket.interface";
 import { LeaveRoomDto } from "./dtos/LeaveRoom.dto";
-import ClientMessageDto from "./dtos/ClientMessage.dto";
 import { ChatRoleService } from "src/chat/services/chatRole.service";
 import * as _ from "lodash";
 import { ChatMessageService } from "src/chat/services/chatMessage.service";
@@ -11,6 +10,11 @@ import ClientDmDto from "./dtos/clientDm.dto";
 import { RelationService } from "src/relation/relation.service";
 import RelationEntity from "src/relation/entities/relation.entity";
 import { UserService } from "src/user/user.service";
+import ClientGroupMessageDto from "./dtos/clientGroupMessage.dto";
+import { RoleTypeEnum } from "src/chat/types/role.type";
+import MutedException from "./exceptions/mutedException";
+import BannedException from "./exceptions/bannedException";
+import { forwardRef, Inject } from "@nestjs/common";
 
 /**
  * This class is a websocket gateway.
@@ -32,6 +36,7 @@ import { UserService } from "src/user/user.service";
 })
 export class SocketGateway implements OnGatewayDisconnect {
     constructor(
+        @Inject(forwardRef(() => ChatRoleService))
         private readonly chatRoleService: ChatRoleService,
         private readonly chatMessageService: ChatMessageService,
         private readonly relationService: RelationService,
@@ -63,7 +68,7 @@ export class SocketGateway implements OnGatewayDisconnect {
     public registerClientSocket(socket: Socket, userId: string) {
         this.userService.setUserAsConnected(userId);
         this.events.push({ socket, userId });
-        this.server.emit("FriendConnection", userId);
+        this.server.emit("UpdateUserRelations", userId);
     }
 
     /**
@@ -91,10 +96,25 @@ export class SocketGateway implements OnGatewayDisconnect {
      * @param body request content
      */
     @SubscribeMessage("ClientMessage")
-    public async sendMessage(socket: Socket, body: ClientMessageDto) {
-        this.server.to(body.room).emit("ServerMessage", body);
-		await this.chatRoleService.uploadRoleFromExpiration(body.roleId);
-        await this.chatRoleService.postMessageFromRole(body.userId, body.roleId, {
+    public async sendMessage(socket: Socket, body: ClientGroupMessageDto) {
+
+        const user = await this.userService.findOne({
+            where: {
+                login: body.login,
+            },
+            relations: ["roles"]
+        });
+
+        if (!user) return;
+
+        const role = await this.chatRoleService.findOneById(body.role.id);
+
+        if (role.role === RoleTypeEnum.MUTE) return;
+        if (role.role === RoleTypeEnum.BANNED) return;
+
+        this.server.to(body.role.chatGroup.id).emit("ServerGroupMessage", body);
+        await this.chatRoleService.uploadRoleFromExpiration(body.role.id);
+        return await this.chatRoleService.postMessageFromRole(body.role.user.id, body.role.id, {
             content: body.content,
             login: body.login,
             avatar: body.avatar,
@@ -176,5 +196,27 @@ export class SocketGateway implements OnGatewayDisconnect {
                 ...relation, counterPart: this.relationService.getCounterPart(relation.users, client.userId)
             });
         })
+    }
+
+    public updateRoles(newRole: string, groupName: string, userId: string) {
+        let message = "";
+
+        if (newRole === RoleTypeEnum.BANNED) {
+            message = `You've been banned from ${groupName}`
+        }
+        if (newRole === RoleTypeEnum.MUTE) {
+            message = `You've been muted from ${groupName}`
+        }
+        if (newRole === RoleTypeEnum.ADMIN) {
+            message = `You're now admin in ${groupName}`
+        }
+        if (newRole === RoleTypeEnum.LAMBDA) {
+            message = `You're now a lambda user in ${groupName}`
+        }
+
+        const event = this.events.find((event: ClientSocket) => event.userId === userId);
+
+        if (event)
+            this.server.to(event.socket.id).emit("UpdateUserRoles", message);
     }
 }

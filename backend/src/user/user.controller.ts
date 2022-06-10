@@ -29,6 +29,7 @@ export class UserController {
 		const users = await this.userService.findMany({
 			limit: limit,
 			page: page,
+			relations: ["roles"]
 		});
 
 		const userWithoutCurrent = users.items.filter((user: UserEntity) => user.id !== request.user.id);
@@ -39,6 +40,7 @@ export class UserController {
 					id: user.id,
 					login: user.login,
 					avatar: user.avatar,
+					roles: user.roles,
 				}
 			}
 		});

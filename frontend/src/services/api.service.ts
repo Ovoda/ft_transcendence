@@ -1,4 +1,5 @@
 import axios from "axios";
+import { RoleTypeEnum } from "enums/roleType.enum";
 import { config } from "../app/config";
 import UserData from "../features/user/interfaces/user.interface";
 import CreateRoomDto from "./interfaces/CreateRoom.dto";
@@ -23,13 +24,14 @@ export async function getUserData(): Promise<UserData | null | undefined> {
     }
 }
 
-export async function getPreviousMessages(roleId: string, messageId: string | null) {
+export async function getMessages(lastMessage: string, roleId: string = "") {
+    if (!lastMessage) return { messages: [], error: "Last message is null" };
     try {
-        if (!messageId) return [];
-        const ret = await api.get(`/chat/many/messages/${roleId}/${messageId}?limit=20`);
-        return (ret.data);
-    } catch (err: any) {
-        console.log(err.response);
+        const url = (roleId === "") ? `chat/many/message/dm/${lastMessage}` : `chat/many/message/group/${roleId}/${lastMessage}`;
+        const response = await api.get(url);
+        return { messages: response.data, error: "" };
+    } catch (error: any) {
+        return { messages: null, error: error.response.data.message };
     }
 }
 
@@ -40,7 +42,8 @@ export async function getPreviousMessages(roleId: string, messageId: string | nu
  */
 export async function createRoom(createRoomDto: CreateRoomDto) {
     try {
-        await api.post("/chat/create", createRoomDto);
+        const group = await api.post("/chat/group/create", createRoomDto);
+        console.log(group);
         return { data: await getUserData(), error: "" }
     } catch (error: any) {
         if (error.response.status === 404) {
@@ -77,10 +80,8 @@ export async function addFriend(userId: string) {
             status: UserRelationsEnum.FRIEND as UserRelationsEnum,
             userId,
         });
-        console.log(ret.data);
         return { data: ret.data, error: "" }
     } catch (error: any) {
-        console.log(error.response);
         return { data: null, error: error.response.data.message }
     }
 }
@@ -92,6 +93,7 @@ export async function addFriend(userId: string) {
 export async function getAllRelations() {
     try {
         const ret = await api.get("/relation/many");
+        console.log(ret.data);
         return { data: ret.data, error: "" }
     } catch (error: any) {
         return { data: null, error: error.response.data.message }
@@ -104,5 +106,38 @@ export async function getRelation(relationId: string) {
         return { data: ret.data, error: "" }
     } catch (error: any) {
         return { data: null, error: error.response.data.message };
+    }
+}
+
+export async function getAllRoles() {
+    try {
+        const ret = await api.get("/chat/all/roles");
+        return { data: ret.data, error: "" }
+    } catch (error: any) {
+        return { data: null, error: error.response.data.message }
+    }
+}
+
+export async function getRole(roleId: string) {
+    try {
+        const ret = await api.get(`/chat/role/${roleId}`);
+        return { data: ret.data, error: "" }
+    } catch (error: any) {
+        return { data: null, error: error.response.data.message };
+    }
+}
+
+export async function updateUserRole(userId: string, groupId: string, newRole: RoleTypeEnum) {
+    try {
+        const ret = await api.post("/chat/change/group/role", {
+            userId,
+            groupId,
+            newRole
+        });
+        console.log(ret);
+        return true;
+    } catch (error: any) {
+        console.log(error.response);
+        return false;
     }
 }

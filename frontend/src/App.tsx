@@ -13,11 +13,13 @@ import Chat from './components/chat/chat';
 import useWebsockets from './hooks/useWebsocket';
 import { mainSocketContext } from 'src';
 import UserRelation from './shared/interfaces/userRelation';
+import UserRole from './shared/interfaces/role.interface';
+import Notification from './components/notification/notification';
 
 function App() {
 
   /** Global Data */
-  const { uiState, user, chat, relations } = useSelector((store: Store) => store);
+  const { uiState, user, chat, relations, roleSlice } = useSelector((store: Store) => store);
   const mainSocket = useContext(mainSocketContext);
 
   /** Tools */
@@ -28,10 +30,14 @@ function App() {
   useWebsockets();
 
   useEffect(() => {
-    if (chat.currentRoom !== "") {
-      mainSocket?.joinRoom(chat.currentRoom);
+    if (roleSlice) {
+      roleSlice.roles.map((role: UserRole) => {
+        mainSocket?.leaveDm(role.chatGroup.id);
+        console.log("listening on ", role.chatGroup.id);
+        mainSocket?.joinDm(role.chatGroup.id);
+      });
     }
-  }, [chat.currentRoom]);
+  }, [roleSlice.roles]);
 
   useEffect(() => {
     if (relations) {
@@ -44,6 +50,7 @@ function App() {
 
   return (
     <div className="App">
+      <Notification />
       <Navbar />
       <TfaRegistration />
       <Chat />
