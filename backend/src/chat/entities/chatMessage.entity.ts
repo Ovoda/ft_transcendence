@@ -11,6 +11,9 @@ export class ChatMessageEntity {
 	@Column()
 	avatar: string;
 
+	@Column({ nullable: true })
+	imageId?:string;
+
 	@Column()
 	content: string;
 

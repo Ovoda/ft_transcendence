@@ -21,7 +21,8 @@ export class ConfigService {
 				"POSTGRES_DB",
 				"POSTGRES_USER",
 				"POSTGRES_PASSWORD",
-				"JWT_SECRET"
+				"JWT_SECRET",
+				"BACKEND_URL",
 			]
 		)
 		this.database_entities = [
@@ -50,6 +51,10 @@ export class ConfigService {
 
 	public getJwtTokenSecret() {
 		return this.getValue("JWT_SECRET");
+	}
+
+	public getBackendUrl(){
+		return this.getValue("BACKEND_URL");
 	}
 
 	public getTypeOrmConfig(): TypeOrmModuleOptions {
