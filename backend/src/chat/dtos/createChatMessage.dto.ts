@@ -12,6 +12,9 @@ export class CreateChatMessageDto {
 	avatar: string;
 
 	@IsOptional()
+	imageId?: string;
+
+	@IsOptional()
 	@IsUUID()
 	prevMessage?: string;
 
