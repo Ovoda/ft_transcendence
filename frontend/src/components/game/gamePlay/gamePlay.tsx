@@ -21,6 +21,9 @@ import Button from "assets/Button/Button";
 import { ResultStatusEnum } from "./enums/resultStatus.enum";
 import SwitchButton from "assets/SwitchButton/SwitchButton";
 import { mainSocketContext } from "src";
+import SelectOptions from "../gameOptions/SelectOptions";
+import { useDispatch } from "react-redux";
+import { openGameOptions } from "features/uiState/uiState.slice";
 
 const defaultBackgroundColor: string = '#4285F4';
 const defaultElementsColor: string = 'white';
@@ -33,6 +36,9 @@ function GamePlay() {
 
 	const store: Store = useSelector((store: Store) => store);
 	const userData: UserData = store.user;
+
+	/** Tools */
+	const dispatch = useDispatch();
 
 	///** Variables */
 	const [gameCanvas, setGameCanvas] = useState<GameCanvas>(setInitialGameCanvasState(canvaRef));
@@ -50,21 +56,20 @@ function GamePlay() {
 	});
 
 	///** Request a new game **/
-	async function launchPlaying() {
-		setGameplay({
-			...gameplay,
-			ball: setInitialBallState(gameCanvas.width, gameCanvas.height),
-			playerLeft: setInitialPlayerLeftState(gameCanvas.width, gameCanvas.height),
-			playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
-		})
-		//console.log(gameplay.ball.velocity);
-		let userInfo: SetUserDto = {
-			id: userData.id,
-			login: userData.login,
-		}
-		mainSocket?.emit("joinGame", userInfo);
-		return true;
-	}
+	//async function launchPlaying() {
+	//	setGameplay({
+	//		...gameplay,
+	//		ball: setInitialBallState(gameCanvas.width, gameCanvas.height),
+	//		playerLeft: setInitialPlayerLeftState(gameCanvas.width, gameCanvas.height),
+	//		playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
+	//	})
+	//	let userInfo: SetUserDto = {
+	//		id: userData.id,
+	//		login: userData.login,
+	//	}
+	//	mainSocket?.emit("joinGame", userInfo);
+	//	return true;
+	//}
 
 	/**  stop playing the game **/
 	async function leaveGame(data: number[]) {
@@ -152,8 +157,6 @@ function GamePlay() {
 		}
 	});
 
-
-
 	useEffect(() => {
 		if (gameplay.arrowUp) {
 			let player: Player;
@@ -205,10 +208,19 @@ function GamePlay() {
 		}
 	}
 
+	async function handleOptionsModal() {
+		dispatch(openGameOptions());
+		return false;
+	}
+
 	return (
 		<div className="gameplay">
 			{gameStatus.play === PlayStatusEnum.OFF && (
-				<Button onClick={() => launchPlaying()}>Start Game</Button>
+				<>
+					{/*<Button onClick={() => launchPlaying()}>Start Game</Button>*/}
+					<Button onClick={() => handleOptionsModal()}>Start a Game</Button>
+					<SelectOptions setGameplay={setGameplay} gameCanvas={gameCanvas} />
+				</>
 			)}
 			{gameStatus.play !== PlayStatusEnum.OFF && gameStatus.user !== UserStatusEnum.WATCHER && (
 				<Button onClick={() => leaveGame([gameplay.playerLeft.score, gameplay.playerRight.score])}>Stop Game</Button>
