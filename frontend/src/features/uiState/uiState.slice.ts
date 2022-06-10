@@ -5,7 +5,7 @@ const initialState: UiState = {
 	openedSettings: false,
 	logged: false,
 	showTfaRegistration: false,
-	showGame: false,
+	showGameOptions: false,
 	notification: "",
 }
 

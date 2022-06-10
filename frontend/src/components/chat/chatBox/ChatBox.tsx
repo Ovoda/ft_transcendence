@@ -1,7 +1,7 @@
 import React, { UIEvent, useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import './chatBox.scss';
+import './ChatBox.scss';
 import settings_image from 'images/settings.png';
 import block_user_image from 'images/block_user.png';
 import TextInput from "assets/TextInput/TextInput";
@@ -22,6 +22,9 @@ export default function ChatBox() {
 	const { chat, user } = useSelector((store: Store) => store);
 	const messages = chat.messages;
 	const mainSocket = useContext(mainSocketContext);
+
+	/** Tools */
+	const dispatch = useDispatch();
 
 	/** Variables */
 	const [openSettings, setOpenSettings] = useState<string>("");
@@ -80,7 +83,7 @@ export default function ChatBox() {
 
 	useEffect(() => {
 		if (chat.messages.length > 0) {
-			setFirstMessage(chat.messages[0].id);
+			setFirstMessage(chat.messages[0].id as string);
 		}
 	}, [chat.messages]);
 
