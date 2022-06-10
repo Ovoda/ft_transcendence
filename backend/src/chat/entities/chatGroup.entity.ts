@@ -11,6 +11,9 @@ export class ChatGroupEntity {
 	name: string;
 
 	@Column({ nullable: true })
+	imageId?: string;
+
+	@Column({ nullable: true })
 	lastMessage: string; // uuid of the last message, needs to be updated each time a message is send in this room
 
 	@Exclude()
