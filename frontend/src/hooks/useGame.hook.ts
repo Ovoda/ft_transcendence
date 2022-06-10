@@ -70,7 +70,6 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				})
 			} else {
 				setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
-				//console.log(gameStatus.play);
 				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
 					mainSocket.emit("animateGame", {
 						posX: gameplay.ball.position.x,
@@ -82,7 +81,6 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		/** Pause the game **/
 		mainSocket.on("pauseGame", () => {
-			//console.log(gameStatus.user);
 			setGameStatus({ ...gameStatus, play: PlayStatusEnum.PAUSE, })
 		})
 
@@ -227,6 +225,24 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 							x: gameplay.playerRight.position.x,
 							y: value,
 						}
+					}
+				}
+			})
+		})
+
+		mainSocket.on("setLogin", (data: any) => {
+			console.log("RECEIVED LOGINS");
+			console.log(data);
+			setGameplay((gameplay: Gameplay) => {
+				return {
+					...gameplay,
+					playerLeft: {
+						...gameplay.playerLeft,
+						login: data.left,
+					},
+					playerRight: {
+						...gameplay.playerRight,
+						login: data.right,
 					}
 				}
 			})

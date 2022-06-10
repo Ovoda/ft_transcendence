@@ -57,7 +57,7 @@ function GamePlay() {
 			playerLeft: setInitialPlayerLeftState(gameCanvas.width, gameCanvas.height),
 			playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
 		})
-		console.log(gameplay.ball.velocity);
+		//console.log(gameplay.ball.velocity);
 		let userInfo: SetUserDto = {
 			id: userData.id,
 			login: userData.login,
@@ -151,6 +151,8 @@ function GamePlay() {
 			mainSocket?.emit("movePlayer", newPos);
 		}
 	});
+
+
 
 	useEffect(() => {
 		if (gameplay.arrowUp) {

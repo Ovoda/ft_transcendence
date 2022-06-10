@@ -46,17 +46,52 @@ export default function ChatBox() {
 		return false;
 	}
 
+<<<<<<< HEAD
 	function handleScroll(event: UIEvent<HTMLDivElement>) {
 		const target = event.target as HTMLInputElement;
 		const top = target.scrollHeight + target.scrollTop;
 		setScrolledToTop(top <= target.clientHeight + 10 && top >= target.clientHeight - 10);
 	}
 
+<<<<<<< HEAD
+=======
+	useEffect(() => {
+		async function fetchPreviousMessages() {
+			const response = await api.get(`chat/many/message/dm/${firstMessage}`);
+			const messages = response.data;
+			dispatch(addMessageFromBack(messages));
+		}
+		if (scrolledToTop === true && firstMessage) {
+			fetchPreviousMessages();
+		}
+	}, [scrolledToTop]);
+
+	useEffect(() => {
+		if (chat.messages.length > 0) {
+			setFirstMessage(chat.messages[0].id);
+		}
+	}, [chat.messages]);
+
+=======
+	async function handlePlayRequest() {
+		console.log("Playing Request");
+		return false;
+	}
+
+>>>>>>> 10d2be5 (Synchronise data when watching a game, saving scores in db, displaying scores in profile)
+>>>>>>> 4fa0ba376cf4e3207ef9729a6319c3477eabd70e
 	return (
 		<div className='chat_box'>
 			<div className={"chat_box_header"}>
 				<h3>{chat.currentRelation?.counterPart.login}</h3>
-				<Button onClick={handleWatchRequest}>Watch Game</Button>
+				{
+					chat.currentRelation?.counterPart.activityStatus === UserActivityStatusEnum.PLAYING &&
+					<Button onClick={handleWatchRequest}>Watch</Button>
+				}
+				{
+					chat.currentRelation?.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED &&
+					<Button onClick={handlePlayRequest}>Play</Button>
+				}
 				<img onClick={handleOpenSettings} src={settings_image} alt="" />
 			</div>
 			<div id="chat_messages_container" onScroll={handleScroll}>

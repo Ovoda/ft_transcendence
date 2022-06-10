@@ -3,28 +3,30 @@ import { UdpateUserAction } from "./interfaces/updateUserAction.interface";
 import UserData from "./interfaces/user.interface";
 
 const initialState: UserData = {
-    id: "",
-    login: "",
-    avatar: "",
-    tfaEnabled: false,
-    roles: [],
+	id: "",
+	login: "",
+	avatar: "",
+	tfaEnabled: false,
+	roles: [],
+	victories: 0,
+	defeats: 0,
 }
 
 const UserDataSlice = createSlice({
-    name: "user",
-    initialState,
-    reducers: {
-        updateUser(state, action: UdpateUserAction) {
-            return action.payload;
-        },
-        updateTfaEnabled(state, action) {
-            return { ...state, tfaEnabled: action.payload };
-        }
-    }
+	name: "user",
+	initialState,
+	reducers: {
+		updateUser(state, action: UdpateUserAction) {
+			return action.payload;
+		},
+		updateTfaEnabled(state, action) {
+			return { ...state, tfaEnabled: action.payload };
+		}
+	}
 })
 
 export const {
-    updateUser,
-    updateTfaEnabled,
+	updateUser,
+	updateTfaEnabled,
 } = UserDataSlice.actions;
 export default UserDataSlice.reducer;

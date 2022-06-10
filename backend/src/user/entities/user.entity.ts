@@ -27,9 +27,11 @@ export class UserEntity {
 	@Column({ default: UserActivityStatusEnum.DISCONNECTED })
 	activityStatus: UserActivityStatusEnum;
 
-	@ManyToMany(() => GameEntity, games => games, { nullable: true })
-	@JoinTable()
-	games: GameEntity[];
+	@Column({ default: 0 })
+	victories: number;
+
+	@Column({ default: 0 })
+	defeats: number;
 
 	@ManyToMany(() => RelationEntity, relations => relations.users, { nullable: true })
 	relations: RelationEntity[];

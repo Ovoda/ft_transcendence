@@ -63,6 +63,7 @@ export class SocketGateway implements OnGatewayDisconnect {
      * @listens
      * @param socket client's socket
      * @param userId client's user ID
+	 * 
      */
     @SubscribeMessage("RegisterClient")
     public registerClientSocket(socket: Socket, userId: string) {
