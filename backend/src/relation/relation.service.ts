@@ -68,39 +68,6 @@ export class RelationService extends CrudService<RelationEntity>{
     }
 
     /**
-     * Get user that is not current user in a relation entity
-     * @param relationId - given relation ID
-     * @param currentUserId - current user's ID
-     * @returns current user's counter part in a given relation
-     */
-    async getRelationCounterPart(relationId: string, currentUserId: string) {
-        const relation = await this.findOneById(relationId, {
-            relations: ["users"],
-        });
-        return this.getCounterPart(relation.users, currentUserId);
-    }
-
-    /**
-     * Get counter parts from current user's every relation 
-     * @param currentUser - current user's entity
-     * @param relationStatus - filter specific relationship type
-     * @returns an array of current user's counter parts in every relation with the given status
-     */
-    async getAllRelationCounterPart(currentUser: UserEntity, relationStatus: RelationTypeEnum | null = null) {
-        const counterParts = currentUser.relations.map((relation: RelationEntity) => {
-            if (relation.status === relationStatus || !relationStatus) {
-                if (relation.users[0].id === currentUser.id) {
-                    return relation.users[1];
-                } else {
-                    return relation.users[0];
-                }
-            }
-        });
-        return counterParts;
-    }
-
-
-    /**
      * Get current user's relations with it's counterpart
      * @param currentUserId
      * @returns All relation with additional counter parg

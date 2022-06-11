@@ -10,6 +10,7 @@ const initialState: UserData = {
 	roles: [],
 	victories: 0,
 	defeats: 0,
+	relations: []
 }
 
 const UserDataSlice = createSlice({

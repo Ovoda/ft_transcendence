@@ -15,7 +15,7 @@ import { SocketGateway } from 'src/websockets/socket.gateway';
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([ChatRoleEntity, ChatGroupEntity, ChatMessageEntity]),
-		UserModule,
+		forwardRef(() => UserModule),
 		forwardRef(() => WebsocketsModule)],
 	providers: [ChatPasswordService, ChatGroupService, ChatRoleService, ChatMessageService, Logger],
 	controllers: [ChatController],

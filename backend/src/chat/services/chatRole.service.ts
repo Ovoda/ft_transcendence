@@ -4,21 +4,22 @@ import { CrudService } from "src/app/templates/crud.service";
 import { UserEntity } from "src/user/entities/user.entity";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
-import { ChangeRoleDto } from "../dto/changeRole.dto";
-import { CreateGroupDto } from "../dto/createGroup.dto";
-import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
+import { ChangeRoleDto } from "../dtos/changeRole.dto";
+import { CreateGroupDto } from "../dtos/createGroup.dto";
+import { CreateChatMessageDto } from "../dtos/createChatMessage.dto";
 import { ChatRoleEntity } from "../entities/chatRole.entity";
 import { OwnerError } from "../exceptions/ownerError.exception";
 import { UserUnauthorized } from "../exceptions/userUnauthorized.exception";
 import { RoleTypeEnum } from "../types/role.type";
 import { ChatMessageService } from "./chatMessage.service";
 import { ChatGroupService } from "./chatGroup.service.ts";
-import { TransferPasswordDto } from "../dto/transferPassword.dto";
+import { TransferPasswordDto } from "../dtos/transferPassword.dto";
 import { WrongPassword } from "../exceptions/wrongPassword.exception";
 import { ChatPasswordService } from "./chatPassword.service";
 import { NotCurrentUserRole } from "../exceptions/notCurrentUserRole.exception";
 import { WebsocketsService } from "src/websockets/websockets.service";
 import { SocketGateway } from "src/websockets/socket.gateway";
+import JoinGroupDto from "../dtos/joinGroupDto";
 
 @Injectable()
 export class ChatRoleService extends CrudService<ChatRoleEntity>{
@@ -199,22 +200,25 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		return modifiedRole;
 	}
 
-	async addUserAndRole(userIdCaller: string, roomId: string, userIdAdded: string) {
-		//const room = await this.findOneById(roomId, {relations: ['roles']});
-		const caller = await this.userService.findOneById(userIdCaller);
+	async addUserAndRole(caller: UserEntity, roomId: string, userIdAdded: string) {
 		const callerRole: ChatRoleEntity = await this.findOne({ where: { user: caller } });
+
 		if (callerRole.role !== RoleTypeEnum.OWNER && callerRole.role !== RoleTypeEnum.ADMIN) {
 			throw new UserUnauthorized("You are not admin or owner of this chat group");
 		}
+
 		const newUser = await this.userService.findOneById(userIdAdded);
 		const chatGroup = await this.chatGroupService.findOneById(roomId, { relations: ['users'] });
+
 		const newRole = await this.save({
 			expires: null,
 			role: RoleTypeEnum.LAMBDA,
 			user: newUser,
 			chatGroup: chatGroup,
 		})
+
 		chatGroup.users.push(newRole);
+
 		return await this.chatGroupService.save(chatGroup);
 	}
 

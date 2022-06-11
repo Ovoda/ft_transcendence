@@ -1,14 +1,14 @@
-import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { throws } from "assert";
 import { use } from "passport";
 import { CrudService } from "src/app/templates/crud.service";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
-import { ChangePasswordDto } from "../dto/changePassword.dto";
-import { CreateGroupDto } from "../dto/createGroup.dto";
-import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
-import { CreatePasswordDto } from "../dto/createPassword.dto";
+import { ChangePasswordDto } from "../dtos/changePassword.dto";
+import { CreateGroupDto } from "../dtos/createGroup.dto";
+import { CreateChatMessageDto } from "../dtos/createChatMessage.dto";
+import { CreatePasswordDto } from "../dtos/createPassword.dto";
 import { ChatRoleEntity } from "../entities/chatRole.entity";
 import { ChatGroupEntity } from "../entities/chatGroup.entity";
 import { noMessagesYet } from "../exceptions/noMessagesYet.exception";
@@ -18,6 +18,8 @@ import { ChatMessageService } from "./chatMessage.service";
 import { ChatPasswordService } from "./chatPassword.service";
 import { ChatRoleService } from "./chatRole.service";
 import { WrongPassword } from "../exceptions/wrongPassword.exception";
+import { UserEntity } from "src/user/entities/user.entity";
+import JoinGroupDto from "../dtos/joinGroupDto";
 
 @Injectable()
 export class ChatGroupService extends CrudService<ChatGroupEntity>{
@@ -49,6 +51,25 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 			user.roles.push(roles[i]);
 		}
 		return chat;
+	}
+
+	async joinGroup(user: UserEntity, joinGroupDto: JoinGroupDto) {
+		const group = await this.findOneById(joinGroupDto.groupId, { relations: ["users"] });
+
+		if (!await this.chatPasswordService.verifyPassword(
+			joinGroupDto.password, group.password)) {
+			throw new UnauthorizedException();
+		}
+
+		const newRole = await this.chatRoleService.save({
+			expires: null,
+			role: RoleTypeEnum.LAMBDA,
+			user: user,
+			chatGroup: group,
+		});
+
+		group.users.push(newRole);
+		return await this.save(group);
 	}
 
 	async checkLastMessage(room_id: string) {

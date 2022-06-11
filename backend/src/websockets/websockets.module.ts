@@ -10,7 +10,7 @@ import { WebsocketsService } from './websockets.service';
   imports: [
     forwardRef(() => ChatModule),
     forwardRef(() => RelationModule),
-    UserModule],
+    forwardRef(() => UserModule)],
   providers: [WebsocketsService, SocketGateway],
   exports: [SocketGateway],
 })

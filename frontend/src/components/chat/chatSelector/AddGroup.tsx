@@ -8,7 +8,7 @@ import { closeChatRoomCreationModal, openChatRoomCreationModal } from "features/
 import close from 'images/close.png';
 import { createRoom } from "services/api.service";
 import { updateUser } from "features/user/user.slice";
-import UsersList from "./usersList";
+import UsersList, { UserListTypeEnum } from "./usersList";
 
 interface Props {
     className: string;
@@ -69,7 +69,6 @@ export default function AddGroup({ className, swap }: Props) {
     return (
         <div className={"room_creation " + className}>
             <h2>Create a group</h2>
-
             {
                 step === 0 &&
                 <>
@@ -86,12 +85,7 @@ export default function AddGroup({ className, swap }: Props) {
 
             {
                 step === 1 &&
-                <UsersList
-                    firstButtonClick={addUserToRoom}
-                    secondButtonClick={handleRoomCreation}
-                    firstButtonContent="Add"
-                    secondButtonContent="Add"
-                />
+                <UsersList type={UserListTypeEnum.GROUP} onClick={addUserToRoom} />
             }
 
             <div id="room_creation_modal_nav">

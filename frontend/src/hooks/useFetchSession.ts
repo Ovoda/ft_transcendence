@@ -16,15 +16,15 @@ export default function useFetchSession() {
 
         async function fetchSession() {
             const userData = await getUserData();
-            const userRelations = await getAllRelations();
+            const userRelation = await getAllRelations();
             const userRoles = await getAllRoles();
 
             if (userData) {
                 dispatch(updateUser(userData));
             }
 
-            if (userRelations.data) {
-                dispatch(setRelations(userRelations.data));
+            if (userRelation.data) {
+                dispatch(setRelations(userRelation.data));
             }
 
             if (userRoles.data) {

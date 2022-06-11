@@ -4,11 +4,12 @@ import { closeChatDm, openChatDm, openChatGroup, openChatRoomCreationModal } fro
 import './dmPicker.scss';
 import "./RoomCreation.scss";
 import Button from "assets/Button/Button";
-import AddRoomMenu from "./AddRoomMenu";
+import AddRoomMenu, { RoomMenuType } from "./AddRoomMenu";
 import { getMessages, getRelation, getRole } from "services/api.service";
 import UserRelation from "src/shared/interfaces/userRelation";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import UserRole from "src/shared/interfaces/role.interface";
+import { useState } from "react";
 
 export default function DmPicker() {
 
@@ -17,6 +18,9 @@ export default function DmPicker() {
 
 	/** Tools */
 	const dispatch = useDispatch();
+
+	/** Variables */
+	const [menuType, setMenuType] = useState<RoomMenuType>(RoomMenuType.FRIENDS);
 
 	async function selectDmRoom(relation: UserRelation) {
 		if (chat.currentRelation?.id === relation.id) {
@@ -39,12 +43,14 @@ export default function DmPicker() {
 		const group = updatedRole.data.chatGroup;
 
 		const { messages } = await getMessages(group.lastMessage, updatedRole.data.id);
+
 		if (messages)
 			dispatch(openChatGroup({ messages: messages.reverse(), role: updatedRole.data }));
 	}
 
 	/** Opens a modal to create rooms */
-	async function handleRoomCreationModal() {
+	async function handleRoomCreationModal(menuType: RoomMenuType) {
+		setMenuType(menuType);
 		dispatch(openChatRoomCreationModal());
 		return false;
 	}
@@ -52,8 +58,8 @@ export default function DmPicker() {
 	return (
 		<div id="dm_picker">
 			{
-				relations.relations &&
-				relations.relations.map((relation: UserRelation, index: number) =>
+				relations.friends &&
+				relations.friends.map((relation: UserRelation, index: number) =>
 					<div key={index} onClick={() => selectDmRoom(relation)} className="dm_picker_room">
 						<img src={relation.counterPart.avatar} alt="" />
 						{/* <button onClick={() => watchingRequest(role.chatroom.name, mainSocket)}>Watch Game</button> */}
@@ -76,8 +82,9 @@ export default function DmPicker() {
 					</div>
 				)
 			}
-			<Button id="add_room_button" onClick={handleRoomCreationModal}>&#43;</Button>
-			<AddRoomMenu />
+			<Button onClick={() => handleRoomCreationModal(RoomMenuType.FRIENDS)}>Friends</Button>
+			<Button onClick={() => handleRoomCreationModal(RoomMenuType.GROUP)}>Groups</Button>
+			<AddRoomMenu menuType={menuType} />
 		</div >
 	);
 }

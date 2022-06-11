@@ -1,5 +1,5 @@
 import { addMessage } from "features/chat/chat.slice";
-import { addRelation, setRelations } from "features/relations/relations.slice";
+import { setRelations } from "features/relations/relations.slice";
 import { setRoles } from "features/roles/roles.slice";
 import { setNotification } from "features/uiState/uiState.slice";
 import { useContext, useEffect } from "react";
@@ -33,9 +33,12 @@ export default function useWebsockets() {
     }
 
     const reFetchRelations = async (userId: string) => {
-        const userRelations = await getAllRelations();
-        if (userRelations.data) {
-            dispatch(setRelations(userRelations.data));
+
+        console.log("refreshing");
+
+        const userRelation = await getAllRelations();
+        if (userRelation.data) {
+            dispatch(setRelations(userRelation.data));
         }
     }
 
@@ -43,15 +46,13 @@ export default function useWebsockets() {
         const userRoles = await getAllRoles();
         if (userRoles.data) {
             dispatch(setRoles(userRoles.data));
-            dispatch(setNotification(notification));
         }
+        if (notification)
+            dispatch(setNotification(notification));
     }
 
     useEffect(() => {
         if (user.login !== "" && mainSocket) {
-            mainSocket.chat = chat;
-            mainSocket.dispatch = dispatch;
-            mainSocket.init(user.id);
             mainSocket.on("ServerMessage", serverMessageCallback);
             mainSocket.on("ServerGroupMessage", serverGroupMessageCallback);
             mainSocket.on("UpdateUserRelations", reFetchRelations);
@@ -66,4 +67,10 @@ export default function useWebsockets() {
         }
 
     }, [user, chat]);
+
+    useEffect(() => {
+        if (user.login !== "" && mainSocket) {
+            mainSocket.init(user.id);
+        }
+    }, [user.login]);
 }

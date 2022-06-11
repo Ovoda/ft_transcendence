@@ -1,19 +1,18 @@
 import React, { UIEvent, useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import './ChatBox.scss';
+import './chatBox.scss';
 import settings_image from 'images/settings.png';
-import block_user_image from 'images/block_user.png';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
 import { mainSocketContext } from "src";
 import useLoadMessagesOnScroll from "src/hooks/useLoadMessagesOnScroll";
 import { translateMessageDate } from "services/utils.service";
-import ChatSender from "./ChatSender";
 import GroupUserList from "./groupUsersList";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import { api } from "services/api.service";
 import { addMessageFromBack } from "features/chat/chat.slice";
+import ChatSender from "./chatSender";
 
 
 export default function ChatBox() {
@@ -87,7 +86,6 @@ export default function ChatBox() {
 		}
 	}, [chat.messages]);
 
-
 	return (
 		<div className='chat_box'>
 			<div className={"chat_box_header"}>
@@ -100,7 +98,13 @@ export default function ChatBox() {
 					chat.currentRelation?.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED &&
 					<Button onClick={handlePlayRequest}>Play</Button>
 				}
-				<img onClick={handleOpenSettings} src={settings_image} alt="" />
+				{
+					chat.currentRole &&
+					<>
+						<p>{chat.currentRole.chatGroup.name}</p>
+						<img onClick={handleOpenSettings} src={settings_image} alt="" />
+					</>
+				}
 			</div>
 			<div id="chat_messages_container" onScroll={handleScroll}>
 				<div className={"chat_box_settings_container " + openSettings}>

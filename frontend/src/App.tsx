@@ -19,7 +19,7 @@ import Notification from './components/notification/notification';
 function App() {
 
   /** Global Data */
-  const { uiState, user, chat, relations, roleSlice } = useSelector((store: Store) => store);
+  const { uiState, user, relations, roleSlice } = useSelector((store: Store) => store);
   const mainSocket = useContext(mainSocketContext);
 
   /** Tools */
@@ -41,12 +41,12 @@ function App() {
 
   useEffect(() => {
     if (relations) {
-      relations.relations.map((relation: UserRelation) => {
+      relations.friends.map((relation: UserRelation) => {
         mainSocket?.leaveDm(relation.id);
         mainSocket?.joinDm(relation.id);
       });
     }
-  }, [relations.relations]);
+  }, [relations.friends]);
 
   return (
     <div className="App">

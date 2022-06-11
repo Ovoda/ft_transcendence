@@ -6,8 +6,18 @@ import './AddRoomMenu.scss';
 import AddGroup from "./AddGroup";
 import close from 'images/close.png';
 import { closeChatRoomCreationModal } from "features/chat/chat.slice";
+import JoinGroup from "./joinGroup";
 
-export default function AddRoomMenu() {
+export const enum RoomMenuType {
+    FRIENDS = "FRIEND",
+    GROUP = "GROUP",
+}
+
+interface Props {
+    menuType: RoomMenuType;
+}
+
+export default function AddRoomMenu({ menuType }: Props) {
 
     /** Global data */
     const { user, chat } = useSelector((store: Store) => store);
@@ -31,8 +41,17 @@ export default function AddRoomMenu() {
                 <div id="room_creation_menu" >
                     <img id="close_button_img" onClick={() => dispatch(closeChatRoomCreationModal())} src={close} alt="Close modal icon" />
                     <div id="room_creation_container">
-                        <AddFriend className={pos} swap={swapCreation} />
-                        <AddGroup className={pos} swap={swapCreation} />
+                        {
+                            menuType === RoomMenuType.FRIENDS &&
+                            <AddFriend className={pos} swap={swapCreation} />
+                        }
+                        {
+                            menuType === RoomMenuType.GROUP &&
+                            <>
+                                <AddGroup className={pos} swap={swapCreation} />
+                                <JoinGroup className={pos} swap={swapCreation} />
+                            </>
+                        }
                     </div>
 
                 </div>

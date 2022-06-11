@@ -1,5 +1,4 @@
-import { addFriend } from "services/api.service";
-import UsersList from "./usersList";
+import UsersList, { UserListTypeEnum } from "./usersList";
 
 interface Props {
     className: string;
@@ -8,20 +7,10 @@ interface Props {
 
 export default function AddFriend({ className, swap }: Props) {
 
-    async function handleAddFriend(userId: string) {
-        await addFriend(userId);
-        return false;
-    }
-
     return (
         <div className={"room_creation " + className}>
-            <h2>Add a user</h2>
-            <UsersList
-                firstButtonClick={handleAddFriend}
-                secondButtonClick={handleAddFriend}
-                firstButtonContent="Add"
-                secondButtonContent="Add"
-            />
+            <h2>Manage relations</h2>
+            <UsersList type={UserListTypeEnum.RELATIONS} />
             <div id="room_creation_modal_nav">
                 <p onClick={swap} className="link">
                     Create a group chat

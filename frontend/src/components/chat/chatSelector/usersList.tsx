@@ -1,19 +1,21 @@
 import Button from "assets/Button/Button";
 import UserData from "features/user/interfaces/user.interface";
-import { ReactNode, useEffect, useState } from "react";
-import { addFriend, getAllUsers } from "services/api.service";
-import { Node } from "typescript";
+import { useEffect, useState } from "react";
+import { getAllUsers } from "services/api.service";
+import { BlockAddButtons } from "./blockAddButtons";
 import './usersList.scss';
 
-interface Props {
-    firstButtonClick: any;
-    firstButtonContent: string;
-    secondButtonClick: any;
-    secondButtonContent: string;
+export const enum UserListTypeEnum {
+    RELATIONS = "RELATIONS",
+    GROUP = "GROUP",
 }
 
+interface Props {
+    type: UserListTypeEnum;
+    onClick?: any;
+}
 
-export default function UsersList({ firstButtonClick, secondButtonClick, firstButtonContent, secondButtonContent }: Props) {
+export default function UsersList({ type, onClick }: Props) {
 
     /** Variables */
     const [users, setUsers] = useState<any[]>([]);
@@ -37,8 +39,14 @@ export default function UsersList({ firstButtonClick, secondButtonClick, firstBu
                     <div key={index} className="users_list_item">
                         <img className="users_list_item_img" src={user.avatar} alt={user.login + "'s avatar"} />
                         <p>{user.login}</p>
-                        <Button onClick={async () => { return firstButtonClick(user.id) }}>{firstButtonContent}</Button>
-                        <Button onClick={async () => { return secondButtonClick(user.id) }}>{secondButtonContent}</Button>
+                        {
+                            type === UserListTypeEnum.RELATIONS &&
+                            <BlockAddButtons selectedUser={user} />
+                        }
+                        {
+                            type === UserListTypeEnum.GROUP &&
+                            <Button onClick={async () => { return onClick(user.id) }}>Add</Button>
+                        }
                     </div>
                 )
             }

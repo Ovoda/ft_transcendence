@@ -2,7 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
 import { Repository } from "typeorm";
-import { CreateChatMessageDto } from "../dto/createChatMessage.dto";
+import { CreateChatMessageDto } from "../dtos/createChatMessage.dto";
 import { ChatMessageEntity } from "../entities/chatMessage.entity";
 
 @Injectable()
@@ -31,10 +31,10 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		messages.push(message);
 		let lim: number;
 		if (!message.prev_message) {
-			return [];
+			return [message];
 		} else {
 			lim = (!limit) ? 20 : limit;
-			for (let i = 0; i < lim - 1; i++) {
+			for (let i = 0; i < lim; i++) {
 				if (!message.prev_message) {
 					break;
 				}

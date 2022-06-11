@@ -61,7 +61,6 @@ export default class ClientSocket {
 	 * @param message message to send
 	 */
 	public sendDm(message: Dm) {
-		console.log(message);
 		this.socket.emit("ClientDm", message);
 	}
 

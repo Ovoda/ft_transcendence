@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
 import { JwtRequest } from 'src/auth/interfaces/jwtRequest.interface';
 import { SocketGateway } from 'src/websockets/socket.gateway';
@@ -18,7 +18,8 @@ export class RelationController {
     @Get("many")
     @HttpCode(200)
     @UseGuards(TfaGuard)
-    async getAllRelations(@Req() request: JwtRequest) {
+    async getAllRelations(
+        @Req() request: JwtRequest) {
         return await this.relationService.getAllRelations(request.user.id);
     }
 
@@ -31,20 +32,25 @@ export class RelationController {
         return await this.relationService.getRelation(relationId, request.user.id);
     }
 
-    @Get("counterpart/many")
+    @Delete("/:relation_id")
     @HttpCode(200)
     @UseGuards(TfaGuard)
-    async getAllRelationsCounterpart(
+    async deleteRelation(
         @Req() request: JwtRequest,
-        @Query("status") status: string) {
+        @Param("relation_id") relationId: string) {
 
-        let relationStatus: RelationTypeEnum | null = null;
-        if (status === "friends") {
-            relationStatus = RelationTypeEnum.FRIEND;
-        } else if (status === "blocked") {
-            relationStatus = RelationTypeEnum.BLOCKED;
+        const relation = await this.relationService.findOneById(relationId, {
+            relations: ["users"],
+        })
+
+        if (!relation) return;
+
+        const deleted = await this.relationService.delete(relationId);
+
+        if (deleted) {
+            this.socketGateway.updateRelations(relation.users[0].id);
+            this.socketGateway.updateRelations(relation.users[1].id);
         }
-        return await this.relationService.getAllRelationCounterPart(request.user, relationStatus);
     }
 
     @Post()

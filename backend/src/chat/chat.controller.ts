@@ -1,14 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, UseGuards, HttpCode, Query, Request } from '@nestjs/common';
 import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
-import { ChangeRoleDto } from './dto/changeRole.dto';
-import { CreateGroupDto } from './dto/createGroup.dto';
-import { CreateChatMessageDto } from './dto/createChatMessage.dto';
-import { CreatePasswordDto } from './dto/createPassword.dto';
+import { ChangeRoleDto } from './dtos/changeRole.dto';
+import { CreateGroupDto } from './dtos/createGroup.dto';
+import { CreateChatMessageDto } from './dtos/createChatMessage.dto';
+import { CreatePasswordDto } from './dtos/createPassword.dto';
 import { ChatMessageService } from './services/chatMessage.service';
 import { ChatRoleService } from './services/chatRole.service';
 import { ChatGroupService } from './services/chatGroup.service.ts';
-import { TransferPasswordDto } from './dto/transferPassword.dto';
+import { TransferPasswordDto } from './dtos/transferPassword.dto';
 import { JwtRequest } from 'src/auth/interfaces/jwtRequest.interface';
+import { SocketGateway } from 'src/websockets/socket.gateway';
+import JoinGroupDto from './dtos/joinGroupDto';
 
 @Controller('chat')
 export class ChatController {
@@ -16,14 +18,29 @@ export class ChatController {
 		private readonly chatGroupService: ChatGroupService,
 		private readonly chatRoleService: ChatRoleService,
 		private readonly chatMessageService: ChatMessageService,
+		private readonly socketGateway: SocketGateway,
 	) { }
+
+	@UseGuards(TfaGuard)
+	@Get("group/many")
+	@HttpCode(200)
+	async getGroups() {
+		console.log("in route");
+
+		return await this.chatGroupService.findMany({
+			page: 1,
+			limit: 1000,
+		});
+	}
 
 	@UseGuards(TfaGuard)
 	@Post('group/create')
 	@HttpCode(201)
 	async createChat(@Body() dto: CreateGroupDto) {
 		const roles = await this.chatRoleService.createRoles(dto);
-		return await this.chatGroupService.createGroup(dto, roles);
+		const newGroup = await this.chatGroupService.createGroup(dto, roles);
+		this.socketGateway.addGroup(newGroup);
+		return newGroup
 	}
 
 	@UseGuards(TfaGuard)
@@ -116,7 +133,16 @@ export class ChatController {
 		@Param('roomId') roomId: string,
 		@Param('userId') userIdAdded: string
 	) {
-		return await this.chatRoleService.addUserAndRole(req.user.id, roomId, userIdAdded);
+		return await this.chatRoleService.addUserAndRole(req.user, roomId, userIdAdded);
+	}
+
+	@UseGuards(TfaGuard)
+	@Patch('/group/join')
+	@HttpCode(200)
+	async joinGroup(
+		@Request() req,
+		@Body() joinGroupDto: JoinGroupDto) {
+		return await this.chatGroupService.joinGroup(req.user, joinGroupDto);
 	}
 
 	@UseGuards(TfaGuard)
