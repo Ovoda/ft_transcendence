@@ -5,6 +5,7 @@ import { Store } from "../../app/store";
 import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { toggleTfa } from "../../services/tfa.service";
+import UserData from "features/user/interfaces/user.interface";
 
 interface Props {
 	settingsWindowState: boolean;
@@ -14,11 +15,12 @@ interface Props {
 export default function UserSettings({ settingsWindowState, setSettingsWindowAction }: Props) {
 
 	/** Global data */
-	const { user, uiState }: Store = useSelector((store: Store) => store);
+	const store: Store = useSelector((store: Store) => store);
+	const userData: UserData = store.user;
 
 	/** Variables */
 	const [windowClass, setWindowClass] = useState<string>("");
-	const [tfaEnabled, setTfaEnabled] = useState<boolean>(user.tfaEnabled);
+	const [tfaEnabled, setTfaEnabled] = useState<boolean>(userData.tfaEnabled);
 
 	/** Tools */
 	const dispatch = useDispatch();
@@ -32,7 +34,7 @@ export default function UserSettings({ settingsWindowState, setSettingsWindowAct
 	}, [settingsWindowState]);
 
 	useEffect(() => {
-		if (user.tfaEnabled !== tfaEnabled) {
+		if (userData.tfaEnabled !== tfaEnabled) {
 			toggleTfa({
 				dispatch,
 				uiTfaEnabled: tfaEnabled,
@@ -41,18 +43,18 @@ export default function UserSettings({ settingsWindowState, setSettingsWindowAct
 	}, [tfaEnabled]);
 
 	useEffect(() => {
-		setTfaEnabled(user.tfaEnabled);
-	}, [uiState.showTfaRegistration]);
+		setTfaEnabled(userData.tfaEnabled);
+	}, []);
 
 	return (
 		<div id="user_settings" className={windowClass}>
 			<div id="close_settings"><FaChevronRight onClick={() => setSettingsWindowAction()} /></div>
-			<img src={user.avatar} alt={user.login + "'s profile picture"} />
-			<p>{user.login}</p>
+			<img src={userData.avatar} alt={userData.login + "'s profile picture"} />
+			<p>{userData.login}</p>
 			<div id="user_settings_stats">
-				<p>50% win rate</p>
-				<p>21 victories</p>
-				<p>21 defeats</p>
+				<p>{(userData.victories / (userData.victories + userData.defeats)) * 100}% win rate</p>
+				<p>{userData.victories} victories</p>
+				<p>{userData.defeats} defeats</p>
 			</div>
 			<div id="tfa_option">
 				<p>Two-factor authentication</p>
