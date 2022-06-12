@@ -59,6 +59,7 @@ function GamePlay() {
 
 	/**  stop playing the game **/
 	async function leaveGame(data: number[]) {
+		console.log("Leaving Request");
 		mainSocket?.emit("leaveGame", data);
 		return true;
 	}

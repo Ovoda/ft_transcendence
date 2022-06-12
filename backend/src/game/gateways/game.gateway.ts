@@ -69,7 +69,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage('joinGame')
 	async handleJoinGame(client: Socket, data: any) {
 		this.logger.log(`New Game Request from: ${client.id}`);
-		this.logger.log(`Current Games: ${this.games.length}`);
 		if (!this.games.length || this.games[this.games.length - 1].status === true) {
 			const newGame: GameRoom = {
 				id: "game" + client.id,
@@ -83,6 +82,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				watchers: [],
 			}
 			this.games.push(newGame);
+			this.logger.log(`Current Games: ${this.games.length}`);
 
 			await this.userService.setUserAsQueuing(data.id);
 
@@ -181,6 +181,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('leaveGame')
 	async handleLeaveGame(client: Socket, data: any) {
+
 		const game = this.games.find((game: GameRoom) => {
 			return game.socket1 === client.id || game.socket2 === client.id;
 		});
@@ -192,8 +193,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			winnerId: (data.posX > data.posY) ? game.user1 : game.user2,
 			loserId: (data.posX < data.posY) ? game.user1 : game.user2,
 		}
-		console.log(updateStatsDto);
-		return await this.gameService.saveNewStats(updateStatsDto);
+		if (data.winnerId && data.loserId) {
+			console.log(updateStatsDto);
+			return await this.gameService.saveNewStats(updateStatsDto);
+		}
 	}
 
 	@SubscribeMessage('stopWatching')
@@ -223,12 +226,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		} else if (game.socket2 === client.id) {
 			game.socket2 = null;
 		}
+
 		if (game.socket1 === null && game.socket2 === null) {
-			await this.userService.setUserAsConnected(game.user1);
-			await this.userService.setUserAsConnected(game.user2);
-			this.server.emit("FriendConnection", game.user1);
-			this.server.emit("FriendConnection", game.user2);
+			if (game.user1) {
+				await this.userService.setUserAsConnected(game.user1);
+				this.server.emit("FriendConnection", game.user1);
+			}
+			if (game.user2) {
+				await this.userService.setUserAsConnected(game.user2);
+				this.server.emit("FriendConnection", game.user2);
+			}
 			_.remove(this.games, game);
+			this.logger.log(`Current Games: ${this.games.length}`);
 		}
 	}
 
