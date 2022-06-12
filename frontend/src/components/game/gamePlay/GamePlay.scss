@@ -4,14 +4,13 @@
 	justify-content: center;
 	align-items: center;
 	box-sizing: border-box;
-	//background-color: darkred;
 
 	.score {
 		justify-content: center;
 	}
 
 	button {
-		margin-top: 10rem;
+		margin-top: 5rem;
 	}
 
 	#score_container {
@@ -36,6 +35,8 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		max-width: 1000rem;
+		max-height: 700rem;
 		width: 80%;
 		margin: auto;
 		height: 80%;
