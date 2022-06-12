@@ -1,11 +1,13 @@
 import Button from "assets/Button/Button";
 import SwitchButton from "assets/SwitchButton/SwitchButton";
 import { closeGameOptions } from "features/uiState/uiState.slice";
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { FaSearch } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import ClientSocket from "services/websocket.service";
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
+import GamePlay from "../gamePlay/gamePlay";
 import { setInitialBallState } from "../gamePlay/interfaces/ball.interface";
 import GameCanvas from "../gamePlay/interfaces/gameCanvas.interface";
 import Gameplay from "../gamePlay/interfaces/gameplay.interface";
@@ -15,17 +17,17 @@ import "./selectOptions.scss"
 
 interface Props {
 	setGameplay: Dispatch<SetStateAction<Gameplay>>;
+	gameplay: Gameplay;
 	gameCanvas: GameCanvas;
 }
 
-export default function SelectOptions({ setGameplay, gameCanvas }: Props) {
+export default function SelectOptions({ setGameplay, gameplay, gameCanvas }: Props) {
 
 	//Global Data
 	const { uiState, user } = useSelector((store: Store) => store);
 	const mainSocket: ClientSocket | null = useContext(mainSocketContext);
 
 	/** Variables */
-	const [darkModeActivated, setDarkModeActivated] = useState<boolean>(false);
 	const [fastModeActivated, setFastModeActivated] = useState<boolean>(false);
 	const [longModeActivated, setLongModeActivated] = useState<boolean>(false);
 
@@ -33,10 +35,11 @@ export default function SelectOptions({ setGameplay, gameCanvas }: Props) {
 	const dispatch = useDispatch();
 
 	async function launchPlaying() {
+		console.log("In Launch Playing");
+		console.log("Fast Mode on?:", fastModeActivated);
 		setGameplay((gameplay: Gameplay) => {
 			return {
 				...gameplay,
-				dark: darkModeActivated,
 				fast: fastModeActivated,
 				longGame: longModeActivated,
 				ball: setInitialBallState(gameCanvas.width, gameCanvas.height),
@@ -53,6 +56,45 @@ export default function SelectOptions({ setGameplay, gameCanvas }: Props) {
 		return true;
 	}
 
+	useEffect(() => {
+		let newVX: number = gameplay.ball.velocity.x;
+		let newVY: number = gameplay.ball.velocity.y;
+
+		if (fastModeActivated) {
+			newVX = newVX + 1;
+			newVY = newVY + 1;
+			if (gameplay.ball.velocity.x < 0) {
+				newVX = gameplay.ball.velocity.x - 1;
+			}
+			if (gameplay.ball.velocity.y < 0) {
+				newVY = gameplay.ball.velocity.y - 1;
+			}
+		}
+		else {
+			newVX = newVX - 1;
+			newVY = newVY - 1;
+			if (gameplay.ball.velocity.x < 0) {
+				newVX = gameplay.ball.velocity.x + 1;
+			}
+			if (gameplay.ball.velocity.y < 0) {
+				newVY = gameplay.ball.velocity.y + 1;
+			}
+		}
+		setGameplay((gameplay: Gameplay) => {
+			return {
+				...gameplay,
+				ball: {
+					...gameplay.ball,
+					velocity: {
+						x: newVX,
+						y: newVY,
+					}
+				}
+			}
+		})
+		console.log("Switch speed: ", gameplay.ball.velocity);
+	}, [fastModeActivated]);
+
 	if (uiState.showGameOptions) {
 		return (
 			<div id="game_options_list_container">
@@ -63,13 +105,8 @@ export default function SelectOptions({ setGameplay, gameCanvas }: Props) {
 						<SwitchButton value={fastModeActivated} setValue={setFastModeActivated} />
 						<p>Fast</p>
 					</div>
-					{/*<div className="game_option_item">
-						<p>Light</p>
-						<SwitchButton value={darkModeActivated} setValue={setDarkModeActivated} />
-						<p>Dark</p>
-					</div>*/}
 					<div className="game_option_item">
-						<p>10 pts</p>
+						<p>21 pts</p>
 						<SwitchButton value={longModeActivated} setValue={setLongModeActivated} />
 						<p>42 pts</p>
 					</div>

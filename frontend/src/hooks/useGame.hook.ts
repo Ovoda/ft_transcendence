@@ -13,7 +13,8 @@ import { useSelector } from "react-redux";
 import UserData from "features/user/interfaces/user.interface";
 import { mainSocketContext } from "src";
 
-const scoreToWin: number = 50;
+const shortGameScoreToWin: number = 21;
+const longGameScoreToWin: number = 42;
 
 interface Props {
 	setGameplay: Dispatch<SetStateAction<Gameplay>>,
@@ -71,6 +72,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			} else {
 				setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
 				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+					console.log("Socket gameStatus speed: ", gameplay.ball.velocity);
+					console.log("Game fast speed?: ", gameplay.fast);
 					mainSocket.emit("animateGame", {
 						posX: gameplay.ball.position.x,
 						posY: gameplay.ball.position.y
@@ -88,6 +91,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		mainSocket.on("resumeGame", (data: UpdateBallDto) => {
 			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON })
 			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+				console.log("Socket resumeGame speed: ", gameplay.ball.velocity);
 				mainSocket?.emit("animateGame", data);
 			}
 		})
@@ -153,6 +157,10 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		})
 
 		mainSocket.on("updateScore", (data: UpdateBallDto) => {
+			let scoreToWin = shortGameScoreToWin;
+			if (gameplay.longGame) {
+				scoreToWin = longGameScoreToWin;
+			}
 			setGameplay((gameplay: Gameplay) => {
 				return {
 					...gameplay,
@@ -178,6 +186,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				}
 			}
 			else {
+				console.log("Socket updateScore speed: ", gameplay.ball.velocity);
 				mainSocket.emit("animateGame", {
 					posX: gameplay.ball.position.x,
 					posY: gameplay.ball.position.y,
