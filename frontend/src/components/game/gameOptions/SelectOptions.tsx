@@ -63,11 +63,11 @@ export default function SelectOptions({ setGameplay, gameCanvas }: Props) {
 						<SwitchButton value={fastModeActivated} setValue={setFastModeActivated} />
 						<p>Fast</p>
 					</div>
-					<div className="game_option_item">
+					{/*<div className="game_option_item">
 						<p>Light</p>
 						<SwitchButton value={darkModeActivated} setValue={setDarkModeActivated} />
 						<p>Dark</p>
-					</div>
+					</div>*/}
 					<div className="game_option_item">
 						<p>10 pts</p>
 						<SwitchButton value={longModeActivated} setValue={setLongModeActivated} />
