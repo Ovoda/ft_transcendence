@@ -52,8 +52,8 @@ export default function GroupUserList() {
                     if (role.user.id !== user.id) {
                         return (
                             <div key={index} className="group_users_list_item">
-                                <img className="group_users_list_item_img" src={role.user.avatar} alt={role.user.login + "'s avatar"} />
-                                <p>{role.user.login}</p>
+                                <img className="group_users_list_item_img" src={role.user.avatar} alt={role.user.username + "'s avatar"} />
+                                <p>{role.user.username}</p>
                                 {
                                     isMuted(role) ?
                                         <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Unmute</Button>

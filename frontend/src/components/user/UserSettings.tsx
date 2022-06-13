@@ -6,6 +6,8 @@ import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { toggleTfa } from "../../services/tfa.service";
 import UserData from "features/user/interfaces/user.interface";
+import EditProfile from "./editProfile";
+import { openEditProfile } from "features/uiState/uiState.slice";
 
 interface Props {
 	settingsWindowState: boolean;
@@ -46,11 +48,15 @@ export default function UserSettings({ settingsWindowState, setSettingsWindowAct
 		setTfaEnabled(userData.tfaEnabled);
 	}, []);
 
+	function handleOpenEditProfile() {
+		dispatch(openEditProfile());
+	}
+
 	return (
 		<div id="user_settings" className={windowClass}>
 			<div id="close_settings"><FaChevronRight onClick={() => setSettingsWindowAction()} /></div>
-			<img src={userData.avatar} alt={userData.login + "'s profile picture"} />
-			<p>{userData.login}</p>
+			<img src={userData.avatar} alt={userData.username + "'s profile picture"} />
+			<p onClick={handleOpenEditProfile}>{userData.username}</p>
 			<div id="user_settings_stats">
 				<p>{Math.round((userData.victories / (userData.victories + userData.defeats)) * 100)}% win rate</p>
 				<p>{userData.victories} victories</p>

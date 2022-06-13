@@ -4,6 +4,7 @@ import UserRelation from "src/shared/interfaces/userRelation";
 export default interface UserData {
 	id: string;
 	login: string;
+	username: string;
 	avatar: string;
 	tfaEnabled: boolean;
 	roles: UserRole[];

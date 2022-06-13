@@ -14,6 +14,9 @@ export class UserEntity {
 	@Column({ unique: true })
 	login: string;
 
+	@Column({ unique: true, nullable: true })
+	username: string;
+
 	@Column()
 	avatar: string;
 

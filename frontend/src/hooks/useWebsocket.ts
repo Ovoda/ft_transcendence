@@ -9,12 +9,13 @@ import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
+import UserRelation from "src/shared/interfaces/userRelation";
 
 
 export default function useWebsockets() {
 
     /** Global data */
-    const { chat, user } = useSelector((store: Store) => store);
+    const { chat, user, relations } = useSelector((store: Store) => store);
     const mainSocket = useContext(mainSocketContext);
 
     /** Tools */
@@ -27,6 +28,12 @@ export default function useWebsockets() {
     }
 
     const serverGroupMessageCallback = (message: GroupMessage) => {
+
+        const relation = relations.blocked.find((relation: UserRelation) =>
+            relation.counterPart.id === message.role.user.id
+        )
+        if (relation) return true;
+
         if (message.role.chatGroup.id === chat.currentRole?.chatGroup.id) {
             dispatch(addMessage(message));
         }

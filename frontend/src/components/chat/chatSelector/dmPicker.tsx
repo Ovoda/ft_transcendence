@@ -63,7 +63,7 @@ export default function DmPicker() {
 					<div key={index} onClick={() => selectDmRoom(relation)} className="dm_picker_room">
 						<img src={relation.counterPart.avatar} alt="" />
 						{/* <button onClick={() => watchingRequest(role.chatroom.name, mainSocket)}>Watch Game</button> */}
-						<p className="dm_picker_room_name">{relation.counterPart.login}</p>
+						<p className="dm_picker_room_name">{relation.counterPart.username}</p>
 
 						<span id="friend_log_status"
 							className={relation.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED

@@ -1,0 +1,58 @@
+#edit_profile_container {
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    #edit_profile {
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 2rem;
+        border-radius: 1rem;
+
+        h2 {
+            font-weight: 300;
+        }
+
+        #edit_profile_texts {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+
+            p.edit_profile_cancel {
+                margin: 0;
+                font-size: 1.4rem;
+                color: rgba(0, 0, 0, 0.5);
+                cursor: pointer;
+            }
+
+            p {
+                margin: 0;
+            }
+        }
+
+        #edit_profile_input {
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0 1rem 0;
+
+            .text_input_container {
+                margin: 0;
+            }
+        }
+    }
+}

@@ -56,6 +56,16 @@ export async function leaveGroup(groupId: string, roleId: string) {
     }
 }
 
+export async function deleteGroup(groupId: string, roleId: string) {
+    try {
+        const response = await api.delete(`/chat/group/${groupId}/${roleId}`);
+        return { response: response.data, error: "" };
+    } catch (error: any) {
+        console.log(error.response);
+        return { response: null, error: error.response.message.data };
+    }
+}
+
 /**
  * Check if a group is password protected
  * @param groupId ID of the group to check

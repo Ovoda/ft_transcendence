@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
 import { GameModule } from '../game/game.module';
 import { configService } from './config/config.service';
 import { UserModule } from '../user/user.module';
@@ -21,7 +20,6 @@ import { ImagesModule } from 'src/images/images.module';
 		RelationModule,
 		ImagesModule,
 	],
-	controllers: [AppController],
 	exports: [TypeOrmModule],
 })
 export class AppModule { }

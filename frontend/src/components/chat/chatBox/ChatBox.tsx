@@ -1,10 +1,9 @@
-import React, { UIEvent, useContext, useEffect, useState } from "react";
+import React, { UIEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import './ChatBox.scss';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
-import { mainSocketContext } from "src";
 import useLoadMessagesOnScroll from "src/hooks/useLoadMessagesOnScroll";
 import { translateMessageDate } from "services/utils.service";
 import GroupUserList from "./groupUsersList";
@@ -18,9 +17,8 @@ import ChatBoxHeader from "./chatBoxHeader";
 export default function ChatBox() {
 
 	/** Global data */
-	const { chat, user } = useSelector((store: Store) => store);
+	const { chat } = useSelector((store: Store) => store);
 	const messages = chat.messages;
-	const mainSocket = useContext(mainSocketContext);
 
 	/** Tools */
 	const dispatch = useDispatch();

@@ -1,10 +1,8 @@
 import { forwardRef, Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { throws } from "assert";
-import { use } from "passport";
 import { CrudService } from "src/app/templates/crud.service";
 import { UserService } from "src/user/user.service";
-import { Repository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 import { ChangePasswordDto } from "../dtos/changePassword.dto";
 import { CreateGroupDto } from "../dtos/createGroup.dto";
 import { CreateChatMessageDto } from "../dtos/createChatMessage.dto";
@@ -61,6 +59,24 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 			user.roles.push(roles[i]);
 		}
 		return chat;
+	}
+
+
+	async deleteGroup(groupId: string, roleId: string) {
+		const chatGroup = await this.findOneById(groupId,);
+
+		const roles = await this.chatRoleService.findMany({
+			where: {
+				chatGroup: chatGroup,
+			}
+		});
+
+		const deleted = await Promise.all(roles.items.map(async (role: ChatRoleEntity) => {
+			return await this.chatRoleService.delete(role.id);
+		}));
+		await this.delete(chatGroup.id);
+		this.socketGateway.emitToSocketRoom(groupId, "UpdateUserRoles");
+
 	}
 
 	async joinGroup(currentUser: UserEntity, joinGroupDto: JoinGroupDto) {
@@ -179,8 +195,12 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		return roles;
 	}
 
-	async GroupPasswordProtected(groupId: string) {
-		const gp = await this.findOneById(groupId);
-		return (gp.password) ? true : false;
+	async groupPasswordProtected(groupId: string) {
+		const groupe = await getRepository(ChatGroupEntity)
+			.createQueryBuilder()
+			.addSelect('password')
+			.getOne()
+		console.log("password: ", groupe.password);
+		return (groupe.password) ? true : false;
 	}
 }

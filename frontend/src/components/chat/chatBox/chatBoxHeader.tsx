@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
 import settings_image from 'images/settings.png';
-import { leaveGroup } from "services/group.api.service";
+import { deleteGroup, leaveGroup } from "services/group.api.service";
 import './chatBoxHeader.scss';
 
 interface Props {
@@ -46,6 +46,12 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
         return false;
     }
 
+    async function handleDeleteGroup() {
+        if (!chat.currentRole) return false;
+        await deleteGroup(chat.currentRole?.chatGroup.id, chat.currentRole.id);
+        return false;
+    }
+
     /** Effects */
     useEffect(() => {
         if (chat.currentRelation) {
@@ -58,7 +64,7 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
     if (chat.currentRelation) {
         return (
             <div className={"chat_box_header"}>
-                <p className="chat_box_header_title">{chat.currentRelation?.counterPart.login}</p>
+                <p className="chat_box_header_title">{chat.currentRelation?.counterPart.username}</p>
                 {
                     chat.currentRelation?.counterPart.activityStatus === UserActivityStatusEnum.PLAYING &&
                     <Button onClick={handleWatchRequest}>Watch</Button>
@@ -76,7 +82,10 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
                 <p className="chat_box_header_title">{chat.currentRole.chatGroup.name}</p>
                 {
                     chat.currentRole?.role === RoleTypeEnum.OWNER &&
-                    <img onClick={handleOpenSettings} src={settings_image} alt="" />
+                    <>
+                        <Button id="delete_group_button" onClick={handleDeleteGroup}>Delete</Button>
+                        <img onClick={handleOpenSettings} src={settings_image} alt="" />
+                    </>
                 }
                 {
                     chat.currentRole?.role !== RoleTypeEnum.OWNER &&

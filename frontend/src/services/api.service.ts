@@ -4,6 +4,7 @@ import { RoleTypeEnum } from "enums/roleType.enum";
 import { config } from "../app/config";
 import UserData from "../features/user/interfaces/user.interface";
 import CreateRoomDto from "./interfaces/CreateRoom.dto";
+import UpdateUserDto from "./interfaces/updateUser.dto";
 import { UserRelationsEnum } from "./interfaces/userRelation.enum";
 
 /** Superset of axios, fills baseURL and enables credentials */
@@ -22,6 +23,18 @@ export async function getUserData() {
         return ({ userData: response.data, error: "" });
     } catch (error: any) {
         return ({ userData: null, error: error.response.data.message });
+    }
+}
+
+export async function updateUser(updateUserDto: UpdateUserDto) {
+    try {
+        const response = await api.patch("/user", updateUserDto);
+        return ({ newUser: response.data, error: "" });
+    } catch (error: any) {
+        if (error.response.status === 400) {
+            return ({ newUser: null, error: "Username already taken" });
+        }
+        return ({ newUser: null, error: error.response.data.message });
     }
 }
 
@@ -117,7 +130,6 @@ export async function updateRelation(relationId: string, status: RelationTypeEnu
 export async function deleteRelation(relationId: string) {
     try {
         const ret = await api.delete(`/relation/${relationId}`);
-        console.log(ret);
     } catch (err: any) {
         console.log(err);
     }

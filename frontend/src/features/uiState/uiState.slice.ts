@@ -6,6 +6,7 @@ const initialState: UiState = {
 	logged: false,
 	showTfaRegistration: false,
 	showGameOptions: false,
+	showEditProfile: false,
 	notification: "",
 }
 
@@ -37,6 +38,12 @@ const uiState = createSlice({
 		closeGameOptions(state) {
 			return { ...state, showGameOptions: false }
 		},
+		openEditProfile(state) {
+			return { ...state, showEditProfile: true };
+		},
+		closeEditProfile(state) {
+			return { ...state, showEditProfile: false };
+		}
 	}
 })
 
@@ -49,6 +56,8 @@ export const {
 	setNotification,
 	openGameOptions,
 	closeGameOptions,
+	openEditProfile,
+	closeEditProfile
 } = uiState.actions;
 
 export default uiState.reducer;

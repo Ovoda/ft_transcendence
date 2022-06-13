@@ -148,7 +148,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 						...gameplay,
 						playerLeft: {
 							...gameplay.playerLeft,
-							login: userData.login,
+							login: userData.username,
 						}
 					}
 				})
@@ -163,7 +163,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 						...gameplay,
 						playerRight: {
 							...gameplay.playerRight,
-							login: userData.login,
+							login: userData.username,
 						}
 					}
 				})

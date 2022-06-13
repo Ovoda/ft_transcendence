@@ -7,7 +7,7 @@ import Button from "assets/Button/Button";
 import { closeChatRoomCreationModal, openChatRoomCreationModal } from "features/chat/chat.slice";
 import close from 'images/close.png';
 import { createRoom, getUserData } from "services/api.service";
-import { updateUser } from "features/user/user.slice";
+import { updateUserData } from "features/user/user.slice";
 import UsersList, { UserListTypeEnum } from "../lists/usersList";
 
 interface Props {
@@ -58,7 +58,7 @@ export default function AddGroup({ className, swap }: Props) {
 
         const { userData } = await getUserData();
         if (!userData) return false;
-        dispatch(updateUser(userData));
+        dispatch(updateUserData(userData));
         dispatch(closeChatRoomCreationModal());
         return false;
     }
