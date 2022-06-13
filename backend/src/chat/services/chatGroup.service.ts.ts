@@ -20,6 +20,8 @@ import { ChatRoleService } from "./chatRole.service";
 import { WrongPassword } from "../exceptions/wrongPassword.exception";
 import { UserEntity } from "src/user/entities/user.entity";
 import JoinGroupDto from "../dtos/joinGroupDto";
+import UserAlreadyInGroup from "../exceptions/UserAlreadyInGroup.exception";
+import { SocketGateway } from "src/websockets/socket.gateway";
 
 @Injectable()
 export class ChatGroupService extends CrudService<ChatGroupEntity>{
@@ -31,16 +33,24 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		private readonly chatMessageService: ChatMessageService,
 		private readonly chatPasswordService: ChatPasswordService,
 		protected readonly userService: UserService,
+		@Inject(forwardRef(() => SocketGateway))
+		private readonly socketGateway: SocketGateway,
 		protected readonly _log: Logger,
 	) {
 		super(_repository, _log);
 	}
 
 	async createGroup(dto: CreateGroupDto, roles: ChatRoleEntity[]) {
+
+		const password = await this.chatPasswordService.encryptPassword(dto.password);
+		console.log(password);
+
 		const chat = await this.save({
 			name: dto.name,
 			users: roles,
-		})
+			password,
+		});
+
 		for (let i = 0; i < roles.length; i++) {
 			await this.chatRoleService.updateById(roles[i].id, {
 				chatGroup: chat,
@@ -53,23 +63,47 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		return chat;
 	}
 
-	async joinGroup(user: UserEntity, joinGroupDto: JoinGroupDto) {
-		const group = await this.findOneById(joinGroupDto.groupId, { relations: ["users"] });
+	async joinGroup(currentUser: UserEntity, joinGroupDto: JoinGroupDto) {
 
-		if (!await this.chatPasswordService.verifyPassword(
+		/** Check if user is already in the group */
+		if (await this.checkUserInGroup(currentUser.id, joinGroupDto.groupId)) {
+			throw new UserAlreadyInGroup();
+		}
+
+		/** Verify group password */
+		const group = await this.findOneById(joinGroupDto.groupId, { relations: ["users"], });
+		if (group.password && !await this.chatPasswordService.verifyPassword(
 			joinGroupDto.password, group.password)) {
 			throw new UnauthorizedException();
 		}
 
+		/** Create new group user role */
 		const newRole = await this.chatRoleService.save({
 			expires: null,
 			role: RoleTypeEnum.LAMBDA,
-			user: user,
-			chatGroup: group,
+			user: currentUser,
 		});
 
+		/** Add user/role to group */
 		group.users.push(newRole);
-		return await this.save(group);
+
+		/** Save new group */
+		const newGroup = await this.save(group);
+
+		/** Emit event to refresh infos in user's frontend */
+		this.socketGateway.updateRoles(newRole.role, newGroup.name, currentUser.id);
+
+		/** Update and return new role */
+		return await this.chatRoleService.updateById(newRole.id, {
+			chatGroup: newGroup,
+		});
+	}
+
+	async checkUserInGroup(userId: string, groupId: string) {
+		const roles = await this.chatRoleService.getAllRolesFromUserId(userId);
+		const group = roles.find((role: ChatRoleEntity) => role.chatGroup.id === groupId);
+		if (group) return true;
+		return false;
 	}
 
 	async checkLastMessage(room_id: string) {

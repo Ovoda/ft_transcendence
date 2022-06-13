@@ -20,6 +20,7 @@ import { NotCurrentUserRole } from "../exceptions/notCurrentUserRole.exception";
 import { WebsocketsService } from "src/websockets/websockets.service";
 import { SocketGateway } from "src/websockets/socket.gateway";
 import JoinGroupDto from "../dtos/joinGroupDto";
+import * as _ from 'lodash';
 
 @Injectable()
 export class ChatRoleService extends CrudService<ChatRoleEntity>{
@@ -223,21 +224,27 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	}
 
 	async kickUserAndRole(userIdCaller: string, roomId: string, KickRoleId: string) {
-		const caller = await this.userService.findOneById(userIdCaller);
-		const callerRole: ChatRoleEntity = await this.findOne({ where: { user: caller } });
-		if (callerRole.role !== RoleTypeEnum.OWNER && callerRole.role !== RoleTypeEnum.ADMIN) {
+
+		/** Get caller entity and role entity */
+		const chatGroup = await this.chatGroupService.findOneById(roomId, { relations: ['users'] });
+		const callerRole = chatGroup.users.find((role: ChatRoleEntity) => role.user.id === userIdCaller);
+
+		/** Check if caller is authorized to kick */
+		if (callerRole.role !== RoleTypeEnum.OWNER
+			&& callerRole.role !== RoleTypeEnum.ADMIN
+			&& callerRole.id !== KickRoleId) {
 			throw new UserUnauthorized("You are not admin or owner of this chat group");
 		}
-		const chatGroup = await this.chatGroupService.findOneById(roomId, { relations: ['users'] });
-		let oldUsers = chatGroup.users;
-		let newUsers = [];
-		for (let i = 0; i < oldUsers.length; i++) {
-			if (KickRoleId !== oldUsers[i].id) {
-				newUsers.push(oldUsers[i]);
-			}
-		}
-		chatGroup.users = newUsers;
-		return await this.chatGroupService.save(chatGroup);
+
+		/** Remove role from group's user list and datatase(!!) */
+		_.remove(chatGroup.users, { id: KickRoleId });
+		await this.delete(KickRoleId);
+
+		/** Save new group entity */
+		await this.chatGroupService.save(chatGroup);
+
+		/** Emit event to client */
+		this.socketGateway.updateRoles(RoleTypeEnum.BANNED, chatGroup.name, userIdCaller);
 	}
 
 	async getAllRolesFromUserId(userId: string) {

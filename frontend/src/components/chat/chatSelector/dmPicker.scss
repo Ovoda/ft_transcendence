@@ -12,6 +12,13 @@
     border-radius: 1rem;
 
     padding: 1rem;
+    overflow-x: hidden;
+    overflow-y: visible;
+    max-width: 100%;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
     .dm_picker_room {
         position: relative;

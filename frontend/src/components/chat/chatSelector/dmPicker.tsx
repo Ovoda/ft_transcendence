@@ -1,15 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import { closeChatDm, openChatDm, openChatGroup, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
+import { closeChat, openChatDm, openChatGroup, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
 import './dmPicker.scss';
-import "./RoomCreation.scss";
+import "./roomCreation.scss";
 import Button from "assets/Button/Button";
-import AddRoomMenu, { RoomMenuType } from "./AddRoomMenu";
 import { getMessages, getRelation, getRole } from "services/api.service";
 import UserRelation from "src/shared/interfaces/userRelation";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import UserRole from "src/shared/interfaces/role.interface";
 import { useState } from "react";
+import AddRoomMenu, { RoomMenuType } from "./addRoom/addRoomModal";
 
 export default function DmPicker() {
 
@@ -24,7 +24,7 @@ export default function DmPicker() {
 
 	async function selectDmRoom(relation: UserRelation) {
 		if (chat.currentRelation?.id === relation.id) {
-			dispatch(closeChatDm());
+			dispatch(closeChat());
 			return;
 		}
 		const updatedRelation = await getRelation(relation.id);
@@ -35,7 +35,7 @@ export default function DmPicker() {
 
 	async function selectGroupRoom(role: UserRole) {
 		if (chat.currentRole?.id === role.id) {
-			dispatch(closeChatDm());
+			dispatch(closeChat());
 			return;
 		}
 

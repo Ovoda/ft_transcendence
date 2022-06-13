@@ -39,7 +39,7 @@ const chat = createSlice({
 				messages: action.payload.messages,
 			};
 		},
-		closeChatDm(state) {
+		closeChat(state) {
 			return {
 				...state,
 				displayChatBox: false,
@@ -55,8 +55,6 @@ const chat = createSlice({
 			return { ...state, displayRoomCreationModal: false };
 		},
 		addMessage(state, action) {
-			console.log(action.payload);
-
 			return { ...state, messages: [...state.messages, action.payload] };
 		},
 		addMessageFromBack(state, action) {
@@ -75,7 +73,7 @@ export const {
 	updateRoomtype,
 	openChatDm,
 	openChatGroup,
-	closeChatDm,
+	closeChat,
 	addMessage,
 	setMessages,
 	addMessageFromBack,

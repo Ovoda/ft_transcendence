@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import UserRole from "src/shared/interfaces/role.interface";
 import RolesSlice from "./interfaces/roles.interface";
 
 const initialState: RolesSlice = {
@@ -7,7 +8,7 @@ const initialState: RolesSlice = {
 }
 
 const roles = createSlice({
-    name: "relations",
+    name: "roles",
     initialState,
     reducers: {
         updateCurrentRole(state, action): RolesSlice {

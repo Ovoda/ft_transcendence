@@ -8,20 +8,6 @@
 	justify-content: space-between;
 	position: relative;
 
-	.chat_box_header {
-		box-sizing: border-box;
-
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-
-		img {
-			padding: 1rem;
-			max-width: 20px;
-			cursor: pointer;
-		}
-	}
-
 	.chat_box_settings_container {
 		box-sizing: border-box;
 		height: 0%;

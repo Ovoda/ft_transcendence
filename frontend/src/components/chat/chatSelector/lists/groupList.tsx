@@ -1,10 +1,9 @@
-import Button from "assets/Button/Button";
-import UserData from "features/user/interfaces/user.interface";
 import { useEffect, useState } from "react";
-import { getAllGroups, getAllUsers } from "services/api.service";
+import { getAllGroups } from "services/group.api.service";
 import Group from "src/shared/interfaces/group.interface";
-import { BlockAddButtons } from "./blockAddButtons";
 import './usersList.scss';
+import './groupList.scss';
+import Button from "assets/Button/Button";
 
 interface Props {
     onClick?: any;
@@ -24,18 +23,25 @@ export default function GroupList({ onClick }: Props) {
             setGroups(groups);
         }
         fetchAllGroups();
+        console.log(groups);
+
     }, []);
 
     return (
-        <div className="users_list" >
+        <div id="join_group_list" >
             {
-                groups &&
+                groups.length > 0 &&
                 groups.map((group: Group, index: number) =>
-                    <div key={index} className="users_list_item">
-                        <img src="https://42.fr/wp-content/uploads/2021/08/42.jpg" alt="" />
+                    <div key={index} className="join_group_list_item">
+                        <img className="join_group_list_item_image" src="https://42.fr/wp-content/uploads/2021/08/42.jpg" alt="" />
                         <p>{group.name}</p>
+                        <Button onClick={async () => { return onClick(group) }}>Join</Button>
                     </div>
                 )
+            }
+            {
+                groups.length <= 0 &&
+                <p>No groups yet...</p>
             }
         </div >
     );

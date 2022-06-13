@@ -16,7 +16,7 @@ export class ChatRoleEntity {
 	@Column()
 	role: RoleTypeEnum;
 
-	@ManyToOne(() => UserEntity, user => user.roles)
+	@ManyToOne(() => UserEntity, user => user.roles, { eager: true })
 	user: UserEntity;
 
 	@ManyToOne(() => ChatGroupEntity, { nullable: true, eager: true })

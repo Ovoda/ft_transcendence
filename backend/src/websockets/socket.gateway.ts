@@ -209,7 +209,7 @@ export class SocketGateway implements OnGatewayDisconnect {
         })
     }
 
-    public updateRoles(newRole: string, groupName: string, userId: string) {
+    public updateRoles(newRole: RoleTypeEnum, groupName: string, userId: string) {
         let message = "";
 
         if (newRole === RoleTypeEnum.BANNED) {

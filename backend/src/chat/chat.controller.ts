@@ -22,15 +22,22 @@ export class ChatController {
 	) { }
 
 	@UseGuards(TfaGuard)
+	@Get("group/find/:group_id")
+	@HttpCode(200)
+	async getGroup(
+		@Param("group_id") groupId: string) {
+		return await this.chatGroupService.findOneById(groupId, { relations: ["users"] });
+	}
+
+	@UseGuards(TfaGuard)
 	@Get("group/many")
 	@HttpCode(200)
 	async getGroups() {
-		console.log("in route");
-
-		return await this.chatGroupService.findMany({
+		const groups = await this.chatGroupService.findMany({
 			page: 1,
 			limit: 1000,
 		});
+		return groups.items;
 	}
 
 	@UseGuards(TfaGuard)
@@ -59,7 +66,6 @@ export class ChatController {
 		return await this.chatRoleService.getRole(roleId, req.user.id);
 	}
 
-	// return true or false.
 	@UseGuards(TfaGuard)
 	@Get('haspassword/role/:roleId')
 	@HttpCode(200)
@@ -68,7 +74,7 @@ export class ChatController {
 	}
 
 	@UseGuards(TfaGuard)
-	@Get('haspassword/group/:groupId')
+	@Get('/group/protected/:groupId')
 	@HttpCode(200)
 	async groupRequirePassword(@Request() req, @Param('groupId') groupId: string) {
 		return await this.chatGroupService.GroupPasswordProtected(groupId)
@@ -146,7 +152,7 @@ export class ChatController {
 	}
 
 	@UseGuards(TfaGuard)
-	@Patch('kick/group/:groupIs/:roleId')
+	@Patch('/group/kick/:groupId/:roleId')
 	@HttpCode(200)
 	async kickUserFromRoom(
 		@Request() req,
@@ -172,5 +178,6 @@ export class ChatController {
 	) {
 		return await this.chatGroupService.getAllRolesFromGroupId(req.user.id, groupId);
 	}
+
 
 }

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import AddFriend from "./AddFriend";
-import './AddRoomMenu.scss';
-import AddGroup from "./AddGroup";
+import AddFriend from "./addFriend";
+import './addRoomModal.scss';
+import AddGroup from "./addGroup";
 import close from 'images/close.png';
 import { closeChatRoomCreationModal } from "features/chat/chat.slice";
 import JoinGroup from "./joinGroup";
@@ -48,8 +48,8 @@ export default function AddRoomMenu({ menuType }: Props) {
                         {
                             menuType === RoomMenuType.GROUP &&
                             <>
-                                <AddGroup className={pos} swap={swapCreation} />
                                 <JoinGroup className={pos} swap={swapCreation} />
+                                <AddGroup className={pos} swap={swapCreation} />
                             </>
                         }
                     </div>

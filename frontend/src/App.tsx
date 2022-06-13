@@ -33,7 +33,6 @@ function App() {
     if (roleSlice) {
       roleSlice.roles.map((role: UserRole) => {
         mainSocket?.leaveDm(role.chatGroup.id);
-        console.log("listening on ", role.chatGroup.id);
         mainSocket?.joinDm(role.chatGroup.id);
       });
     }

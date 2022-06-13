@@ -2,17 +2,17 @@ import React, { UIEvent, useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import './chatBox.scss';
-import settings_image from 'images/settings.png';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
 import { mainSocketContext } from "src";
 import useLoadMessagesOnScroll from "src/hooks/useLoadMessagesOnScroll";
 import { translateMessageDate } from "services/utils.service";
 import GroupUserList from "./groupUsersList";
-import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import { api } from "services/api.service";
 import { addMessageFromBack } from "features/chat/chat.slice";
 import ChatSender from "./chatSender";
+import { RoleTypeEnum } from "enums/roleType.enum";
+import ChatBoxHeader from "./chatBoxHeader";
 
 
 export default function ChatBox() {
@@ -33,35 +33,6 @@ export default function ChatBox() {
 
 	/** Hooks */
 	useLoadMessagesOnScroll({ firstMessage, setFirstMessage, scrolledToTop });
-
-	function handleOpenSettings() {
-		setOpenSettings((settings: string) => {
-			if (settings === "") {
-				return ("chat_box_settings_container_open");
-			}
-			return ("");
-		})
-	}
-
-	async function handleWatchRequest() {
-		mainSocket?.watchingRequest(
-			{
-				watched: chat.currentRelation?.counterPart.id as string,
-				watcher: user.id,
-			});
-		return false;
-	}
-
-	async function handlePlayRequest() {
-		mainSocket?.playingRequest(
-			{
-				userRequested: chat.currentRelation?.counterPart.id as string,
-				userRequesting: user.id,
-			}
-		)
-		return false;
-	}
-
 
 	function handleScroll(event: UIEvent<HTMLDivElement>) {
 		const target = event.target as HTMLInputElement;
@@ -88,35 +59,21 @@ export default function ChatBox() {
 
 	return (
 		<div className='chat_box'>
-			<div className={"chat_box_header"}>
-				<h3>{chat.currentRelation?.counterPart.login}</h3>
-				{
-					chat.currentRelation?.counterPart.activityStatus === UserActivityStatusEnum.PLAYING &&
-					<Button onClick={handleWatchRequest}>Watch</Button>
-				}
-				{
-					chat.currentRelation?.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED &&
-					<Button onClick={handlePlayRequest}>Play</Button>
-				}
-				{
-					chat.currentRole &&
-					<>
-						<p>{chat.currentRole.chatGroup.name}</p>
-						<img onClick={handleOpenSettings} src={settings_image} alt="" />
-					</>
-				}
-			</div>
+			<ChatBoxHeader setOpenSettings={setOpenSettings} />
 			<div id="chat_messages_container" onScroll={handleScroll}>
-				<div className={"chat_box_settings_container " + openSettings}>
-					<div className="chat_box_settings">
-						<div className="chat_box_settings_password">
-							<p>Set room password</p>
-							<TextInput text={roomPassword} setText={setRoomPassword} type="password" name="room_password" placeholder="Password" />
-							<Button onClick={async () => { return false }}>Next</Button>
+				{
+					chat.currentRole?.role === RoleTypeEnum.OWNER &&
+					<div className={"chat_box_settings_container " + openSettings}>
+						<div className="chat_box_settings">
+							<div className="chat_box_settings_password">
+								<p>Set room password</p>
+								<TextInput text={roomPassword} setText={setRoomPassword} type="password" name="room_password" placeholder="Password" />
+								<Button onClick={async () => { return false }}>Next</Button>
+							</div>
+							<GroupUserList />
 						</div>
-						<GroupUserList />
 					</div>
-				</div>
+				}
 				<div id="chat_messages" onScroll={handleScroll}>
 					{
 						messages &&
@@ -137,6 +94,6 @@ export default function ChatBox() {
 				</div>
 			</div>
 			<ChatSender />
-		</div>
+		</div >
 	);
 }

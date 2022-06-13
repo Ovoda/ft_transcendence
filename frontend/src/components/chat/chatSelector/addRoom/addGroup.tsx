@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { RoomTypeEnum } from "enums/RoomType.enum";
-import TextInput from "../../../assets/TextInput/TextInput";
+import TextInput from "../../../../assets/TextInput/TextInput";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import Button from "assets/Button/Button";
 import { closeChatRoomCreationModal, openChatRoomCreationModal } from "features/chat/chat.slice";
 import close from 'images/close.png';
-import { createRoom } from "services/api.service";
+import { createRoom, getUserData } from "services/api.service";
 import { updateUser } from "features/user/user.slice";
-import UsersList, { UserListTypeEnum } from "./usersList";
+import UsersList, { UserListTypeEnum } from "../lists/usersList";
 
 interface Props {
     className: string;
@@ -45,18 +45,20 @@ export default function AddGroup({ className, swap }: Props) {
             return false;
         }
 
-        const response = await createRoom({
+        const { data, error } = await createRoom({
             name: groupName,
             ids: users,
             password: password,
         });
 
-        if (!response.data) {
-            setErrorText(response.error);
+        if (error) {
+            setErrorText(error);
             return false;
         }
 
-        dispatch(updateUser(response.data));
+        const { userData } = await getUserData();
+        if (!userData) return false;
+        dispatch(updateUser(userData));
         dispatch(closeChatRoomCreationModal());
         return false;
     }
@@ -89,7 +91,7 @@ export default function AddGroup({ className, swap }: Props) {
             }
 
             <div id="room_creation_modal_nav">
-                <p onClick={swap} className="link">Add a friend</p>
+                <p onClick={swap} className="link">Join group</p>
                 <Button onClick={handleRoomCreation}>Next</Button>
             </div>
         </div>

@@ -16,11 +16,12 @@ export const api = axios.create({
  * Fetch current user data from api
  * @returns user data if successfull requests, null otherwise
  */
-export async function getUserData(): Promise<UserData | null | undefined> {
+export async function getUserData() {
     try {
         const response = await api.get("/user");
-        return response.data as UserData;
+        return ({ userData: response.data, error: "" });
     } catch (error: any) {
+        return ({ userData: null, error: error.response.data.message });
     }
 }
 
@@ -28,7 +29,6 @@ export async function getMessages(lastMessage: string, roleId: string = "") {
     if (!lastMessage) return { messages: [], error: "Last message is null" };
     try {
         const url = (roleId === "") ? `chat/many/message/dm/${lastMessage}` : `chat/many/message/group/${roleId}/${lastMessage}`;
-        console.log(url);
         const response = await api.get(url);
 
         return { messages: response.data, error: "" };
@@ -44,10 +44,9 @@ export async function getMessages(lastMessage: string, roleId: string = "") {
  */
 export async function createRoom(createRoomDto: CreateRoomDto) {
     try {
-        await api.post("/chat/group/create", createRoomDto);
-        return { data: await getUserData(), error: "" }
+        const response = await api.post("/chat/group/create", createRoomDto);
+        return { data: response.data, error: "" }
     } catch (error: any) {
-        console.log(error.response);
         if (error.response.status === 404) {
             return { data: null, error: "User not found" };
         }
@@ -63,11 +62,8 @@ export async function createRoom(createRoomDto: CreateRoomDto) {
 export async function getAllUsers(limit: number, page: number) {
     try {
         const ret = await api.get(`/user/many?limit=${limit}&page=${page}`);
-        console.log(ret.data);
-
         return { data: ret.data, error: "" }
     } catch (error: any) {
-        console.log(error.response);
         return { data: null, error: error.response.data.message }
     }
 }
@@ -134,11 +130,9 @@ export async function deleteRelation(relationId: string) {
 export async function getAllRelations() {
     try {
         const ret = await api.get("/relation/many");
-        return { data: ret.data, error: "" }
+        return { userRelations: ret.data, error: "" }
     } catch (error: any) {
-        console.log(error.response);
-
-        return { data: null, error: error.response.data.message }
+        return { userRelations: null, error: error.response.data.message }
     }
 }
 
@@ -154,9 +148,9 @@ export async function getRelation(relationId: string) {
 export async function getAllRoles() {
     try {
         const ret = await api.get("/chat/all/roles");
-        return { data: ret.data, error: "" }
+        return { userRoles: ret.data, error: "" }
     } catch (error: any) {
-        return { data: null, error: error.response.data.message }
+        return { userRoles: null, error: error.response.data.message }
     }
 }
 
@@ -180,29 +174,5 @@ export async function updateUserRole(userId: string, groupId: string, newRole: R
     } catch (error: any) {
         console.log(error.response);
         return false;
-    }
-}
-
-export async function getAllGroups() {
-    try {
-        const ret = await api.get("/chat/group/many");
-        console.log(ret.data);
-        return { groups: ret.data, error: "" };
-    } catch (error: any) {
-        console.log(error.response);
-        return { groups: null, error: error.response.data.message };
-    }
-}
-
-export async function joinGroup(groupId: string, password: string = "") {
-    try {
-        const ret = await api.patch("/group/join", {
-            groupId,
-            password,
-        });
-        return { response: ret.data, error: "" }
-    } catch (error: any) {
-        console.log(error.response);
-        return { response: null, error: error.response.data.message }
     }
 }

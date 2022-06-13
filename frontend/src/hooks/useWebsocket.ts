@@ -33,19 +33,16 @@ export default function useWebsockets() {
     }
 
     const reFetchRelations = async (userId: string) => {
-
-        console.log("refreshing");
-
-        const userRelation = await getAllRelations();
-        if (userRelation.data) {
-            dispatch(setRelations(userRelation.data));
+        const { userRelations } = await getAllRelations();
+        if (userRelations) {
+            dispatch(setRelations(userRelations));
         }
     }
 
     const reFetchRoles = async (notification: any) => {
-        const userRoles = await getAllRoles();
-        if (userRoles.data) {
-            dispatch(setRoles(userRoles.data));
+        const { userRoles } = await getAllRoles();
+        if (userRoles) {
+            dispatch(setRoles(userRoles));
         }
         if (notification)
             dispatch(setNotification(notification));
