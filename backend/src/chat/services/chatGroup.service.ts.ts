@@ -41,7 +41,6 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 	async createGroup(dto: CreateGroupDto, roles: ChatRoleEntity[]) {
 
 		const password = await this.chatPasswordService.encryptPassword(dto.password);
-		console.log(password);
 
 		const chat = await this.save({
 			name: dto.name,
@@ -175,7 +174,7 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		if (role.user.id !== userId || role.role !== RoleTypeEnum.OWNER) {
 			throw new UserUnauthorized("This user cannot change password");
 		}
-		const room = await this.findOneById(roomId);
+		const room = await this.findOneById(roomId, {relations: ['password']});
 		if (!this.chatPasswordService.verifyPassword(changePassword.oldPassword, room.password)) {
 			throw new WrongPassword('Old password is wrong');
 		}
@@ -196,11 +195,7 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 	}
 
 	async groupPasswordProtected(groupId: string) {
-		const groupe = await getRepository(ChatGroupEntity)
-			.createQueryBuilder()
-			.addSelect('password')
-			.getOne()
-		console.log("password: ", groupe.password);
-		return (groupe.password) ? true : false;
+		const group = await this.findOneById(groupId);
+		return (group.password) ? true : false;
 	}
 }

@@ -73,7 +73,9 @@ export async function deleteGroup(groupId: string, roleId: string) {
  */
 export async function checkGroupProtection(groupId: string) {
     try {
+		console.log("here");
         const ret = await api.get(`/chat/group/protected/${groupId}`);
+		console.log("checkGroupPro:", ret.data);
         return { isProtected: ret.data, error: "" }
     } catch (error: any) {
         return { response: null, error: error.response.data.message }

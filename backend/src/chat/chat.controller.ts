@@ -11,6 +11,7 @@ import { TransferPasswordDto } from './dtos/transferPassword.dto';
 import { JwtRequest } from 'src/auth/interfaces/jwtRequest.interface';
 import { SocketGateway } from 'src/websockets/socket.gateway';
 import JoinGroupDto from './dtos/joinGroupDto';
+import { forEach } from 'lodash';
 
 @Controller('chat')
 export class ChatController {
@@ -45,6 +46,7 @@ export class ChatController {
 		const groups = await this.chatGroupService.findMany({
 			page: 1,
 			limit: 1000,
+			select: ['groupAvatar', 'id', 'lastMessage', 'name']
 		});
 		return groups.items;
 	}
@@ -86,7 +88,8 @@ export class ChatController {
 	@Get('/group/protected/:groupId')
 	@HttpCode(200)
 	async groupRequirePassword(@Request() req, @Param('groupId') groupId: string) {
-		return await this.chatGroupService.groupPasswordProtected(groupId);
+		const tmp = await this.chatGroupService.groupPasswordProtected(groupId);
+		return tmp;
 	}
 
 
