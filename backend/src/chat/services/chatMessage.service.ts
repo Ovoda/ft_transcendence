@@ -70,7 +70,7 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		return blockedUserIds.includes(messageUserId);
 	}
 
-	async getManyMessagesFromId(getterId: string, messageId: string, limit?: number) {
+	async getManyMessagesFromId(getterId: string, messageId: string, onScroll: boolean, limit?: number) {
 		//let messages: ChatMessageEntity[] = [];
 		let message = await this.findOneById(messageId);
 		let msg = await this.buildMessageFromEntity(message);
@@ -96,7 +96,7 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 
 		console.log(blockedUsers);
 
-		let valid = await this.filterBlockedMessages(blockedUsers, message.userId);
+		let valid = this.filterBlockedMessages(blockedUsers, message.userId);
 		if (!valid) {
 			messages.push(msg);
 		}
@@ -118,7 +118,7 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 				msg = tmpmsg;
 			}
 		}
-		return messages;
+		return (onScroll && !messages[messages.length - 1].prev_message) ? [] : messages;
 	}
 
 	/**

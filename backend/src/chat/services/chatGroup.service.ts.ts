@@ -138,12 +138,12 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		return chat;
 	}
 
-	async getChatGroupManyMessages(userId: string, room_id: string, limit: number) {
+	async getChatGroupManyMessages(userId: string, room_id: string, limit: number, onScroll: boolean) {
 		const lastMessageId = await this.checkLastMessage(room_id);
 		if (!lastMessageId) {
 			throw new noMessagesYet("No message in chat room yet.");
 		}
-		const messages = await this.chatMessageService.getManyMessagesFromId(userId, lastMessageId, limit);
+		const messages = await this.chatMessageService.getManyMessagesFromId(userId, lastMessageId, onScroll, limit);
 		const obj = {
 			prev_message: messages[messages.length - 1].prev_message,
 			messages: messages,

@@ -114,7 +114,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	 * @param role_id the role trying to get messages.
 	 * @returns array of messages if given role is not banned, undefined either.
 	 */
-	async getManyMessagesFromRole(userId: string, role_id: string, message_id: string, limit: number) {
+	async getManyMessagesFromRole(userId: string, role_id: string, message_id: string, limit: number, onScroll: boolean) {
 		const role = await this.findOneById(role_id, {
 			relations: ['user'],
 		});
@@ -124,7 +124,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (role.role === RoleTypeEnum.BANNED) {
 			throw new UserUnauthorized("User is banned from this room");
 		}
-		return await this.chatMessageService.getManyMessagesFromId(userId, message_id, limit);
+		return await this.chatMessageService.getManyMessagesFromId(userId, message_id, onScroll,limit);
 	}
 
 	/**
