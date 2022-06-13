@@ -1,5 +1,5 @@
 import React, { Dispatch, MouseEvent, SetStateAction, useContext } from "react";
-import { mainSocketContext } from "../../App";
+import { mainSocketContext } from "src";
 import UserData from "src/features/user/interfaces/user.interface";
 import { logout } from "../../services/auth.service";
 

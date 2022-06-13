@@ -24,7 +24,7 @@ export default function Button({ onClick, id = "", children }: Props) {
         <>
             {
                 isLoading ?
-                    <button id={id} className="button" >Loading...</button>
+                    <button id={id} className="button">o</button>
                     :
                     <button id={id} className="button" onClick={handleClick}> {children}</button>
             }

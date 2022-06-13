@@ -3,11 +3,13 @@ import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
 import { UserService } from './user.service';
 import { UserEntity } from './entities/user.entity';
 import { JwtRequest } from 'src/auth/interfaces/jwtRequest.interface';
+import { RelationService } from 'src/relation/relation.service';
 
 @Controller('user')
 export class UserController {
 	constructor(
 		private readonly userService: UserService,
+		private readonly relationService: RelationService,
 	) { }
 
 	@Get()
@@ -29,17 +31,18 @@ export class UserController {
 		const users = await this.userService.findMany({
 			limit: limit,
 			page: page,
+			relations: ["roles", "relations"],
 		});
 
 		const userWithoutCurrent = users.items.filter((user: UserEntity) => user.id !== request.user.id);
 
 		return userWithoutCurrent.map((user: UserEntity) => {
-			if (user.id !== request.user.id) {
-				return {
-					id: user.id,
-					login: user.login,
-					avatar: user.avatar,
-				}
+			return {
+				id: user.id,
+				login: user.login,
+				avatar: user.avatar,
+				roles: user.roles,
+				relations: user.relations,
 			}
 		});
 	}

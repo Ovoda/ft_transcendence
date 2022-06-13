@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, useContext, useEffect } from "react";
-import { mainSocketContext } from "../App";
 import UpdateBallDto from "./interfaces/UpdateBall.dto";
 import { getNewBallPos, handleKeyPressed, handleKeyUnpressed } from "../components/game/gamePlay/services/play.service";
 import GameStatus from "src/components/game/gamePlay/interfaces/gameStatus.interface";
@@ -10,11 +9,13 @@ import Gameplay from "src/components/game/gamePlay/interfaces/gameplay.interface
 import { setInitialBallState } from '../components/game/gamePlay/interfaces/ball.interface';
 import GameCanvas from "src/components/game/gamePlay/interfaces/gameCanvas.interface";
 import { Store } from '../app/store';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import UserData from "features/user/interfaces/user.interface";
-import Position from "src/components/game/gamePlay/interfaces/position.interface";
+import { mainSocketContext } from "src";
+import { setNotification } from "features/uiState/uiState.slice";
 
-const scoreToWin: number = 50;
+const shortGameScoreToWin: number = 21;
+const longGameScoreToWin: number = 42;
 
 interface Props {
 	setGameplay: Dispatch<SetStateAction<Gameplay>>,
@@ -26,6 +27,10 @@ interface Props {
 }
 
 export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameStatus, gameCanvas, setGameCanvas }: Props) {
+
+	/** Tools */
+	const dispatch = useDispatch();
+
 
 	const store: Store = useSelector((store: Store) => store);
 	const userData: UserData = store.user;
@@ -71,8 +76,9 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				})
 			} else {
 				setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
-				//console.log(gameStatus.play);
 				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+					console.log("Socket gameStatus speed: ", gameplay.ball.velocity);
+					console.log("Game fast speed?: ", gameplay.fast);
 					mainSocket.emit("animateGame", {
 						posX: gameplay.ball.position.x,
 						posY: gameplay.ball.position.y
@@ -81,9 +87,13 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			}
 		})
 
+		/** Game Alert */
+		mainSocket.on("GameAlert", (message: string) => {
+			dispatch(setNotification(message));
+		})
+
 		/** Pause the game **/
 		mainSocket.on("pauseGame", () => {
-			//console.log(gameStatus.user);
 			setGameStatus({ ...gameStatus, play: PlayStatusEnum.PAUSE, })
 		})
 
@@ -91,6 +101,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		mainSocket.on("resumeGame", (data: UpdateBallDto) => {
 			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON })
 			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+				console.log("Socket resumeGame speed: ", gameplay.ball.velocity);
 				mainSocket?.emit("animateGame", data);
 			}
 		})
@@ -120,6 +131,10 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			})
 		})
 
+		/** Playing with friends */
+		mainSocket.on("PlayingRequest", (data: any) => {
+			console.log("Game request received");
+		})
 
 		/** Set sides of players */
 		mainSocket.on("setSide", (data: string) => {
@@ -156,6 +171,10 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		})
 
 		mainSocket.on("updateScore", (data: UpdateBallDto) => {
+			let scoreToWin = shortGameScoreToWin;
+			if (gameplay.longGame) {
+				scoreToWin = longGameScoreToWin;
+			}
 			setGameplay((gameplay: Gameplay) => {
 				return {
 					...gameplay,
@@ -181,6 +200,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 				}
 			}
 			else {
+				console.log("Socket updateScore speed: ", gameplay.ball.velocity);
 				mainSocket.emit("animateGame", {
 					posX: gameplay.ball.position.x,
 					posY: gameplay.ball.position.y,
@@ -228,6 +248,22 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 							x: gameplay.playerRight.position.x,
 							y: value,
 						}
+					}
+				}
+			})
+		})
+
+		mainSocket.on("setLogin", (data: any) => {
+			setGameplay((gameplay: Gameplay) => {
+				return {
+					...gameplay,
+					playerLeft: {
+						...gameplay.playerLeft,
+						login: data.left,
+					},
+					playerRight: {
+						...gameplay.playerRight,
+						login: data.right,
 					}
 				}
 			})

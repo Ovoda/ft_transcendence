@@ -40,7 +40,7 @@ export default function TfaLogin() {
             const res = await loginTfa(code);
 
             if (res) {
-                const userData = await getUserData();
+                const { userData } = await getUserData();
                 if (userData) {
                     dispatch(updateUser(userData));
                 }

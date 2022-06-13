@@ -1,0 +1,20 @@
+.chat_box_header {
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 1rem;
+
+
+    .chat_box_header_title {
+        font-size: 1.6rem;
+    }
+
+    img {
+        padding: 1rem;
+        max-width: 20px;
+        cursor: pointer;
+    }
+}

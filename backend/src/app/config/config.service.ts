@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import 'dotenv/config';
-import { ChatRoomEntity } from "src/chat/entities/chatRoom.entity";
+import { ChatGroupEntity } from "src/chat/entities/chatGroup.entity";
 import { ChatMessageEntity } from "src/chat/entities/chatMessage.entity";
 import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
 import { UserEntity } from "src/user/entities/user.entity";
@@ -8,6 +8,7 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { INestApplication } from "@nestjs/common";
 import { GameEntity } from "src/game/entities/game.entity";
 import RelationEntity from "src/relation/entities/relation.entity";
+import { ImagesEntity } from "src/images/entities/images.entity";
 
 export class ConfigService {
 	private database_entities;
@@ -27,9 +28,10 @@ export class ConfigService {
 			UserEntity,
 			RelationEntity,
 			ChatRoleEntity,
-			ChatRoomEntity,
+			ChatGroupEntity,
 			ChatMessageEntity,
 			GameEntity,
+			ImagesEntity,
 		]
 	}
 

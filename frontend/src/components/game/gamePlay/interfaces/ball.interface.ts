@@ -1,3 +1,4 @@
+import GamePlay from '../gamePlay';
 import Position from './position.interface'
 
 interface Ball {

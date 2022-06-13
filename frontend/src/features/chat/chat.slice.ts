@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import Chat, { e_roomtype } from "./interfaces/chat.interface";
-import Message from '../../shared/interfaces/Message';
+import Chat from "./interfaces/chat.interface";
 import OpenChatRoom from "./interfaces/openChatGroup.interface";
 import OpenChatDm from "./interfaces/openChatDm.interface";
+import OpenChatGroup from "./interfaces/openChatGroup.interface";
 
 const initialState: Chat = {
 	messages: [],
 	currentRoom: "",
-	currentRole: "",
+	currentRole: null,
 	currentRelation: null,
 	currentLastMessage: "",
 	displayChatBox: false,
@@ -21,28 +21,30 @@ const chat = createSlice({
 		updateRoomtype(state, action) {
 			return { ...state, roomtype: action.payload }
 		},
-		openChatRoom(state, action: OpenChatRoom) {
-			return {
-				...state,
-				displayChatBox: true,
-				currentRoom: action.payload.roomId,
-				currentRole: action.payload.roleId,
-				messages: action.payload.messages,
-			};
-		},
 		openChatDm(state, action: OpenChatDm) {
 			return {
 				...state,
 				displayChatBox: true,
+				currentRole: null,
 				currentRelation: action.payload.relation,
 				messages: action.payload.messages,
 			};
 		},
-		closeChatDm(state) {
+		openChatGroup(state, action: OpenChatGroup) {
+			return {
+				...state,
+				displayChatBox: true,
+				currentRole: action.payload.role,
+				currentRelation: null,
+				messages: action.payload.messages,
+			};
+		},
+		closeChat(state) {
 			return {
 				...state,
 				displayChatBox: false,
 				currentRelation: null,
+				currentRole: null,
 				messages: [],
 			};
 		},
@@ -55,6 +57,11 @@ const chat = createSlice({
 		addMessage(state, action) {
 			return { ...state, messages: [...state.messages, action.payload] };
 		},
+		addMessageFromBack(state, action) {
+			const newMessages = action.payload;
+			newMessages.reverse();
+			return { ...state, messages: [...newMessages, ...state.messages] };
+		},
 		setMessages(state, action) {
 			const array = action.payload.reverse();
 			return { ...state, messages: array };
@@ -65,10 +72,11 @@ const chat = createSlice({
 export const {
 	updateRoomtype,
 	openChatDm,
-	openChatRoom,
-	closeChatDm,
+	openChatGroup,
+	closeChat,
 	addMessage,
 	setMessages,
+	addMessageFromBack,
 	openChatRoomCreationModal,
 	closeChatRoomCreationModal,
 } = chat.actions;

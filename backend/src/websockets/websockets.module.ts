@@ -6,7 +6,10 @@ import { SocketGateway } from './socket.gateway';
 import { WebsocketsService } from './websockets.service';
 
 @Module({
-  imports: [ChatModule, forwardRef(() => RelationModule), UserModule],
+  imports: [
+    forwardRef(() => ChatModule),
+    forwardRef(() => RelationModule),
+    forwardRef(() => UserModule)],
   providers: [WebsocketsService, SocketGateway],
   exports: [SocketGateway],
 })

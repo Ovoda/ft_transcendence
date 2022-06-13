@@ -1,19 +1,24 @@
 import { forwardRef, Logger, Module } from '@nestjs/common';
 import { ChatController } from './chat.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChatRoomEntity } from './entities/chatRoom.entity';
 import { ChatRoleEntity } from './entities/chatRole.entity';
+import { ChatGroupEntity } from './entities/chatGroup.entity';
 import { ChatRoleService } from './services/chatRole.service';
 import { ChatMessageService } from './services/chatMessage.service';
-import { ChatRoomService } from './services/chatRoom.service';
+import { ChatGroupService } from './services/chatGroup.service.ts';
 import { ChatMessageEntity } from './entities/chatMessage.entity';
 import { UserModule } from 'src/user/user.module';
 import { ChatPasswordService } from './services/chatPassword.service';
+import { WebsocketsModule } from 'src/websockets/websockets.module';
+import { SocketGateway } from 'src/websockets/socket.gateway';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([ChatRoomEntity, ChatRoleEntity, ChatMessageEntity]), UserModule],
-	providers: [ChatPasswordService, ChatRoomService, ChatRoleService, ChatMessageService, Logger],
+	imports: [
+		TypeOrmModule.forFeature([ChatRoleEntity, ChatGroupEntity, ChatMessageEntity]),
+		forwardRef(() => UserModule),
+		forwardRef(() => WebsocketsModule)],
+	providers: [ChatPasswordService, ChatGroupService, ChatRoleService, ChatMessageService, Logger],
 	controllers: [ChatController],
-	exports: [ChatRoomService, ChatRoleService, ChatMessageService],
+	exports: [ChatGroupService, ChatRoleService, ChatMessageService],
 })
 export class ChatModule { }

@@ -1,4 +1,6 @@
-import Message from "src/shared/interfaces/Message";
+import Dm from "src/shared/interfaces/dm.interface";
+import GroupMessage from "src/shared/interfaces/groupMessage.interface";
+import UserRole from "src/shared/interfaces/role.interface";
 import UserRelation from "src/shared/interfaces/userRelation";
 
 export enum e_roomtype {
@@ -7,11 +9,11 @@ export enum e_roomtype {
 }
 
 export default interface Chat {
-	currentRole: string;
+	currentRole: UserRole | null;
 	displayChatBox: boolean;
 	currentRelation: UserRelation | null;
 	currentLastMessage: string;
 	displayRoomCreationModal: boolean,
-	messages: Message[];
+	messages: GroupMessage[] | Dm[];
 	currentRoom: string;
 }

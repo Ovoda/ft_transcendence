@@ -1,12 +1,11 @@
 #navbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     width: 100%;
     background-color: #1D1F24;
     box-sizing: border-box;
-	//border: 2px solid red;
-	padding: 0 2rem;
+    padding: 0 2rem;
 
     min-height: 70px;
 
@@ -73,24 +72,24 @@
         font-size: 1.8rem;
     }
 
-	#chat_button {	
+    #chat_button {
         color: white;
         font-size: 2rem;
-		display: flex;
-		justify-content: center;
-		align-items: flex-start;
-	}
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
 
-	#logo {
-		max-height: 50px;
-		display: inline-block;
-		text-align: left;
-		vertical-align: top;
-	}
+    #logo {
+        max-height: 50px;
+        display: inline-block;
+        text-align: left;
+        vertical-align: top;
+    }
 }
 
 #navbar.logged_out_nav {
-	justify-content: flex-end;
+    justify-content: flex-end;
 }
 
 @keyframes ease-in-opacity {

@@ -9,7 +9,9 @@ import { SocketGateway } from 'src/websockets/socket.gateway';
 import { WebsocketsModule } from 'src/websockets/websockets.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RelationEntity, UserEntity]), UserModule, forwardRef(() => WebsocketsModule)],
+  imports: [TypeOrmModule.forFeature([RelationEntity, UserEntity]),
+  forwardRef(() => UserModule),
+  forwardRef(() => WebsocketsModule)],
   providers: [RelationService, Logger],
   controllers: [RelationController],
   exports: [RelationService],

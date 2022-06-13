@@ -9,8 +9,7 @@ import { RoomTypeEnum } from "src/shared/enums/RoomType.enum";
  * @field password - (optional) room password 
  */
 export default interface CreateRoomDto {
-    logins: string[];
-    roomType: RoomTypeEnum;
+    ids: string[];
     name: string;
     password?: string;
 }

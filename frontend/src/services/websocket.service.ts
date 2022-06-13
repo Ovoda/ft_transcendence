@@ -1,6 +1,8 @@
+import { AnyAction, Dispatch } from "@reduxjs/toolkit";
+import Chat from "features/chat/interfaces/chat.interface";
 import { Socket, io } from "socket.io-client";
-import Dm from "src/shared/interfaces/dm";
-import SendChatMessageDto from "src/shared/interfaces/Message";
+import Dm from "src/shared/interfaces/dm.interface";
+import GroupMessage from "src/shared/interfaces/groupMessage.interface";
 
 /**
  * @class ClientSocket
@@ -8,7 +10,6 @@ import SendChatMessageDto from "src/shared/interfaces/Message";
  * @function init
  * @function on
  * @function emit
- * @function sendMessage
  * @function joinRoom
  * @function leaveRoom
  * @function leaveGame
@@ -20,6 +21,10 @@ export default class ClientSocket {
 
 	/** Current client socket id */
 	public id = this.socket.id;
+
+	public chat: Chat | null = null;
+
+	public dispatch: Dispatch<AnyAction> | null = null;
 
 	/**
 	 * Initialize a socket registering it on the server for chat, user and game events
@@ -36,6 +41,10 @@ export default class ClientSocket {
 	 */
 	public on(event: string, fun: any) {
 		this.socket.on(event, fun);
+	}
+
+	public off(event: string, fun: any) {
+		this.socket.off(event, fun);
 	}
 
 	/**
@@ -59,7 +68,7 @@ export default class ClientSocket {
 	 * Sends a message to the websocket server
 	 * @param message message to send
 	 */
-	public sendMessage(message: SendChatMessageDto) {
+	public sendGroupMessage(message: GroupMessage) {
 		this.socket.emit("ClientMessage", message);
 	}
 
@@ -79,14 +88,25 @@ export default class ClientSocket {
 		this.socket.emit("LeaveRoom", { roomId })
 	}
 
+	public joinDm(relationId: string) {
+		this.socket.emit("JoinDm", relationId);
+	}
+
+	public leaveDm(relationId: string) {
+		this.socket.emit("LeaveDm", relationId);
+	}
+
 	/** Leaves the current game */
 	public leaveGame(data: number[]) {
-		this.socket.emit("leaveGame", data);
+		this.socket.emit("LeaveGame", data);
 	}
 
 	/** Watching request on given friend */
 	public watchingRequest(data: any) {
-		this.socket.emit("watchingRequest", data);
+		this.socket.emit("WatchingRequest", data);
+	}
 
+	public playingRequest(data: any) {
+		this.socket.emit("PlayingRequest", data);
 	}
 }

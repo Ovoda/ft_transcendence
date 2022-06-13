@@ -1,0 +1,48 @@
+#game_options_list_container {
+	width: 100vw;
+	height: 100vh;
+
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.8);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 300;
+
+
+	#game_options_list {
+		background-color: white;
+		border-radius: 1rem;
+		gap: 1rem;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+
+		width: 100%;
+		max-width: 350px;
+		padding: 1rem;
+
+		h2 {
+			margin: 1.5rem 0;
+			font-size: 3rem;
+			font-weight: 300;
+		}
+
+		.game_option_item {
+			display: flex;
+			gap: 1rem;
+			font-size: 1.8rem;
+			align-items: center;
+		}
+
+		button {
+			margin: 1.5rem 0;
+		}
+	}
+
+}

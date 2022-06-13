@@ -1,49 +1,56 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import { closeChatDm, openChatDm, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
+import { closeChat, openChatDm, openChatGroup, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
 import './dmPicker.scss';
 import "./RoomCreation.scss";
 import Button from "assets/Button/Button";
-import AddRoomMenu from "./AddRoomMenu";
-import { api } from "services/api.service";
-import ClientSocket from "services/websocket.service";
-import { useContext } from "react";
-import { mainSocketContext } from "../../../App";
+import { getMessages, getRelation, getRole } from "services/api.service";
 import UserRelation from "src/shared/interfaces/userRelation";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
+import UserRole from "src/shared/interfaces/role.interface";
+import { useState } from "react";
+import AddRoomMenu, { RoomMenuType } from "./addRoom/addRoomModal";
 
 export default function DmPicker() {
 
 	/** Global Data */
-	const { chat, user, relations } = useSelector((store: Store) => store);
-	const mainSocket: ClientSocket | null = useContext(mainSocketContext);
+	const { chat, relations, roleSlice } = useSelector((store: Store) => store);
 
 	/** Tools */
 	const dispatch = useDispatch();
 
-	async function selectDmRoom(relation: UserRelation) {
-		if (chat.currentRelation) {
-			mainSocket?.leaveRoom(chat.currentRoom);
-		}
+	/** Variables */
+	const [menuType, setMenuType] = useState<RoomMenuType>(RoomMenuType.FRIENDS);
 
+	async function selectDmRoom(relation: UserRelation) {
 		if (chat.currentRelation?.id === relation.id) {
-			dispatch(closeChatDm());
+			dispatch(closeChat());
+			return;
+		}
+		const updatedRelation = await getRelation(relation.id);
+		const { messages } = await getMessages(updatedRelation.data.lastMessage);
+		if (messages)
+			dispatch(openChatDm({ messages: messages.reverse(), relation: updatedRelation.data }));
+	}
+
+	async function selectGroupRoom(role: UserRole) {
+		if (chat.currentRole?.id === role.id) {
+			dispatch(closeChat());
 			return;
 		}
 
-		let messages;
-		/** Todo get relation last message, not just last message */
-		if (relation.lastMessage) {
-			const response = await api.get(`chat/many/message/dm/${relation.lastMessage}`);
-			messages = response.data;
-		} else {
-			messages = [];
-		}
-		dispatch(openChatDm({ messages, relation }));
+		const updatedRole = await getRole(role.id);
+		const group = updatedRole.data.chatGroup;
+
+		const { messages } = await getMessages(group.lastMessage, updatedRole.data.id);
+
+		if (messages)
+			dispatch(openChatGroup({ messages: messages.reverse(), role: updatedRole.data }));
 	}
 
 	/** Opens a modal to create rooms */
-	async function handleRoomCreationModal() {
+	async function handleRoomCreationModal(menuType: RoomMenuType) {
+		setMenuType(menuType);
 		dispatch(openChatRoomCreationModal());
 		return false;
 	}
@@ -51,8 +58,8 @@ export default function DmPicker() {
 	return (
 		<div id="dm_picker">
 			{
-				relations.relations &&
-				relations.relations.map((relation: UserRelation, index: number) =>
+				relations.friends &&
+				relations.friends.map((relation: UserRelation, index: number) =>
 					<div key={index} onClick={() => selectDmRoom(relation)} className="dm_picker_room">
 						<img src={relation.counterPart.avatar} alt="" />
 						{/* <button onClick={() => watchingRequest(role.chatroom.name, mainSocket)}>Watch Game</button> */}
@@ -65,8 +72,19 @@ export default function DmPicker() {
 					</div>
 				)
 			}
-			<Button id="add_room_button" onClick={handleRoomCreationModal}>&#43;</Button>
-			<AddRoomMenu />
+			{
+				roleSlice.roles &&
+				roleSlice.roles.map((role: UserRole, index: number) =>
+					<div key={index} onClick={() => selectGroupRoom(role)} className="dm_picker_room">
+						{/* TODO : image */}
+						<img src="https://42.fr/wp-content/uploads/2021/08/42.jpg" alt="" />
+						<p className="dm_picker_room_name">{role.chatGroup.name}</p>
+					</div>
+				)
+			}
+			<Button onClick={() => handleRoomCreationModal(RoomMenuType.FRIENDS)}>Friends</Button>
+			<Button onClick={() => handleRoomCreationModal(RoomMenuType.GROUP)}>Groups</Button>
+			<AddRoomMenu menuType={menuType} />
 		</div >
 	);
 }

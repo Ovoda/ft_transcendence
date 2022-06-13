@@ -1,9 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import RelationSlice from "./relations.interface";
+import { RelationTypeEnum } from "enums/relationType.enum";
+import UserRelation from "src/shared/interfaces/userRelation";
+import RelationSlice from "./interfaces/relations.interface";
 
 const initialState: RelationSlice = {
     currentRelation: null,
-    relations: [],
+    friends: [],
+    blocked: [],
+    all: [],
 }
 
 const relations = createSlice({
@@ -14,19 +18,24 @@ const relations = createSlice({
             return ({ ...state, currentRelation: action.payload.currentRelation });
         },
         setRelations(state, action) {
-            return ({ ...state, relations: action.payload });
-        },
-        addRelation(state, action) {
             return ({
-                ...state, relations: [...state.relations, action.payload],
+                ...state,
+                all: action.payload,
+                friends: action.payload.filter((relation: UserRelation) => relation.status === RelationTypeEnum.FRIEND),
+                blocked: action.payload.filter((relation: UserRelation) => relation.status === RelationTypeEnum.BLOCKED),
+            });
+        },
+        addFriendRelation(state, action) {
+            return ({
+                ...state, relations: [...state.friends, action.payload],
             })
-        }
+        },
     }
 });
 
 export const {
     updateCurrentRelation,
     setRelations,
-    addRelation
+    addFriendRelation
 } = relations.actions;
 export default relations.reducer;

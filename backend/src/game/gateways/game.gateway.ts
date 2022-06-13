@@ -11,10 +11,11 @@ import { Socket, Server } from 'socket.io';
 import { GameRoom } from '../types/gameRoom.interface';
 import { CannotPlay } from "../exceptions/cannotPlay.exception";
 import { GameService } from "../services/game.service";
-import { CreateGameDto } from "../dto/createGame.dto";
 import { UserService } from "src/user/user.service";
 import { UserActivityStatusEnum } from "src/user/enums/userConnectionStatus.enum";
 import * as _ from 'lodash';
+import { UpdateStatsDto } from "../dtos/updateStats.dto";
+import { emit } from "process";
 
 @WebSocketGateway({
 	cors: {
@@ -36,6 +37,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
 	/** Match Making Between Players **/
+
 
 
 	@SubscribeMessage('gameRequestToFriend')
@@ -66,8 +68,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('joinGame')
 	async handleJoinGame(client: Socket, data: any) {
-		this.logger.log(`New Game Request from: ${client.id}`);
-		this.logger.log(`Current Games: ${this.games.length}`);
+		this.logger.log(`New Game Request from: ${client.id}, ${data.login}, ${data.id}`);
+
+		const game = this.games.find((game: GameRoom) => {
+			return (game.user1 === data.id || game.user2 === data.id);
+		});
+
+		if (game) {
+			this.server.to(client.id).emit('GameAlert', "You already have an ongoing game.");
+			return;
+		}
+
 		if (!this.games.length || this.games[this.games.length - 1].status === true) {
 			const newGame: GameRoom = {
 				id: "game" + client.id,
@@ -81,6 +92,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				watchers: [],
 			}
 			this.games.push(newGame);
+			this.logger.log(`Current Games: ${this.games.length}`);
 
 			await this.userService.setUserAsQueuing(data.id);
 
@@ -97,6 +109,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 			await this.userService.setUserAsPlaying(gameroom.user1);
 			await this.userService.setUserAsPlaying(gameroom.user2);
+			this.server.emit("FriendConnection", gameroom.user1);
+			this.server.emit("FriendConnection", gameroom.user2);
 
 			client.join(gameroom.id);
 			this.server.to(client.id).emit('setSide', "right");
@@ -107,7 +121,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	/** Watchers added to game room without role to move **/
-	@SubscribeMessage('watchingRequest')
+	@SubscribeMessage('WatchingRequest')
 	handleWatchingRequest(client: Socket, data: string) {
 		this.server.to(client.id).emit("startWatching", data);
 	}
@@ -125,17 +139,24 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		game.watchers.push(client.id);
 		this.userService.setUserAsWatching(watcher);
 		client.join(game.id);
+		let logins = {
+			left: game.login1,
+			right: game.login2,
+		}
+		console.log("Watching...");
+		console.log(logins);
+		this.server.to(client.id).emit("setLogin", logins);
 	}
-
 
 	@SubscribeMessage('pauseGameRequest')
 	handlePauseRequest(client: Socket) {
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
-		if (index >= 0) {
-			this.server.to(this.games[index].id).emit("pauseGame");
-		}
+
+		if (index < 0) { return; }
+
+		this.server.to(this.games[index].id).emit('pauseGame');
 	}
 
 	@SubscribeMessage('resumeGameRequest')
@@ -143,9 +164,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
-		if (index >= 0) {
-			this.server.to(this.games[index].id).emit("resumeGame", data);
-		}
+
+		if (index < 0) { return; }
+
+		this.server.to(this.games[index].id).emit("resumeGame", data);
 	}
 
 
@@ -154,9 +176,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
-		if (index >= 0) {
-			this.server.to(this.games[index].id).emit("updateScore", data);
-		}
+
+		if (index < 0) { return; }
+
+		this.server.to(this.games[index].id).emit('updateScore', data);
 	}
 
 	@SubscribeMessage('animateGame')
@@ -165,26 +188,27 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
 		if (index >= 0 && this.games[index].socket1 === client.id) {
-			this.server.to(this.games[index].id).emit("updateBall", data);
+			this.server.to(this.games[index].id).emit('updateBall', data);
 		}
 	}
 
 	@SubscribeMessage('leaveGame')
 	async handleLeaveGame(client: Socket, data: any) {
-		const index = this.games.findIndex((game: GameRoom) => {
+
+		const game = this.games.find((game: GameRoom) => {
 			return game.socket1 === client.id || game.socket2 === client.id;
-		})
-		if (index >= 0) {
-			this.server.to(this.games[index].id).emit('gameStop', client.id);
-			const newdto: CreateGameDto = {
-				user1: this.games[index].user1,
-				user2: this.games[index].user2,
-				score1: data.posX,
-				score2: data.posY,
-				winner: (client.id === this.games[index].socket1 ? this.games[index].user2 : this.games[index].user1),
-			}
-			// REPLACE BY SAVE VICTORY / DEFEAT TO USERS
-			//return await this.gameService.saveNewGame(newdto);
+		});
+
+		if (!game) { return; }
+
+		this.server.to(game.id).emit('gameStop', client.id);
+		let updateStatsDto: UpdateStatsDto = {
+			winnerId: (data.posX > data.posY) ? game.user1 : game.user2,
+			loserId: (data.posX < data.posY) ? game.user1 : game.user2,
+		}
+		if (data.winnerId && data.loserId) {
+			console.log(updateStatsDto);
+			return await this.gameService.saveNewStats(updateStatsDto);
 		}
 	}
 
@@ -212,30 +236,36 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		client.leave(game.id);
 		if (game.socket1 === client.id) {
 			game.socket1 = null;
-		}
-		else if (game.socket2 === client.id) {
+		} else if (game.socket2 === client.id) {
 			game.socket2 = null;
 		}
+
 		if (game.socket1 === null && game.socket2 === null) {
-			await this.userService.setUserAsConnected(game.user1);
-			await this.userService.setUserAsConnected(game.user2);
+			if (game.user1) {
+				await this.userService.setUserAsConnected(game.user1);
+				this.server.emit("FriendConnection", game.user1);
+			}
+			if (game.user2) {
+				await this.userService.setUserAsConnected(game.user2);
+				this.server.emit("FriendConnection", game.user2);
+			}
 			_.remove(this.games, game);
+			this.logger.log(`Current Games: ${this.games.length}`);
 		}
 	}
 
 	@SubscribeMessage('movePlayer')
 	handleArrow(client: Socket, data: number): void {
-		const index = this.games.findIndex((game: GameRoom) => {
+		const game = this.games.find((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
 
-		if (index >= 0) {
-			if (this.games[index].socket1 === client.id) {
-				this.server.to(this.games[index].id).emit('updateLeftPlayer', data);
-			}
-			else if (this.games[index].socket2 === client.id) {
-				this.server.to(this.games[index].id).emit('updateRightPlayer', data);
-			}
+		if (!game) { return; }
+
+		if (game.socket1 === client.id) {
+			this.server.to(game.id).emit('updateLeftPlayer', data);
+		} else if (game.socket2 === client.id) {
+			this.server.to(game.id).emit('updateRightPlayer', data);
 		}
 	}
 
@@ -248,16 +278,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	handleDisconnect(client: Socket, ...args: any[]) {
-		const index = this.games.findIndex((game: GameRoom) => {
+		const game = this.games.find((game: GameRoom) => {
 			return game.socket1 === client.id || game.socket2 === client.id;
 		})
-		if (index >= 0) {
-			if (this.games[index].socket1 === client.id)
-				this.server.to(this.games[index].socket2).emit('gameStop', this.games[index].socket1);
-			else if (this.games[index].socket2 === client.id)
-				this.server.to(this.games[index].socket1).emit('gameStop', this.games[index].socket2);
-			this.logger.log(`Client disconnected: ${client.id}`);
-			this.handleDeleteRoom(client);
+
+		if (!game) { return; }
+
+		if (game.socket1 === client.id) {
+			this.server.to(game.socket2).emit('gameStop', game.socket1);
+		} else if (game.socket2 === client.id) {
+			this.server.to(game.socket1).emit('gameStop', game.socket2);
 		}
+		this.logger.log(`Client disconnected: ${client.id}`);
+		this.handleDeleteRoom(client);
 	}
 }
