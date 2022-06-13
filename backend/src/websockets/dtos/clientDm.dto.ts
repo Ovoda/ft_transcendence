@@ -1,3 +1,4 @@
+import { IsNotEmpty } from "class-validator";
 import RelationEntity from "src/relation/entities/relation.entity";
 
 /**
@@ -8,10 +9,21 @@ import RelationEntity from "src/relation/entities/relation.entity";
  * @field room: string - room ID where message should be sent
  */
 export default class ClientDmDto {
+	@IsNotEmpty()
     content: string;
+
+	@IsNotEmpty()
     username: string;
+
+	@IsNotEmpty()
     avatar: string;
+
+	@IsNotEmpty()
     userId: string;
+
+	@IsNotEmpty()
     date: string;
+
+	@IsNotEmpty()
     relation: RelationEntity;
 } 
