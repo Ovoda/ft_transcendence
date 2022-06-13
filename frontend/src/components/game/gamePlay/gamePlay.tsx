@@ -1,18 +1,16 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useSelector } from 'react-redux';
 import './GamePlay.scss';
-import Player, { setInitialPlayerLeftState, setInitialPlayerRightState } from './interfaces/player.interface';
+import Player from './interfaces/player.interface';
 import Position from './interfaces/position.interface';
-import { setInitialBallState } from './interfaces/ball.interface';
 import GameStatus, { initialGameStatus } from './interfaces/gameStatus.interface';
 import Gameplay, { setInitialGameplayState } from './interfaces/gameplay.interface';
 import GameCanvas, { setInitialGameCanvasState } from './interfaces/gameCanvas.interface';
 import { PlayStatusEnum } from "./enums/playStatus.enum";
 import UserData from 'features/user/interfaces/user.interface';
 import UpdateBallDto from '../../../hooks/interfaces/UpdateBall.dto';
-import SetUserDto from "./interfaces/SetUser.dto";
 import drawPlayer from './services/player.service';
-import drawBall from './services/ball.service';
+import drawBall, { setBallSpeed } from './services/ball.service';
 import { getNewBallPos } from './services/play.service';
 import { Store } from '../../../app/store';
 import { useGameListeners } from '../../../hooks/useGame.hook';
@@ -43,11 +41,17 @@ function GamePlay() {
 	const dispatch = useDispatch();
 
 	///** Variables */
+	const [darkModeActivated, setDarkModeActivated] = useState<boolean>(false);
 	const [gameCanvas, setGameCanvas] = useState<GameCanvas>(setInitialGameCanvasState(canvaRef));
 	const [gameStatus, setGameStatus] = useState<GameStatus>(initialGameStatus);
 	const [gameplay, setGameplay] = useState<Gameplay>(setInitialGameplayState(gameCanvas.width, gameCanvas.height));
+	if (gameplay.fast) {
+
+	}
+
 
 	/** Set game listeners (keyboard events & socket events) */
+
 	useGameListeners({
 		gameplay,
 		setGameplay,
@@ -145,6 +149,22 @@ function GamePlay() {
 		}
 	});
 
+	mainSocket?.on("gameStatus", (fullRoom: any) => {
+		if (fullRoom === false) {
+			setGameStatus((gameStatus: GameStatus) => {
+				return { ...gameStatus, play: PlayStatusEnum.PENDING };
+			})
+		} else {
+			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
+			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+				mainSocket.emit("animateGame", {
+					posX: gameplay.ball.position.x,
+					posY: gameplay.ball.position.y
+				} as UpdateBallDto);
+			}
+		}
+	})
+
 	useEffect(() => {
 		if (gameplay.arrowUp) {
 			let player: Player;
@@ -162,7 +182,6 @@ function GamePlay() {
 		}
 	});
 
-	const [darkModeActivated, setDarkModeActivated] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (darkModeActivated) {
@@ -195,6 +214,25 @@ function GamePlay() {
 			drawPlayer(gameCanvas, gameplay.playerRight);
 		}
 	}
+
+	useEffect(() => {
+
+		let newVelocity = setBallSpeed(gameplay.ball.velocity.x, gameplay.ball.velocity.y, gameplay.fast);
+
+		setGameplay((gameplay: Gameplay) => {
+			return {
+				...gameplay,
+				ball: {
+					...gameplay.ball,
+					velocity: {
+						x: newVelocity[0],
+						y: newVelocity[1],
+					}
+				}
+			}
+		})
+	}, [gameplay.fast]);
+
 
 	async function handleOptionsModal() {
 		dispatch(openGameOptions());

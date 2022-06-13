@@ -12,53 +12,53 @@ import UpdateUserAvatar from "./updateUserAvatar";
 
 export default function EditProfile() {
 
-    /** Global data */
-    const { uiState, user } = useSelector((store: Store) => store);
+	/** Global data */
+	const { uiState, user } = useSelector((store: Store) => store);
 
-    /** Tools */
-    const dispatch = useDispatch();
+	/** Tools */
+	const dispatch = useDispatch();
 
-    /** Variables */
-    const [username, setUsername] = useState<string>("");
-    const [errorText, setErrorText] = useState<string>("");
+	/** Variables */
+	const [username, setUsername] = useState<string>("");
+	const [errorText, setErrorText] = useState<string>("");
 
-    async function handleProfileUpdate() {
-        if (!username || username === "") return false;
+	async function handleProfileUpdate() {
+		if (!username || username === "") return false;
 
-        const { newUser, error } = await updateUser({ username });
-        if (error) {
-            setErrorText(error);
-            return false;
-        }
-        dispatch(updateUserData(newUser));
-        dispatch(closeEditProfile());
-        return false;
-    }
+		const { newUser, error } = await updateUser({ username });
+		if (error) {
+			setErrorText(error);
+			return false;
+		}
+		dispatch(updateUserData(newUser));
+		dispatch(closeEditProfile());
+		return false;
+	}
 
-    useEffect(() => {
-        setErrorText("");
-    }, [username]);
+	useEffect(() => {
+		setErrorText("");
+	}, [username]);
 
-    function close() {
-        dispatch(closeEditProfile());
-    }
+	function close() {
+		dispatch(closeEditProfile());
+	}
 
-    if (uiState.showEditProfile) {
-        return (
-            <div id="edit_profile_container">
-                <div id="edit_profile">
-                    <h2>Set profile</h2>
-                    <TextInput type="text" text={username} setText={setUsername} placeholder="username" />
-                    <p className="error_text">{errorText}</p>
-                    <UpdateUserAvatar />
-                    <Button onClick={handleProfileUpdate}>Update</Button>
-                    {
-                        user.username &&
-                        < p onClick={close} className="edit_profile_cancel">cancel</p>
-                    }
-                </div>
-            </div >
-        )
-    }
-    return <></>;
+	if (uiState.showEditProfile) {
+		return (
+			<div id="edit_profile_container">
+				<div id="edit_profile">
+					<h2>Set profile</h2>
+					<TextInput type="text" text={username} setText={setUsername} placeholder="username" />
+					<p className="error_text">{errorText}</p>
+					<UpdateUserAvatar />
+					<Button onClick={handleProfileUpdate}>Update</Button>
+					{
+						user.username &&
+						< p onClick={close} className="edit_profile_cancel">cancel</p>
+					}
+				</div >
+			</div >
+		)
+	}
+	return <></>;
 }

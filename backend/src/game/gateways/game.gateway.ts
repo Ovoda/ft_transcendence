@@ -16,6 +16,7 @@ import { UserActivityStatusEnum } from "src/user/enums/userConnectionStatus.enum
 import * as _ from 'lodash';
 import { UpdateStatsDto } from "../dtos/updateStats.dto";
 import { emit } from "process";
+import { Console } from "console";
 
 @WebSocketGateway({
 	cors: {
@@ -170,7 +171,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.server.to(this.games[index].id).emit("resumeGame", data);
 	}
 
-
 	@SubscribeMessage('resetGame')
 	handleResetScore(client: Socket, data: any) {
 		const index = this.games.findIndex((game: GameRoom) => {
@@ -206,8 +206,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			winnerId: (data.posX > data.posY) ? game.user1 : game.user2,
 			loserId: (data.posX < data.posY) ? game.user1 : game.user2,
 		}
-		if (data.winnerId && data.loserId) {
-			console.log(updateStatsDto);
+		if (data.winnerId !== null && data.loserId !== null) {
 			return await this.gameService.saveNewStats(updateStatsDto);
 		}
 	}
@@ -240,6 +239,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			game.socket2 = null;
 		}
 
+		console.log("USER 1", game.user1);
+		console.log("USER 2", game.user2);
 		if (game.socket1 === null && game.socket2 === null) {
 			if (game.user1) {
 				await this.userService.setUserAsConnected(game.user1);
@@ -282,12 +283,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 			return game.socket1 === client.id || game.socket2 === client.id;
 		})
 
+		this.logger.log(`Client asking disconnection: ${game}`);
+
 		if (!game) { return; }
 
 		if (game.socket1 === client.id) {
-			this.server.to(game.socket2).emit('gameStop', game.socket1);
+			if (game.user2) {
+				this.server.to(game.socket2).emit('gameStop', game.socket1);
+			}
 		} else if (game.socket2 === client.id) {
-			this.server.to(game.socket1).emit('gameStop', game.socket2);
+			if (game.user1) {
+				this.server.to(game.socket1).emit('gameStop', game.socket2);
+			}
 		}
 		this.logger.log(`Client disconnected: ${client.id}`);
 		this.handleDeleteRoom(client);

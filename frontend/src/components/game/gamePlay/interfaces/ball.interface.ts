@@ -23,20 +23,40 @@ function getHighSpeed(n: number) {
 	return n;
 }
 
-export function setInitialBallState(windowWidth: number, windowHeight: number) {
+export function setRandomBallSpeed() {
 
 	let x: number = getRandomArbitrary(-0.5, 0.5);
 	let y: number = getRandomArbitrary(-0.5, 0.5);
 
+	x = getHighSpeed(x);
+	y = getHighSpeed(y);
+
+	return ([x, y]);
+}
+
+export function setInitalBallPosition(windowWidth: number, windowHeight: number) {
+	return ([windowWidth / 2, windowHeight / 2])
+}
+
+
+export function setInitialBallRadius(windowWidth: number) {
+	return (windowWidth / 50);
+}
+export function setInitialBallState(windowWidth: number, windowHeight: number) {
+
+	let newVelocity: number[] = setRandomBallSpeed();
+	let newPosition: number[] = setInitalBallPosition(windowWidth, windowHeight);
+	let newRadius: number = setInitialBallRadius(windowWidth);
+
 	return ({
 		velocity: {
-			x: getHighSpeed(x),
-			y: getHighSpeed(y),
+			x: newVelocity[0],
+			y: newVelocity[1],
 		},
 		position: {
-			x: windowWidth / 2,
-			y: windowHeight / 2,
+			x: newPosition[0],
+			y: newPosition[1],
 		},
-		radius: windowWidth / 50,
+		radius: newRadius,
 	});
 }

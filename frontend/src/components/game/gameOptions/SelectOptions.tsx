@@ -35,8 +35,7 @@ export default function SelectOptions({ setGameplay, gameplay, gameCanvas }: Pro
 	const dispatch = useDispatch();
 
 	async function launchPlaying() {
-		//console.log("In Launch Playing");
-		//console.log("Fast Mode on?:", fastModeActivated);
+		//console.log("LAUNCHING MOFO: ", fastModeActivated);
 		setGameplay((gameplay: Gameplay) => {
 			return {
 				...gameplay,
@@ -55,45 +54,6 @@ export default function SelectOptions({ setGameplay, gameplay, gameCanvas }: Pro
 		dispatch(closeGameOptions());
 		return true;
 	}
-
-	useEffect(() => {
-		let newVX: number = gameplay.ball.velocity.x;
-		let newVY: number = gameplay.ball.velocity.y;
-
-		if (fastModeActivated) {
-			newVX = newVX + 1;
-			newVY = newVY + 1;
-			if (gameplay.ball.velocity.x < 0) {
-				newVX = gameplay.ball.velocity.x - 1;
-			}
-			if (gameplay.ball.velocity.y < 0) {
-				newVY = gameplay.ball.velocity.y - 1;
-			}
-		}
-		else {
-			newVX = newVX - 1;
-			newVY = newVY - 1;
-			if (gameplay.ball.velocity.x < 0) {
-				newVX = gameplay.ball.velocity.x + 1;
-			}
-			if (gameplay.ball.velocity.y < 0) {
-				newVY = gameplay.ball.velocity.y + 1;
-			}
-		}
-		setGameplay((gameplay: Gameplay) => {
-			return {
-				...gameplay,
-				ball: {
-					...gameplay.ball,
-					velocity: {
-						x: newVX,
-						y: newVY,
-					}
-				}
-			}
-		})
-		console.log("Switch speed: ", gameplay.ball.velocity);
-	}, [fastModeActivated]);
 
 	if (uiState.showGameOptions) {
 		return (
