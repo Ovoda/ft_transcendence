@@ -124,7 +124,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (role.role === RoleTypeEnum.BANNED) {
 			throw new UserUnauthorized("User is banned from this room");
 		}
-		return await this.chatMessageService.getManyMessagesFromId(message_id, limit);
+		return await this.chatMessageService.getManyMessagesFromId(userId, message_id, limit);
 	}
 
 	/**
