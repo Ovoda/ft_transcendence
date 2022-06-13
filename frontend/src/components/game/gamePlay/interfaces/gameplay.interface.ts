@@ -12,6 +12,7 @@ export default interface Gameplay {
 }
 
 export function setInitialGameplayState(windowWidth: number, windowHeight: number) {
+
 	return ({
 		fast: false,
 		longGame: false,
