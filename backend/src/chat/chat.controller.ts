@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, HttpCode, Query, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, HttpCode, Query, Request, Delete, Req } from '@nestjs/common';
 import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
 import { ChangeRoleDto } from './dtos/changeRole.dto';
 import { CreateGroupDto } from './dtos/createGroup.dto';
@@ -27,6 +27,15 @@ export class ChatController {
 	async getGroup(
 		@Param("group_id") groupId: string) {
 		return await this.chatGroupService.findOneById(groupId, { relations: ["users"] });
+	}
+
+	@UseGuards(TfaGuard)
+	@Delete("/group/:group_id/:role_id")
+	@HttpCode(200)
+	async deleteGroup(
+		@Param("group_id") groupId: string,
+		@Param("role_id") roleId: string) {
+		return await this.chatGroupService.deleteGroup(groupId, roleId);
 	}
 
 	@UseGuards(TfaGuard)
@@ -77,7 +86,7 @@ export class ChatController {
 	@Get('/group/protected/:groupId')
 	@HttpCode(200)
 	async groupRequirePassword(@Request() req, @Param('groupId') groupId: string) {
-		return await this.chatGroupService.GroupPasswordProtected(groupId)
+		return await this.chatGroupService.groupPasswordProtected(groupId);
 	}
 
 

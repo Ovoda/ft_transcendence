@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CrudService } from 'src/app/templates/crud.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/createUser.dto';
+import UpdateUserDto from './dtos/updateUser.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserActivityStatusEnum } from './enums/userConnectionStatus.enum';
 

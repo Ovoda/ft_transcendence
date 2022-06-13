@@ -33,7 +33,7 @@ export default function TextInput({ text, setText, type = "text", name = "", id 
 
 
     return (
-        <div id={id} className="reskue_text_input_container">
+        <div id={id} className="text_input_container">
             <input name={name} type={type} value={text} onChange={textOnChange} />
             <label className="placeholder_text" htmlFor={name} >
                 <p>{placeholder}</p>

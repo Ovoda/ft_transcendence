@@ -22,13 +22,13 @@ export default function LoggedInMenu({ userData, openSettingsWindow }: Props) {
     return (
         <div id="navbar_logged_in">
             <div id="navbar_infos">
-                <p>{userData.login}</p>
+                <p>{userData.username}</p>
                 <button onClick={handleLogout}>Log out</button>
             </div>
             <img
                 onClick={openSettingsWindow}
                 src={userData.avatar}
-                alt={userData.login + "'s avatar"} />
+                alt={userData.username + "'s avatar"} />
         </div>
     );
 }

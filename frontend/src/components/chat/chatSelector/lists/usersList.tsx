@@ -26,6 +26,7 @@ export default function UsersList({ type, onClick }: Props) {
             if (response.error !== "") {
                 return;
             }
+            console.log(response.data);
             setUsers(response.data);
         }
         fetchAllUsers();
@@ -37,8 +38,8 @@ export default function UsersList({ type, onClick }: Props) {
                 users &&
                 users.map((user: UserData, index: number) =>
                     <div key={index} className="users_list_item">
-                        <img className="users_list_item_img" src={user.avatar} alt={user.login + "'s avatar"} />
-                        <p>{user.login}</p>
+                        <img className="users_list_item_img" src={user.avatar} alt={user.username + "'s avatar"} />
+                        <p>{user.username}</p>
                         {
                             type === UserListTypeEnum.RELATIONS &&
                             <BlockAddButtons selectedUser={user} />

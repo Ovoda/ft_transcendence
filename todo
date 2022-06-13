@@ -1,6 +1,9 @@
-- edit profile username and picture
-- block people also hide messages in groups in groups
+- DONE: edit profile username 
+- add user picture
+- block people also hide messages in groups
 - fix: password window shows up even when password not required
 - add kick in groups
-- delete chat group for owner
-
+- DONE: delete chat group for owner
+- add validation for every dto
+- DONE: prompt on first login
+- fix first message fetching repeat

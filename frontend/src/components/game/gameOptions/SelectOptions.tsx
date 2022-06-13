@@ -49,7 +49,7 @@ export default function SelectOptions({ setGameplay, gameplay, gameCanvas }: Pro
 		})
 		let userInfo: SetUserDto = {
 			id: user.id,
-			login: user.login,
+			login: user.username,
 		}
 		mainSocket?.emit("joinGame", userInfo);
 		dispatch(closeGameOptions());

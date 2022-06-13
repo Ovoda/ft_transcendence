@@ -6,7 +6,7 @@ import Navbar from './components/navbar';
 import UserSettings from './components/user/UserSettings';
 import { useDispatch, useSelector } from 'react-redux';
 import { Store } from './app/store';
-import { closeSettingWindow } from './features/uiState/uiState.slice';
+import { closeSettingWindow, openEditProfile } from './features/uiState/uiState.slice';
 import TfaRegistration from './components/auth/TfaRegistration';
 import { useContext, useEffect } from 'react';
 import Chat from './components/chat/chat';
@@ -15,6 +15,7 @@ import { mainSocketContext } from 'src';
 import UserRelation from './shared/interfaces/userRelation';
 import UserRole from './shared/interfaces/role.interface';
 import Notification from './components/notification/notification';
+import EditProfile from './components/user/editProfile';
 
 function App() {
 
@@ -47,12 +48,19 @@ function App() {
     }
   }, [relations.friends]);
 
+  useEffect(() => {
+    if (user && user.login && !user.username) {
+      dispatch(openEditProfile());
+    }
+  }, [user]);
+
   return (
     <div className="App">
       <Notification />
       <Navbar />
       <TfaRegistration />
       <Chat />
+      <EditProfile />
       <UserSettings
         settingsWindowState={uiState.openedSettings}
         setSettingsWindowAction={() => dispatch(closeSettingWindow())} />

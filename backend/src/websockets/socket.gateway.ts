@@ -224,7 +224,13 @@ export class SocketGateway implements OnGatewayDisconnect {
         })
     }
 
-    public updateRoles(newRole: RoleTypeEnum, groupName: string, userId: string) {
+    public updateRoles(newRole: RoleTypeEnum | null, groupName: string, userId: string) {
+        const event = this.events.find((event: ClientSocket) => event.userId === userId);
+
+        if (!newRole) {
+            this.server.to(event.socket.id).emit("UpdateUserRoles");
+        }
+
         let message = "";
 
         if (newRole === RoleTypeEnum.BANNED) {
@@ -240,10 +246,9 @@ export class SocketGateway implements OnGatewayDisconnect {
             message = `You're now a lambda user in ${groupName}`
         }
 
-        const event = this.events.find((event: ClientSocket) => event.userId === userId);
 
-        if (event)
-            this.server.to(event.socket.id).emit("UpdateUserRoles", message);
+        if (!event) return;
+        this.server.to(event.socket.id).emit("UpdateUserRoles", message);
     }
 
     public updateRelations(userId: string) {
@@ -251,5 +256,13 @@ export class SocketGateway implements OnGatewayDisconnect {
         if (event) {
             this.server.to(event.socket.id).emit("UpdateUserRelations", userId);
         }
+    }
+
+    public emitToSocketRoom(groupId: string, eventName: string, eventCallback: () => void = null) {
+        if (eventCallback) {
+            this.server.to(groupId).emit(eventName, eventCallback);
+            return;
+        }
+        this.server.to(groupId).emit(eventName);
     }
 }

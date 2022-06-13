@@ -6,7 +6,7 @@ import Auth from "../../features/auth/interfaces/auth.interface";
 import "./TfaRegistration.scss";
 import useDigitInput from 'react-digit-input';
 import UiState from "../../features/uiState/interfaces/UiState";
-import { updateUser } from "../../features/user/user.slice";
+import { updateUserData } from "../../features/user/user.slice";
 import UserData from "../../features/user/interfaces/user.interface";
 import { loginTfa } from "../../services/auth.service";
 import { getUserData } from "../../services/api.service";
@@ -42,7 +42,7 @@ export default function TfaLogin() {
             if (res) {
                 const { userData } = await getUserData();
                 if (userData) {
-                    dispatch(updateUser(userData));
+                    dispatch(updateUserData(userData));
                 }
                 setCode("");
                 navigate("/");

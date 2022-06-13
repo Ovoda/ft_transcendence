@@ -4,5 +4,6 @@ export default interface UiState {
 	logged: boolean;
 	showTfaRegistration: boolean;
 	showGameOptions: boolean;
+	showEditProfile: boolean;
 	notification: string;
 }

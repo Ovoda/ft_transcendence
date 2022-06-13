@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import UserRole from "src/shared/interfaces/role.interface";
-import { updateUser } from "../features/user/user.slice";
+import { updateUserData } from "../features/user/user.slice";
 import { getAllRelations, getAllRoles, getUserData } from "../services/api.service";
 
 export default function useFetchSession() {
@@ -23,7 +23,7 @@ export default function useFetchSession() {
         async function fetchSession() {
             const { userData } = await getUserData();
             if (!userData) return;
-            dispatch(updateUser(userData));
+            dispatch(updateUserData(userData));
 
             const { userRelations } = await getAllRelations();
             if (!userRelations) return;

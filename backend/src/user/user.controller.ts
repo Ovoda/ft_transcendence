@@ -1,9 +1,11 @@
-import { Controller, Get, HttpCode, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Patch, Query, Req, UseGuards } from '@nestjs/common';
 import { TfaGuard } from 'src/auth/guards/tfa.auth.guard';
 import { UserService } from './user.service';
 import { UserEntity } from './entities/user.entity';
 import { JwtRequest } from 'src/auth/interfaces/jwtRequest.interface';
 import { RelationService } from 'src/relation/relation.service';
+import { request } from 'http';
+import UpdateUserDto from './dtos/updateUser.dto';
 
 @Controller('user')
 export class UserController {
@@ -15,8 +17,7 @@ export class UserController {
 	@Get()
 	@UseGuards(TfaGuard)
 	async getCurrentUser(
-		@Req() req: JwtRequest,
-	) {
+		@Req() req: JwtRequest) {
 		return req.user;
 	}
 
@@ -40,10 +41,21 @@ export class UserController {
 			return {
 				id: user.id,
 				login: user.login,
+				username: user.username,
 				avatar: user.avatar,
 				roles: user.roles,
 				relations: user.relations,
 			}
 		});
+	}
+
+	@Patch()
+	@HttpCode(200)
+	@UseGuards(TfaGuard)
+	async updateUser(
+		@Req() request: JwtRequest,
+		@Body() updateUserDto: UpdateUserDto) {
+		console.log(updateUserDto);
+		return await this.userService.updateById(request.user.id, updateUserDto);
 	}
 }
