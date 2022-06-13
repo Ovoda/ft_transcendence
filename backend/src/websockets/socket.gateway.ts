@@ -1,8 +1,8 @@
 import { ConnectedSocket, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { JoinRoomDto } from "./dtos/JoinRoom.dto";
+import { JoinRoomDto } from "./interfaces/JoinRoom.interface";
 import ClientSocket from "./interfaces/Socket.interface";
-import { LeaveRoomDto } from "./dtos/LeaveRoom.dto";
+import { LeaveRoomDto } from "./interfaces/LeaveRoom.interface";
 import { ChatRoleService } from "src/chat/services/chatRole.service";
 import * as _ from "lodash";
 import { ChatMessageService } from "src/chat/services/chatMessage.service";
