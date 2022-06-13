@@ -68,7 +68,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('joinGame')
 	async handleJoinGame(client: Socket, data: any) {
-		this.logger.log(`New Game Request from: ${client.id}`);
+		this.logger.log(`New Game Request from: ${client.id}, ${data.login}, ${data.id}`);
+
+		const game = this.games.find((game: GameRoom) => {
+			return (game.user1 === data.id || game.user2 === data.id);
+		});
+
+		if (game) {
+			this.server.to(client.id).emit('GameAlert', "You already have an ongoing game.");
+			return;
+		}
+
 		if (!this.games.length || this.games[this.games.length - 1].status === true) {
 			const newGame: GameRoom = {
 				id: "game" + client.id,
@@ -143,9 +153,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
-		if (index >= 0) {
-			this.server.to(this.games[index].id).emit('pauseGame');
-		}
+
+		if (index < 0) { return; }
+
+		this.server.to(this.games[index].id).emit('pauseGame');
 	}
 
 	@SubscribeMessage('resumeGameRequest')
@@ -153,9 +164,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
-		if (index >= 0) {
-			this.server.to(this.games[index].id).emit("resumeGame", data);
-		}
+
+		if (index < 0) { return; }
+
+		this.server.to(this.games[index].id).emit("resumeGame", data);
 	}
 
 
@@ -164,9 +176,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const index = this.games.findIndex((game: GameRoom) => {
 			return (game.socket1 === client.id || game.socket2 === client.id);
 		})
-		if (index >= 0) {
-			this.server.to(this.games[index].id).emit('updateScore', data);
-		}
+
+		if (index < 0) { return; }
+
+		this.server.to(this.games[index].id).emit('updateScore', data);
 	}
 
 	@SubscribeMessage('animateGame')

@@ -207,27 +207,30 @@ function GamePlay() {
 
 	return (
 		<div className="gameplay">
-			{gameStatus.play === PlayStatusEnum.OFF && (
-				<>
-					<Button onClick={() => handleOptionsModal()}>Start a Game</Button>
-					<SelectOptions setGameplay={setGameplay} gameplay={gameplay} gameCanvas={gameCanvas} />
-				</>
-			)}
-			{gameStatus.play !== PlayStatusEnum.OFF && gameStatus.user !== UserStatusEnum.WATCHER && (
-				<Button onClick={() => leaveGame([gameplay.playerLeft.score, gameplay.playerRight.score])}>Stop Game</Button>
-			)}
-			{gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER && (
-				<Button onClick={() => pauseGame()}>Pause Game</Button>
-			)}
-			{gameStatus.play === PlayStatusEnum.PENDING && (
-				<p>Waiting for a match...</p>
-			)}
-			{gameStatus.play === PlayStatusEnum.PAUSE && gameStatus.user !== UserStatusEnum.WATCHER && (
-				<Button onClick={() => resumeGame()}>Resume Game</Button>
-			)}
-			{gameStatus.user === UserStatusEnum.WATCHER && (
-				<Button onClick={() => stopWatching()}>Stop Watching</Button>
-			)}
+			<div className="game_buttons">
+				{gameStatus.play === PlayStatusEnum.OFF && (
+					<>
+						<Button onClick={() => handleOptionsModal()}>Start a Game</Button>
+						<SelectOptions setGameplay={setGameplay} gameplay={gameplay} gameCanvas={gameCanvas} />
+					</>
+				)}
+				{gameStatus.play !== PlayStatusEnum.OFF && gameStatus.user !== UserStatusEnum.WATCHER && (
+					<Button onClick={() => leaveGame([gameplay.playerLeft.score, gameplay.playerRight.score])}>Stop Game</Button>
+				)}
+				{gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER && (
+					<Button onClick={() => pauseGame()}>Pause Game</Button>
+				)}
+
+				{gameStatus.play === PlayStatusEnum.PENDING && (
+					<p>Waiting for a match...</p>
+				)}
+				{gameStatus.play === PlayStatusEnum.PAUSE && gameStatus.user !== UserStatusEnum.WATCHER && (
+					<Button onClick={() => resumeGame()}>Resume Game</Button>
+				)}
+				{gameStatus.user === UserStatusEnum.WATCHER && (
+					<Button onClick={() => stopWatching()}>Stop Watching</Button>
+				)}
+			</div>
 			{(gameStatus.play === PlayStatusEnum.ON || gameStatus.play === PlayStatusEnum.PAUSE) && (
 				<>
 					<div id="score_container">

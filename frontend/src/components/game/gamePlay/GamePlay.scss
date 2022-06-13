@@ -9,15 +9,10 @@
 		justify-content: center;
 	}
 
-	button {
-		margin-top: 5rem;
-	}
-
 	#score_container {
 		display: flex;
 		color: white;
 		width: 30%;
-		//border: 1px solid chartreuse;
 		justify-content: space-between;
 
 		.score_player2 {
@@ -31,15 +26,26 @@
 		}
 	}
 
+	.game_buttons {
+		padding: 1rem;
+		align-items: center;
+		justify-content: space-between;
+		margin: 10px;
+
+		button {
+			margin: 1rem;
+		}
+	}
+
 	#canvas {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		max-width: 1000rem;
-		max-height: 700rem;
-		width: 80%;
+		width: 70%;
 		margin: auto;
-		height: 80%;
+		height: 60%;
+		max-width: 60rem;
+		max-height: 45rem;
 	}
 
 	#dark_button {

@@ -1,11 +1,16 @@
 $type-light: white;
+
 html,
 body {
-    background-color: #282C34;
-    box-sizing: border-box;
+	background-color: #282C34;
+	box-sizing: border-box;
 
-    padding: none;
-    margin: none;
+	padding: none;
+	margin: none;
 
-    font-size: 10px;
+	font-size: 10px;
+}
+
+html {
+	max-height: 100vh;
 }

@@ -35,8 +35,8 @@ export default function SelectOptions({ setGameplay, gameplay, gameCanvas }: Pro
 	const dispatch = useDispatch();
 
 	async function launchPlaying() {
-		console.log("In Launch Playing");
-		console.log("Fast Mode on?:", fastModeActivated);
+		//console.log("In Launch Playing");
+		//console.log("Fast Mode on?:", fastModeActivated);
 		setGameplay((gameplay: Gameplay) => {
 			return {
 				...gameplay,
