@@ -127,10 +127,11 @@ export class ChatController {
 	@HttpCode(200)
 	@UseGuards(TfaGuard)
 	async getManyDmMessages(
+		@Request() req,
 		@Param("message_id") messageId: string,
 		@Query("limit") limit: number,
 	) {
-		return await this.chatMessageService.getManyMessagesFromId(messageId, 20);
+		return await this.chatMessageService.getManyMessagesFromId(req.user.id, messageId, 20);
 	}
 
 	@UseGuards(TfaGuard)

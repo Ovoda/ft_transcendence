@@ -1,6 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CrudService } from "src/app/templates/crud.service";
+import RelationEntity from "src/relation/entities/relation.entity";
+import { RelationTypeEnum } from "src/relation/enums/relationType.enum";
+import { RelationService } from "src/relation/relation.service";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
 import { CreateChatMessageDto } from "../dtos/createChatMessage.dto";
@@ -13,6 +16,7 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		@InjectRepository(ChatMessageEntity)
 		protected readonly _repository: Repository<ChatMessageEntity>,
 		protected readonly userService: UserService,
+		protected readonly relationService: RelationService,
 		protected readonly _log: Logger,
 	) {
 		super(_repository, _log);
@@ -62,7 +66,17 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		return message;
 	}
 
-	async getManyMessagesFromId(messageId: string, limit?: number) {
+	private async filterBlockedMessages(userId1: string, userId2: string) {
+		const relation: RelationEntity = await this.relationService.getRelationFromTwoUsers(userId1, userId2);
+		if (relation){
+			if (relation.status === RelationTypeEnum.BLOCKED){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	async getManyMessagesFromId(getterId: string, messageId: string, limit?: number) {
 		//let messages: ChatMessageEntity[] = [];
 		let message = await this.findOneById(messageId);
 		let msg = await this.buildMessageFromEntity(message);
@@ -71,7 +85,10 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		if (!message) {
 			return messages;
 		}
-		messages.push(msg);
+		let valid = await this.filterBlockedMessages(getterId, message.userId);
+		if (!valid){
+			messages.push(msg);
+		}
 		let lim: number;
 		if (!msg.prev_message) {
 			return messages;
@@ -83,7 +100,12 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 				}
 				let tmp = await this.findOneById(msg.prev_message);
 				const tmpmsg = await this.buildMessageFromEntity(tmp);
-				messages.push(tmpmsg);
+				let bool = await this.filterBlockedMessages(getterId, tmp.userId);
+				if (bool){
+					i--;
+				} else {
+					messages.push(tmpmsg);
+				}
 				msg = tmpmsg;
 			}
 		}
