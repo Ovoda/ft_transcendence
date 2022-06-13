@@ -34,7 +34,7 @@ export class ImagesService extends CrudService<ImagesEntity>{
 		}
 		const user = await this.userService.findOneById(userId);
 		const image = await this.save(createImageDto);
-		user.imageId = image.id;
+		user.avatar = configService.getBackendUrl() + "images/id/" + image.id;
 		await this.userService.save(user);
 		return image;
 	}
@@ -49,7 +49,7 @@ export class ImagesService extends CrudService<ImagesEntity>{
 		}
 		const group = await this.groupService.findOneById(groupId);
 		const image = await this.save(createImageDto);
-		group.imageId = image.id;
+		group.groupAvatar = configService.getBackendUrl() + "images/id/" + image.id;
 		await this.groupService.save(group);
 		return image;
 	}
