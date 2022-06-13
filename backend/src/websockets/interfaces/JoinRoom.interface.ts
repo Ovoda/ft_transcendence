@@ -1,4 +1,3 @@
-
 /**
  * @interface JoinRoomDto
  * @field roomId

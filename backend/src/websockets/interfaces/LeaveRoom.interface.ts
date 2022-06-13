@@ -1,4 +1,4 @@
-import { JoinRoomDto } from "./JoinRoom.dto";
+import { JoinRoomDto } from "./JoinRoom.interface";
 
 /**
  * @interface LeaveRoomDto
