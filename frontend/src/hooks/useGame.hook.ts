@@ -6,13 +6,14 @@ import { UserStatusEnum } from "../components/game/gamePlay/enums/userStatus.enu
 import { PlayStatusEnum } from "../components/game/gamePlay/enums/playStatus.enum";
 import { ResultStatusEnum } from "../components/game/gamePlay/enums/resultStatus.enum";
 import Gameplay from "src/components/game/gamePlay/interfaces/gameplay.interface";
-import { setInitialBallState } from '../components/game/gamePlay/interfaces/ball.interface';
+import { setInitalBallPosition, setInitialBallRadius, setInitialBallState, setRandomBallSpeed } from '../components/game/gamePlay/interfaces/ball.interface';
 import GameCanvas from "src/components/game/gamePlay/interfaces/gameCanvas.interface";
 import { Store } from '../app/store';
 import { useDispatch, useSelector } from "react-redux";
 import UserData from "features/user/interfaces/user.interface";
 import { mainSocketContext } from "src";
 import { setNotification } from "features/uiState/uiState.slice";
+import { setBallSpeed } from "src/components/game/gamePlay/services/ball.service";
 
 const shortGameScoreToWin: number = 21;
 const longGameScoreToWin: number = 42;
@@ -31,83 +32,86 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 	/** Tools */
 	const dispatch = useDispatch();
 
-
+	/** Gloabal Data */
 	const store: Store = useSelector((store: Store) => store);
 	const userData: UserData = store.user;
 	const mainSocket = useContext(mainSocketContext);
 
 	useEffect(() => {
 
-		const keydownCallback = (event: KeyboardEvent) => {
-			console.log("log");
-			handleKeyPressed({ event, setGameplay });
-		}
 
-		const keyupCallback = (event: KeyboardEvent) => {
-			handleKeyUnpressed({ event, setGameplay });
-		};
-
-		/** Set keyboard listeners */
-		window.addEventListener("keydown", keydownCallback);
-		window.addEventListener("keyup", keyupCallback);
 
 		if (!mainSocket) return;
 
-		/** Set socket listener */
-		mainSocket.on("gameStop", (stopclient: string) => {
+		const gameStopCallback = (stopclient: string) => {
 			const Result = stopclient === mainSocket.socket.id ? ResultStatusEnum.LOOSE : ResultStatusEnum.WIN;
 			gameStatus.play = PlayStatusEnum.OFF;
 			setGameStatus({ ...gameStatus, play: PlayStatusEnum.OFF, user: UserStatusEnum.UNASSIGNED, result: Result });
 			mainSocket.emit("deleteRoom");
-		});
+		}
 
-		/**  Watcher joins game room **/
-		mainSocket.on("startWatching", (data: string) => {
-			gameStatus.user = UserStatusEnum.WATCHER;
-			setGameStatus({ ...gameStatus, user: UserStatusEnum.WATCHER, play: PlayStatusEnum.ON });
-			mainSocket?.emit("joinGameAsWatcher", data);
-		})
-
-		/** Set status of Room */
-		mainSocket.on("gameStatus", (fullRoom: any) => {
-			if (fullRoom === false) {
-				setGameStatus((gameStatus: GameStatus) => {
-					return { ...gameStatus, play: PlayStatusEnum.PENDING };
-				})
-			} else {
-				setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
-				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-					console.log("Socket gameStatus speed: ", gameplay.ball.velocity);
-					console.log("Game fast speed?: ", gameplay.fast);
-					mainSocket.emit("animateGame", {
-						posX: gameplay.ball.position.x,
-						posY: gameplay.ball.position.y
-					} as UpdateBallDto);
+		const setLoginCallback = (data: any) => {
+			setGameplay((gameplay: Gameplay) => {
+				return {
+					...gameplay,
+					playerLeft: {
+						...gameplay.playerLeft,
+						login: data.left,
+					},
+					playerRight: {
+						...gameplay.playerRight,
+						login: data.right,
+					}
 				}
-			}
-		})
+			})
+		}
 
-		/** Game Alert */
-		mainSocket.on("GameAlert", (message: string) => {
-			dispatch(setNotification(message));
-		})
+		const updateRightPlayerCallback = (value: number) => {
+			setGameplay((gameplay: Gameplay) => {
+				return {
+					...gameplay,
+					playerRight: {
+						...gameplay.playerRight,
+						position: {
+							x: gameplay.playerRight.position.x,
+							y: value,
+						}
+					}
+				}
+			})
+		}
 
-		/** Pause the game **/
-		mainSocket.on("pauseGame", () => {
-			setGameStatus({ ...gameStatus, play: PlayStatusEnum.PAUSE, })
-		})
+		const updateLeftPlayerCallback = (value: number) => {
+			setGameplay((gameplay: Gameplay) => {
+				return {
+					...gameplay,
+					playerLeft: {
+						...gameplay.playerLeft,
+						position: {
+							x: gameplay.playerLeft.position.x,
+							y: value,
+						}
+					}
+				}
+			})
+		}
 
-		/** Resume the Game  **/
-		mainSocket.on("resumeGame", (data: UpdateBallDto) => {
-			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON })
-			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-				console.log("Socket resumeGame speed: ", gameplay.ball.velocity);
-				mainSocket?.emit("animateGame", data);
-			}
-		})
+		const updateBallCallback = (data: UpdateBallDto) => {
+			setGameplay((gameplay: Gameplay) => {
+				return {
+					...gameplay,
+					ball: {
+						...gameplay.ball,
+						position: {
+							x: data.posX,
+							y: data.posY,
+						}
+					}
+				}
+			})
+		}
 
-		/** Set logins of players **/
-		mainSocket.on("leftLogin", (data: string) => {
+		const leftLoginCallback = (data: string) => {
 			setGameplay((gameplay: Gameplay) => {
 				return {
 					...gameplay,
@@ -117,9 +121,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 					}
 				}
 			})
-		})
-
-		mainSocket.on("rightLogin", (data: string) => {
+		}
+		const rightLoginCallback = (data: string) => {
 			setGameplay((gameplay: Gameplay) => {
 				return {
 					...gameplay,
@@ -129,15 +132,79 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 					}
 				}
 			})
+		}
+
+		mainSocket.on("gameStop", gameStopCallback);
+		mainSocket.on("setLogin", setLoginCallback);
+		mainSocket.on("leftLogin", leftLoginCallback);
+		mainSocket.on("rightLogin", rightLoginCallback);
+		mainSocket.on("updateBall", updateBallCallback);
+		mainSocket.on("updateRightPlayer", updateRightPlayerCallback);
+		mainSocket.on("updateLeftPlayer", updateLeftPlayerCallback);
+
+		return (() => {
+			mainSocket.off("gameStop", gameStopCallback);
+			mainSocket.off("setLogin", setLoginCallback);
+			mainSocket.off("leftLogin", leftLoginCallback);
+			mainSocket.off("rightLogin", rightLoginCallback);
+			mainSocket.off("updateBall", updateBallCallback);
+			mainSocket.off("updateRightPlayer", updateRightPlayerCallback);
+			mainSocket.off("updateLeftPlayer", updateLeftPlayerCallback);
+		});
+	}, [gameplay]);
+
+	useEffect(() => {
+		if (!mainSocket) return;
+
+		const startWatchingCallback = (data: string) => {
+			gameStatus.user = UserStatusEnum.WATCHER;
+			setGameStatus({ ...gameStatus, user: UserStatusEnum.WATCHER, play: PlayStatusEnum.ON });
+			mainSocket?.emit("joinGameAsWatcher", data);
+		}
+
+		const pauseGameCallback = () => {
+			setGameStatus({ ...gameStatus, play: PlayStatusEnum.PAUSE, })
+		}
+
+		const resumeGameCallback = (data: UpdateBallDto) => {
+			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON })
+			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+				mainSocket?.emit("animateGame", data);
+			}
+		}
+
+		mainSocket.on("startWatching", startWatchingCallback);
+		mainSocket.on("pauseGame", pauseGameCallback);
+		mainSocket.on("resumeGame", resumeGameCallback);
+
+		return (() => {
+			mainSocket.off("startWatching", startWatchingCallback);
+			mainSocket.off("pauseGame", pauseGameCallback);
+			mainSocket.off("resumeGame", resumeGameCallback);
 		})
 
-		/** Playing with friends */
-		mainSocket.on("PlayingRequest", (data: any) => {
-			console.log("Game request received");
-		})
+	}, [gameStatus]);
 
-		/** Set sides of players */
-		mainSocket.on("setSide", (data: string) => {
+	useEffect(() => {
+		if (!mainSocket) return;
+
+		const gameStatusCallback = (fullRoom: any) => {
+			if (fullRoom === false) {
+				setGameStatus((gameStatus: GameStatus) => {
+					return { ...gameStatus, play: PlayStatusEnum.PENDING };
+				})
+			} else {
+				setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
+				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+					mainSocket.emit("animateGame", {
+						posX: gameplay.ball.position.x,
+						posY: gameplay.ball.position.y
+					} as UpdateBallDto);
+				}
+			}
+		}
+
+		const setSideCallback = (data: string) => {
 			if (data === "left") {
 				gameStatus.user = UserStatusEnum.PLAYER_LEFT;
 				setGameStatus((gameStatus: GameStatus) => {
@@ -168,17 +235,40 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 					}
 				})
 			}
-		})
+		}
 
-		mainSocket.on("updateScore", (data: UpdateBallDto) => {
+		const updateScoreCallback = (data: UpdateBallDto) => {
+
+			console.log("SCORE TO WIN: ", gameplay.longGame);
+
 			let scoreToWin = shortGameScoreToWin;
 			if (gameplay.longGame) {
 				scoreToWin = longGameScoreToWin;
 			}
+
+			console.log("SCORE TO WIN: ", scoreToWin);
+
+
+			let newVelocity: number[] = setRandomBallSpeed();
+			let newPosition: number[] = setInitalBallPosition(gameCanvas.width, gameCanvas.height);
+			let newRadius: number = setInitialBallRadius(gameCanvas.width);
+
+			newVelocity = setBallSpeed(newVelocity[0], newVelocity[1], gameplay.fast);
+
 			setGameplay((gameplay: Gameplay) => {
 				return {
 					...gameplay,
-					ball: setInitialBallState(gameCanvas.width, gameCanvas.height),
+					ball: {
+						velocity: {
+							x: newVelocity[0],
+							y: newVelocity[1],
+						},
+						position: {
+							x: newPosition[0],
+							y: newPosition[1],
+						},
+						radius: newRadius,
+					},
 					playerLeft: {
 						...gameplay.playerLeft,
 						score: data.posX,
@@ -189,85 +279,82 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 					},
 				}
 			})
-			if (data.posX === scoreToWin) {
-				if (gameStatus.user === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum) {
-					mainSocket.emit('leaveGame', data);
+			let leave: boolean = false;
+			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT) {
+				if (data.posX === scoreToWin) {
+					leave = true;
+				}
+				else if (data.posY === scoreToWin) {
+					leave = true;
 				}
 			}
-			else if (data.posY === scoreToWin) {
-				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-					mainSocket.emit('leaveGame', data);
-				}
+
+			if (gameStatus.user === UserStatusEnum.PLAYER_RIGHT as UserStatusEnum && leave) {
+				mainSocket.emit('leaveGame', data);
+			} else if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum && leave) {
+				mainSocket.emit('leaveGame', data);
 			}
 			else {
-				console.log("Socket updateScore speed: ", gameplay.ball.velocity);
 				mainSocket.emit("animateGame", {
 					posX: gameplay.ball.position.x,
 					posY: gameplay.ball.position.y,
 				} as UpdateBallDto);
 			}
+		}
+
+		mainSocket.on("gameStatus", gameStatusCallback);
+		mainSocket.on("setSide", setSideCallback);
+		mainSocket.on("updateScore", updateScoreCallback);
+
+		return (() => {
+			mainSocket.off("gameStatus", gameStatusCallback);
+			mainSocket.off("setSide", setSideCallback);
+			mainSocket.off("updateScore", updateScoreCallback);
 		})
 
-		mainSocket.on("updateBall", (data: UpdateBallDto) => {
-			setGameplay((gameplay: Gameplay) => {
-				return {
-					...gameplay,
-					ball: {
-						...gameplay.ball,
-						position: {
-							x: data.posX,
-							y: data.posY,
-						}
-					}
-				}
-			})
-		})
+	}, [gameStatus, gameplay])
 
-		mainSocket.on("updateLeftPlayer", (value: number) => {
-			setGameplay((gameplay: Gameplay) => {
-				return {
-					...gameplay,
-					playerLeft: {
-						...gameplay.playerLeft,
-						position: {
-							x: gameplay.playerLeft.position.x,
-							y: value,
-						}
-					}
-				}
-			})
-		})
+	useEffect(() => {
 
-		mainSocket.on("updateRightPlayer", (value: number) => {
-			setGameplay((gameplay: Gameplay) => {
-				return {
-					...gameplay,
-					playerRight: {
-						...gameplay.playerRight,
-						position: {
-							x: gameplay.playerRight.position.x,
-							y: value,
-						}
-					}
-				}
-			})
-		})
+		//window.addEventListener("keydown",
+		//	(event: KeyboardEvent) => handleKeyPressed({
+		//		event,
+		//		setGameplay,
+		//		gameplay,
+		//	})
+		//);
+		//window.addEventListener("keyup",
+		//	(event: KeyboardEvent) => handleKeyUnpressed({
+		//		event,
+		//		setGameplay,
+		//		gameplay,
+		//	})
+		//);
 
-		mainSocket.on("setLogin", (data: any) => {
-			setGameplay((gameplay: Gameplay) => {
-				return {
-					...gameplay,
-					playerLeft: {
-						...gameplay.playerLeft,
-						login: data.left,
-					},
-					playerRight: {
-						...gameplay.playerRight,
-						login: data.right,
-					}
-				}
-			})
-		})
+
+		const keydownCallback = (event: KeyboardEvent) => {
+			console.log("log");
+			handleKeyPressed({ event, setGameplay, gameplay });
+		}
+
+		const keyupCallback = (event: KeyboardEvent) => {
+			handleKeyUnpressed({ event, setGameplay, gameplay });
+		};
+
+		/** Set keyboard listeners */
+		window.addEventListener("keydown", keydownCallback);
+		window.addEventListener("keyup", keyupCallback);
+
+
+		if (!mainSocket) return;
+
+		mainSocket.on("GameAlert", (message: string) => {
+			dispatch(setNotification(message));
+		});
+
+		mainSocket.on("PlayingRequest", (data: any) => {
+			console.log("Game request received");
+		});
 
 		/** Keyboard event listeners cleanup */
 		return () => {
@@ -275,4 +362,5 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			window.removeEventListener("keyup", keyupCallback);
 		};
 	}, []);
+
 }
