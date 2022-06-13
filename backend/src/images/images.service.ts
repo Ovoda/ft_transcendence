@@ -55,7 +55,7 @@ export class ImagesService extends CrudService<ImagesEntity>{
 	}
 
 	async getImage(imageId: string) {
-		console.log(configService.getBackendUrl() + "images/id/" + imageId);
+		//console.log(configService.getBackendUrl() + "images/id/" + imageId);
 		return await this.findOneById(imageId);
 	}
 }
