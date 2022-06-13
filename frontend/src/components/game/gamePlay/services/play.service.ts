@@ -3,6 +3,9 @@ import Gameplay from "../interfaces/gameplay.interface";
 import Position from "../interfaces/position.interface";
 import GameStatus from "../interfaces/gameStatus.interface";
 
+const shortGameScoreToWin: number = 21;
+const longGameScoreToWin: number = 42;
+
 export interface handleKeysProps {
 	event: KeyboardEvent;
 	setGameplay: Dispatch<SetStateAction<Gameplay>>,
@@ -73,6 +76,7 @@ export function getNewBallPos(gameplay: Gameplay, gamestatus: GameStatus, height
 		x: -1,
 		y: -1,
 	};
+	//console.log("Old speed: ", gameplay.ball.velocity);
 	if (wallVerticalCollision(gameplay, width)) {
 		return (newPos);
 	}
@@ -95,5 +99,6 @@ export function getNewBallPos(gameplay: Gameplay, gamestatus: GameStatus, height
 	}
 	newPos.x = gameplay.ball.position.x + gameplay.ball.velocity.x;
 	newPos.y = gameplay.ball.position.y + gameplay.ball.velocity.y;
+	//console.log("New speed: ", gameplay.ball.velocity);
 	return (newPos)
 }

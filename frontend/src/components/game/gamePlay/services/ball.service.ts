@@ -3,6 +3,8 @@ import GameCanvas from "../interfaces/gameCanvas.interface";
 
 function drawBall(game: GameCanvas, ball: Ball) {
 	if (!game.context) { return; }
+	//console.log("Draw speed: ", ball.velocity);
+	game.context.strokeStyle = game.elements_color;
 	game.context.fillStyle = game.elements_color;
 	game.context?.beginPath();
 	game.context?.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);

@@ -52,7 +52,7 @@ export default function UserSettings({ settingsWindowState, setSettingsWindowAct
 			<img src={userData.avatar} alt={userData.login + "'s profile picture"} />
 			<p>{userData.login}</p>
 			<div id="user_settings_stats">
-				<p>{(userData.victories / (userData.victories + userData.defeats)) * 100}% win rate</p>
+				<p>{Math.round((userData.victories / (userData.victories + userData.defeats)) * 100)}% win rate</p>
 				<p>{userData.victories} victories</p>
 				<p>{userData.defeats} defeats</p>
 			</div>

@@ -2,7 +2,6 @@ import Ball, { setInitialBallState } from "./ball.interface";
 import Player, { setInitialPlayerLeftState, setInitialPlayerRightState } from "./player.interface";
 
 export default interface Gameplay {
-	dark: boolean;
 	fast: boolean;
 	longGame: boolean;
 	arrowUp: boolean;
@@ -14,7 +13,6 @@ export default interface Gameplay {
 
 export function setInitialGameplayState(windowWidth: number, windowHeight: number) {
 	return ({
-		dark: false,
 		fast: false,
 		longGame: false,
 		arrowUp: false,

@@ -25,6 +25,8 @@ import SelectOptions from "../gameOptions/SelectOptions";
 import { useDispatch } from "react-redux";
 import { openGameOptions } from "features/uiState/uiState.slice";
 
+const shortGameScoreToWin: number = 21;
+const longGameScoreToWin: number = 42;
 const defaultBackgroundColor: string = '#4285F4';
 const defaultElementsColor: string = 'white';
 
@@ -55,24 +57,9 @@ function GamePlay() {
 		setGameCanvas,
 	});
 
-	///** Request a new game **/
-	//async function launchPlaying() {
-	//	setGameplay({
-	//		...gameplay,
-	//		ball: setInitialBallState(gameCanvas.width, gameCanvas.height),
-	//		playerLeft: setInitialPlayerLeftState(gameCanvas.width, gameCanvas.height),
-	//		playerRight: setInitialPlayerRightState(gameCanvas.width, gameCanvas.height),
-	//	})
-	//	let userInfo: SetUserDto = {
-	//		id: userData.id,
-	//		login: userData.login,
-	//	}
-	//	mainSocket?.emit("joinGame", userInfo);
-	//	return true;
-	//}
-
 	/**  stop playing the game **/
 	async function leaveGame(data: number[]) {
+		console.log("Leaving Request");
 		mainSocket?.emit("leaveGame", data);
 		return true;
 	}
@@ -104,6 +91,7 @@ function GamePlay() {
 	/** Update ball object */
 	useEffect(() => {
 		if (gameStatus.play === PlayStatusEnum.ON) {
+			console.log("Use effect ball speed: ", gameplay.ball.velocity);
 			requestAnimationFrame(animate);
 			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
 				let newPos: Position;
@@ -121,12 +109,14 @@ function GamePlay() {
 	/** Update players */
 	useEffect(() => {
 		if (gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER) {
+			console.log("Use effect playerleft speed: ", gameplay.ball.velocity);
 			requestAnimationFrame(animate);
 		}
 	}, [gameplay.playerLeft]);
 
 	useEffect(() => {
 		if (gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER) {
+			console.log("Use effect playerright speed: ", gameplay.ball.velocity);
 			requestAnimationFrame(animate);
 		}
 	}, [gameplay.playerRight]);
@@ -191,6 +181,7 @@ function GamePlay() {
 				elements_color: defaultElementsColor,
 			})
 		}
+		console.log("Use effect darkmode speed: ", gameplay.ball.velocity);
 		requestAnimationFrame(animate);
 	}, [darkModeActivated]);
 
@@ -202,6 +193,7 @@ function GamePlay() {
 			if (!gameCanvas.context) { return; }
 			gameCanvas.context.fillStyle = gameCanvas.background_color;
 			gameCanvas.context?.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+			console.log("Animate speed: ", gameplay.ball.velocity);
 			drawBall(gameCanvas, gameplay.ball);
 			drawPlayer(gameCanvas, gameplay.playerLeft);
 			drawPlayer(gameCanvas, gameplay.playerRight);
@@ -215,28 +207,30 @@ function GamePlay() {
 
 	return (
 		<div className="gameplay">
-			{gameStatus.play === PlayStatusEnum.OFF && (
-				<>
-					{/*<Button onClick={() => launchPlaying()}>Start Game</Button>*/}
-					<Button onClick={() => handleOptionsModal()}>Start a Game</Button>
-					<SelectOptions setGameplay={setGameplay} gameCanvas={gameCanvas} />
-				</>
-			)}
-			{gameStatus.play !== PlayStatusEnum.OFF && gameStatus.user !== UserStatusEnum.WATCHER && (
-				<Button onClick={() => leaveGame([gameplay.playerLeft.score, gameplay.playerRight.score])}>Stop Game</Button>
-			)}
-			{gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER && (
-				<Button onClick={() => pauseGame()}>Pause Game</Button>
-			)}
-			{gameStatus.play === PlayStatusEnum.PENDING && (
-				<p>Waiting for a match...</p>
-			)}
-			{gameStatus.play === PlayStatusEnum.PAUSE && gameStatus.user !== UserStatusEnum.WATCHER && (
-				<Button onClick={() => resumeGame()}>Resume Game</Button>
-			)}
-			{gameStatus.user === UserStatusEnum.WATCHER && (
-				<Button onClick={() => stopWatching()}>Stop Watching</Button>
-			)}
+			<div className="game_buttons">
+				{gameStatus.play === PlayStatusEnum.OFF && (
+					<>
+						<Button onClick={() => handleOptionsModal()}>Start a Game</Button>
+						<SelectOptions setGameplay={setGameplay} gameplay={gameplay} gameCanvas={gameCanvas} />
+					</>
+				)}
+				{gameStatus.play !== PlayStatusEnum.OFF && gameStatus.user !== UserStatusEnum.WATCHER && (
+					<Button onClick={() => leaveGame([gameplay.playerLeft.score, gameplay.playerRight.score])}>Stop Game</Button>
+				)}
+				{gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER && (
+					<Button onClick={() => pauseGame()}>Pause Game</Button>
+				)}
+
+				{gameStatus.play === PlayStatusEnum.PENDING && (
+					<p>Waiting for a match...</p>
+				)}
+				{gameStatus.play === PlayStatusEnum.PAUSE && gameStatus.user !== UserStatusEnum.WATCHER && (
+					<Button onClick={() => resumeGame()}>Resume Game</Button>
+				)}
+				{gameStatus.user === UserStatusEnum.WATCHER && (
+					<Button onClick={() => stopWatching()}>Stop Watching</Button>
+				)}
+			</div>
 			{(gameStatus.play === PlayStatusEnum.ON || gameStatus.play === PlayStatusEnum.PAUSE) && (
 				<>
 					<div id="score_container">
