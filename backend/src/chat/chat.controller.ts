@@ -118,9 +118,11 @@ export class ChatController {
 		@Param('role_id') role_id: string,
 		@Param('message_id') message_id: string,
 		@Query('limit') limit: number,
+		@Query('onScroll') onscroll: string,
 	) {
+		const onScroll: boolean = (onscroll) ? true : false;
 		await this.chatRoleService.uploadRoleFromExpiration(role_id);
-		return await this.chatRoleService.getManyMessagesFromRole(req.user.id, role_id, message_id, limit);
+		return await this.chatRoleService.getManyMessagesFromRole(req.user.id, role_id, message_id, limit, onScroll);
 	}
 
 	@Get("many/message/dm/:message_id")
@@ -130,8 +132,10 @@ export class ChatController {
 		@Request() req,
 		@Param("message_id") messageId: string,
 		@Query("limit") limit: number,
+		@Query("onScroll") onscroll: string,
 	) {
-		return await this.chatMessageService.getManyMessagesFromId(req.user.id, messageId, 20);
+		const onScroll: boolean = (onscroll) ? true : false;
+		return await this.chatMessageService.getManyMessagesFromId(req.user.id, messageId, onScroll, 20);
 	}
 
 	@UseGuards(TfaGuard)
