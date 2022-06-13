@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import { closeChat, openChatDm, openChatGroup, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
 import './dmPicker.scss';
-import "./roomCreation.scss";
+import "./RoomCreation.scss";
 import Button from "assets/Button/Button";
 import { getMessages, getRelation, getRole } from "services/api.service";
 import UserRelation from "src/shared/interfaces/userRelation";
