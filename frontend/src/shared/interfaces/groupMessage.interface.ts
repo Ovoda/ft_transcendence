@@ -4,8 +4,9 @@ import UserRelation from "./userRelation";
 export default interface GroupMessage {
     id?: string;
     date: string;
-    login: string;
-    avatar: string;
+    //login: string;
+    //avatar: string;
+	userId: string;
     content: string;
     role: UserRole;
 }

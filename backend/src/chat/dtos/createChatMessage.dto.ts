@@ -5,14 +5,17 @@ export class CreateChatMessageDto {
 	@IsNotEmpty()
 	content: string;
 
-	@IsNotEmpty()
-	login: string;
+	// @IsNotEmpty()
+	// login: string;
+
+	// @IsNotEmpty()
+	// avatar: string;
+
+	// @IsOptional()
+	// imageId?: string;
 
 	@IsNotEmpty()
-	avatar: string;
-
-	@IsOptional()
-	imageId?: string;
+	userId: string;
 
 	@IsOptional()
 	@IsUUID()

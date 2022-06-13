@@ -10,8 +10,9 @@ import UserRelation from "./userRelation";
 export default interface Dm {
     id?: string;
     date: string;
-    login: string;
-    avatar: string;
+    //login: string;
+    //avatar: string;
+	userId: string;
     content: string;
     relation: UserRelation;
 }

@@ -5,14 +5,17 @@ export class ChatMessageEntity {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
 
-	@Column()
-	login: string;
+	// @Column()
+	// login: string;
+
+	// @Column()
+	// avatar: string;
+
+	// @Column({ nullable: true })
+	// imageId?:string;
 
 	@Column()
-	avatar: string;
-
-	@Column({ nullable: true })
-	imageId?:string;
+	userId: string;
 
 	@Column()
 	content: string;

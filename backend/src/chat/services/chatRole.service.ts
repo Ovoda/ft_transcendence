@@ -142,7 +142,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (role.role === RoleTypeEnum.MUTE) {
 			throw new UserUnauthorized("User is muted on this room");
 		}
-		const message = await this.chatMessageService.postMessage(createMessageChatDto);
+		const message = await this.chatMessageService.postMessage(role.user.id, createMessageChatDto);
 		const prev = (role.chatGroup.lastMessage) ? role.chatGroup.lastMessage : null;
 		await this.chatMessageService.updateById(message.id, {
 			prev_message: prev,
