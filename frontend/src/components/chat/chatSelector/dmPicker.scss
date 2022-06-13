@@ -41,9 +41,9 @@
             border-radius: 0.5rem;
             min-width: max-content;
 
-            top: 0;
-            left: 0;
-            transform: translate(100%, 0);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 0%);
             transition: all 0.3s;
             animation: fade-in 0.3s forwards;
         }

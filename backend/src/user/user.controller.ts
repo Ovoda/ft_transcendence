@@ -6,12 +6,13 @@ import { JwtRequest } from 'src/auth/interfaces/jwtRequest.interface';
 import { RelationService } from 'src/relation/relation.service';
 import { request } from 'http';
 import UpdateUserDto from './dtos/updateUser.dto';
+import { SocketGateway } from 'src/websockets/socket.gateway';
 
 @Controller('user')
 export class UserController {
 	constructor(
 		private readonly userService: UserService,
-		private readonly relationService: RelationService,
+		private readonly socketGateway: SocketGateway,
 	) { }
 
 	@Get()
@@ -55,7 +56,8 @@ export class UserController {
 	async updateUser(
 		@Req() request: JwtRequest,
 		@Body() updateUserDto: UpdateUserDto) {
-		console.log(updateUserDto);
-		return await this.userService.updateById(request.user.id, updateUserDto);
+		const newUser = await this.userService.updateById(request.user.id, updateUserDto);
+		this.socketGateway.updateRelations();
+		return newUser;
 	}
 }

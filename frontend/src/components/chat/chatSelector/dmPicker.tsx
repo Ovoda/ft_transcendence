@@ -29,6 +29,7 @@ export default function DmPicker() {
 		}
 		const updatedRelation = await getRelation(relation.id);
 		const { messages } = await getMessages(updatedRelation.data.lastMessage);
+
 		if (messages)
 			dispatch(openChatDm({ messages: messages.reverse(), relation: updatedRelation.data }));
 	}
@@ -41,6 +42,7 @@ export default function DmPicker() {
 
 		const updatedRole = await getRole(role.id);
 		const group = updatedRole.data.chatGroup;
+		console.log(group);
 
 		const { messages } = await getMessages(group.lastMessage, updatedRole.data.id);
 
@@ -62,9 +64,7 @@ export default function DmPicker() {
 				relations.friends.map((relation: UserRelation, index: number) =>
 					<div key={index} onClick={() => selectDmRoom(relation)} className="dm_picker_room">
 						<img src={relation.counterPart.avatar} alt="" />
-						{/* <button onClick={() => watchingRequest(role.chatroom.name, mainSocket)}>Watch Game</button> */}
 						<p className="dm_picker_room_name">{relation.counterPart.username}</p>
-
 						<span id="friend_log_status"
 							className={relation.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED
 								? "connected" : ""}>

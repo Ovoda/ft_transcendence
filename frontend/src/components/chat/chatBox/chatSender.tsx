@@ -28,7 +28,7 @@ export default function ChatSender() {
 		if (chat.currentRelation) {
 			mainSocket?.sendDm({
 				content: newMessage,
-				login: user.login,
+				username: user.username,
 				date: time,
 				avatar: user.avatar,
 				userId: user.id,
@@ -37,7 +37,7 @@ export default function ChatSender() {
 		} else if (chat.currentRole) {
 			mainSocket?.sendGroupMessage({
 				content: newMessage,
-				login: user.login,
+				username: user.username,
 				date: time,
 				avatar: user.avatar,
 				userId: user.id,
