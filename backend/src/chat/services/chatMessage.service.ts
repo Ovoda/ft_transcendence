@@ -94,8 +94,6 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 			}
 		});
 
-		console.log(blockedUsers);
-
 		let valid = this.filterBlockedMessages(blockedUsers, message.userId);
 		if (!valid) {
 			messages.push(msg);
