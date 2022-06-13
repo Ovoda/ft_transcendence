@@ -21,6 +21,8 @@ import { WebsocketsService } from "src/websockets/websockets.service";
 import { SocketGateway } from "src/websockets/socket.gateway";
 import JoinGroupDto from "../dtos/joinGroupDto";
 import * as _ from 'lodash';
+import { ChatGroupEntity } from "../entities/chatGroup.entity";
+import { Group } from "../interfaces/group.interface";
 
 @Injectable()
 export class ChatRoleService extends CrudService<ChatRoleEntity>{
@@ -77,6 +79,16 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		return roles;
 	}
 
+	public cleanGroup(group: ChatGroupEntity){
+		const gp: Group = {
+			groupAvatar: group.groupAvatar,
+			id: group.id,
+			lastMessage: group.lastMessage,
+			name: group.name,
+		}
+		return gp;
+	}
+
 	/**
 	 * Create all associated roles when chatGroup is created.
 	 * @param userId the user calling the route. Avoid random user to read messages.
@@ -103,7 +115,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		}
 		let obj = {
 			roomName: room.name,
-			chatGroup: room,
+			chatGroup: this.cleanGroup(room),
 		}
 		return obj;
 	}
@@ -272,7 +284,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (userId != rl.user.id) {
 			throw new UserUnauthorized("user and role don't match");
 		}
-		const group = await this.chatGroupService.findOne({ where: { role: rl } });
+		const group = await this.chatGroupService.findOne({ where: { role: rl }, relations: ['password'] });
 		return (group.password) ? true : false;
 	}
 

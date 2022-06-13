@@ -16,8 +16,10 @@ export class ChatGroupEntity {
 	@Column({ nullable: true })
 	lastMessage: string; // uuid of the last message, needs to be updated each time a message is send in this room
 
-	@Column({ select: false, nullable: true })
-	password: string;
+	//@Exclude({ toPlainOnly: true })
+	// @Column({ select: false, nullable: true })
+	@Column({ nullable: true })
+	password?: string;
 
 	@OneToMany(() => ChatRoleEntity, role => role.chatGroup)
 	@JoinTable()
