@@ -76,8 +76,7 @@ export default function DmPicker() {
 				roleSlice.roles &&
 				roleSlice.roles.map((role: UserRole, index: number) =>
 					<div key={index} onClick={() => selectGroupRoom(role)} className="dm_picker_room">
-						{/* TODO : image */}
-						<img src="https://42.fr/wp-content/uploads/2021/08/42.jpg" alt="" />
+						<img src={role.chatGroup.groupAvatar} alt="" />
 						<p className="dm_picker_room_name">{role.chatGroup.name}</p>
 					</div>
 				)

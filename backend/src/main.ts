@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import * as cookieParser from 'cookie-parser';
 import { configService } from './app/config/config.service';
-import { ValidationPipe } from '@nestjs/common';
+import bodyParser from 'body-parser';
 
 declare const module: any;
 

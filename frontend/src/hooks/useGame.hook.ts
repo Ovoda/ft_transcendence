@@ -38,18 +38,18 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 	useEffect(() => {
 
-		/** Set keyboard listeners */
-		window.addEventListener("keydown",
-			(event: KeyboardEvent) => handleKeyPressed({
-				event,
-				setGameplay,
-			}));
-		window.addEventListener("keyup",
-			(event: KeyboardEvent) => handleKeyUnpressed({
-				event,
-				setGameplay,
-			}));
+		const keydownCallback = (event: KeyboardEvent) => {
+			console.log("log");
+			handleKeyPressed({ event, setGameplay });
+		}
 
+		const keyupCallback = (event: KeyboardEvent) => {
+			handleKeyUnpressed({ event, setGameplay });
+		};
+
+		/** Set keyboard listeners */
+		window.addEventListener("keydown", keydownCallback);
+		window.addEventListener("keyup", keyupCallback);
 
 		if (!mainSocket) return;
 
@@ -271,16 +271,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		/** Keyboard event listeners cleanup */
 		return () => {
-			window.addEventListener("keydown",
-				(event: KeyboardEvent) => handleKeyPressed({
-					event,
-					setGameplay,
-				}));
-			window.addEventListener("keyup",
-				(event: KeyboardEvent) => handleKeyUnpressed({
-					event,
-					setGameplay,
-				}));
+			window.removeEventListener("keydown", keydownCallback);
+			window.removeEventListener("keyup", keyupCallback);
 		};
 	}, []);
 }

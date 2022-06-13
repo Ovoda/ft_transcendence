@@ -21,6 +21,7 @@ export default function GroupList({ onClick }: Props) {
                 return;
             }
             setGroups(groups);
+            console.log(groups);
         }
         fetchAllGroups();
         console.log(groups);
@@ -33,7 +34,7 @@ export default function GroupList({ onClick }: Props) {
                 groups.length > 0 &&
                 groups.map((group: Group, index: number) =>
                     <div key={index} className="join_group_list_item">
-                        <img className="join_group_list_item_image" src="https://42.fr/wp-content/uploads/2021/08/42.jpg" alt="" />
+                        <img className="join_group_list_item_image" src={group.groupAvatar} alt="" />
                         <p>{group.name}</p>
                         <Button onClick={async () => { return onClick(group) }}>Join</Button>
                     </div>
