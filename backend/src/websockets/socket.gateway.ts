@@ -103,7 +103,7 @@ export class SocketGateway implements OnGatewayDisconnect {
         const user = await this.userService.findOne({
             where: {
                 //login: body.login,
-				userId: body.userId,
+				id: body.userId,
             },
             relations: ["roles"]
         });

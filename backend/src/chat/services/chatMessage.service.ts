@@ -67,7 +67,7 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 	}
 
 	private async filterBlockedMessages(userId1: string, userId2: string) {
-		const relation: RelationEntity = await this.relationService.getRelationFromTwoUsers(userId1, userId2);
+		const relation = await this.relationService.getRelationFromTwoUsers(userId1, userId2);
 		if (relation){
 			if (relation.status === RelationTypeEnum.BLOCKED){
 				return true;

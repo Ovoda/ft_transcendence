@@ -11,12 +11,14 @@ import { UserModule } from 'src/user/user.module';
 import { ChatPasswordService } from './services/chatPassword.service';
 import { WebsocketsModule } from 'src/websockets/websockets.module';
 import { SocketGateway } from 'src/websockets/socket.gateway';
+import { RelationModule } from 'src/relation/relation.module';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([ChatRoleEntity, ChatGroupEntity, ChatMessageEntity]),
 		forwardRef(() => UserModule),
-		forwardRef(() => WebsocketsModule)],
+		forwardRef(() => WebsocketsModule),
+		forwardRef(() => RelationModule)],
 	providers: [ChatPasswordService, ChatGroupService, ChatRoleService, ChatMessageService, Logger],
 	controllers: [ChatController],
 	exports: [ChatGroupService, ChatRoleService, ChatMessageService],
