@@ -1,7 +1,7 @@
 import React, { UIEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import './ChatBox.scss';
+import './chatBox.scss';
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";
 import useLoadMessagesOnScroll from "src/hooks/useLoadMessagesOnScroll";
@@ -9,7 +9,7 @@ import { translateMessageDate } from "services/utils.service";
 import GroupUserList from "./groupUsersList";
 import { api } from "services/api.service";
 import { addMessageFromBack } from "features/chat/chat.slice";
-import ChatSender from "./ChatSender";
+import ChatSender from "./chatSender";
 import { RoleTypeEnum } from "enums/roleType.enum";
 import ChatBoxHeader from "./chatBoxHeader";
 
