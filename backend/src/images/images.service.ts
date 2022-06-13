@@ -24,23 +24,20 @@ export class ImagesService extends CrudService<ImagesEntity>{
 		super(_repository, _log);
 	}
 
-	async saveImage(createImageDto: CreateImageDto){
+	async saveImage(createImageDto: CreateImageDto) {
 		return await this.save(createImageDto);
 	}
 
-	async saveImageForUser(createImageDto: CreateImageDto, id: string, userId: string) {
-		if (id !== userId) {
-			throw new UserUnauthorized("You cannot change other role profile picture.");
-		}
+	async saveImageForUser(createImageDto: CreateImageDto, userId: string) {
 		const user = await this.userService.findOneById(userId);
 		const image = await this.save(createImageDto);
-		user.avatar = configService.getBackendUrl() + "images/id/" + image.id;
+		user.avatar = configService.getBackendUrl() + "/images/id/" + image.id;
 		await this.userService.save(user);
 		return image;
 	}
 
 	async saveImageForGroup(createImageDto: CreateImageDto, id: string, groupId: string, roleId: string) {
-		const role = await this.roleService.findOneById(roleId, {relations: ['user']});
+		const role = await this.roleService.findOneById(roleId, { relations: ['user'] });
 		if (role.user.id !== id) {
 			throw new UserUnauthorized("Not the right user.")
 		}
@@ -49,13 +46,12 @@ export class ImagesService extends CrudService<ImagesEntity>{
 		}
 		const group = await this.groupService.findOneById(groupId);
 		const image = await this.save(createImageDto);
-		group.groupAvatar = configService.getBackendUrl() + "images/id/" + image.id;
+		group.groupAvatar = configService.getBackendUrl() + "/images/id/" + image.id;
 		await this.groupService.save(group);
 		return image;
 	}
 
 	async getImage(imageId: string) {
-		//console.log(configService.getBackendUrl() + "images/id/" + imageId);
 		return await this.findOneById(imageId);
 	}
 }

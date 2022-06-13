@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
-import { RoomTypeEnum } from "enums/RoomType.enum";
+import { ChangeEvent, useEffect, useState } from "react";
 import TextInput from "../../../../assets/TextInput/TextInput";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import Button from "assets/Button/Button";
-import { closeChatRoomCreationModal, openChatRoomCreationModal } from "features/chat/chat.slice";
-import close from 'images/close.png';
-import { createRoom, getUserData } from "services/api.service";
+import { closeChatRoomCreationModal } from "features/chat/chat.slice";
+import { createRoom, getAllRoles, getUserData } from "services/api.service";
 import { updateUserData } from "features/user/user.slice";
 import UsersList, { UserListTypeEnum } from "../lists/usersList";
+import UpdateAvatar from "src/components/user/updateUserAvatar";
+import { uploadGroupAvatar } from "services/image.api.service";
+import Group from "src/shared/interfaces/group.interface";
+import { setRoles } from "features/roles/roles.slice";
 
 interface Props {
     className: string;
@@ -27,6 +29,7 @@ export default function AddGroup({ className, swap }: Props) {
     const [successText, setSuccessText] = useState<string>("");
     const [step, setStep] = useState<number>(0);
     const [users, setUsers] = useState<string[]>([user.id]);
+    const [groupAvatar, setGroupAvatar] = useState<File | null>(null);
 
     /** Tools */
     const dispatch = useDispatch();
@@ -45,7 +48,7 @@ export default function AddGroup({ className, swap }: Props) {
             return false;
         }
 
-        const { data, error } = await createRoom({
+        const { data, error }: { data: Group | null, error: string } = await createRoom({
             name: groupName,
             ids: users,
             password: password,
@@ -56,11 +59,32 @@ export default function AddGroup({ className, swap }: Props) {
             return false;
         }
 
+        if (groupAvatar)
+            await uploadGroupAvatar(groupAvatar, data?.id as string);
+
         const { userData } = await getUserData();
+
         if (!userData) return false;
         dispatch(updateUserData(userData));
+
+        const { userRoles } = await getAllRoles();
+        if (!userRoles) return false;
+        dispatch(setRoles(userRoles));
+
         dispatch(closeChatRoomCreationModal());
         return false;
+    }
+
+    function onFileChange(event: ChangeEvent<HTMLInputElement>) {
+        if (event.target.files === null || event.target.files.length <= 0) return;
+        const imageType = /^image\//;
+
+        if (!imageType.test(event.target.files[0].type)) {
+            setErrorText("Avatar must be an image");
+            return;
+        }
+        setErrorText("");
+        setGroupAvatar(event.target.files[0]);
     }
 
     useEffect(() => {
@@ -76,6 +100,7 @@ export default function AddGroup({ className, swap }: Props) {
                 <>
                     <TextInput id="" text={groupName} setText={setGroupName} type="text" name="" placeholder="Group name" />
                     <TextInput id="" text={password} setText={setPassword} type="password" name="" placeholder="Password (optional)" />
+                    <input type="file" name="avatar" id="avatar_input" onChange={onFileChange} />
                     {
                         errorText ?
                             <p className="error_text">{errorText}</p>

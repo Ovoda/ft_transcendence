@@ -6,4 +6,5 @@ export default interface Group {
 	lastmessage: string;
 	password: string;
 	users: UserRole[];
+	groupAvatar: string;
 }

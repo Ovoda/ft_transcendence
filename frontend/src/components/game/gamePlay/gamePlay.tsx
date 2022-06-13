@@ -59,7 +59,6 @@ function GamePlay() {
 
 	/**  stop playing the game **/
 	async function leaveGame(data: number[]) {
-		console.log("Leaving Request");
 		mainSocket?.emit("leaveGame", data);
 		return true;
 	}
@@ -91,7 +90,6 @@ function GamePlay() {
 	/** Update ball object */
 	useEffect(() => {
 		if (gameStatus.play === PlayStatusEnum.ON) {
-			console.log("Use effect ball speed: ", gameplay.ball.velocity);
 			requestAnimationFrame(animate);
 			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
 				let newPos: Position;
@@ -100,7 +98,9 @@ function GamePlay() {
 					mainSocket?.emit("resetGame", { posX: gameplay.playerLeft.score, posY: gameplay.playerRight.score } as UpdateBallDto);
 				}
 				else {
-					mainSocket?.emit("animateGame", { posX: newPos.x, posY: newPos.y } as UpdateBallDto);
+					setTimeout(() => {
+						mainSocket?.emit("animateGame", { posX: newPos.x, posY: newPos.y } as UpdateBallDto);
+					}, 1);
 				}
 			}
 		}
@@ -109,14 +109,12 @@ function GamePlay() {
 	/** Update players */
 	useEffect(() => {
 		if (gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER) {
-			console.log("Use effect playerleft speed: ", gameplay.ball.velocity);
 			requestAnimationFrame(animate);
 		}
 	}, [gameplay.playerLeft]);
 
 	useEffect(() => {
 		if (gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER) {
-			console.log("Use effect playerright speed: ", gameplay.ball.velocity);
 			requestAnimationFrame(animate);
 		}
 	}, [gameplay.playerRight]);
@@ -181,7 +179,6 @@ function GamePlay() {
 				elements_color: defaultElementsColor,
 			})
 		}
-		console.log("Use effect darkmode speed: ", gameplay.ball.velocity);
 		requestAnimationFrame(animate);
 	}, [darkModeActivated]);
 
@@ -193,7 +190,6 @@ function GamePlay() {
 			if (!gameCanvas.context) { return; }
 			gameCanvas.context.fillStyle = gameCanvas.background_color;
 			gameCanvas.context?.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-			console.log("Animate speed: ", gameplay.ball.velocity);
 			drawBall(gameCanvas, gameplay.ball);
 			drawPlayer(gameCanvas, gameplay.playerLeft);
 			drawPlayer(gameCanvas, gameplay.playerRight);
