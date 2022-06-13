@@ -7,13 +7,21 @@ import { updateUserData } from "features/user/user.slice";
 import './editProfile.scss';
 import { closeEditProfile } from "features/uiState/uiState.slice";
 import { Store } from "src/app/store";
+<<<<<<< HEAD
 import UpdateAvatar from "./updateUserAvatar";
 import UpdateUserAvatar from "./updateUserAvatar";
+=======
+
+>>>>>>> d008819 (Profile)
 
 export default function EditProfile() {
 
     /** Global data */
+<<<<<<< HEAD
     const { uiState, user } = useSelector((store: Store) => store);
+=======
+    const { uiState } = useSelector((store: Store) => store);
+>>>>>>> d008819 (Profile)
 
     /** Tools */
     const dispatch = useDispatch();
@@ -48,6 +56,7 @@ export default function EditProfile() {
             <div id="edit_profile_container">
                 <div id="edit_profile">
                     <h2>Set profile</h2>
+<<<<<<< HEAD
                     <TextInput type="text" text={username} setText={setUsername} placeholder="username" />
                     <p className="error_text">{errorText}</p>
                     <UpdateUserAvatar />
@@ -58,6 +67,18 @@ export default function EditProfile() {
                     }
                 </div>
             </div >
+=======
+                    <div id="edit_profile_input">
+                        <TextInput type="text" text={username} setText={setUsername} placeholder="username" />
+                        <Button onClick={handleProfileUpdate}>Update</Button>
+                    </div>
+                    <div id="edit_profile_texts">
+                        <p className="error_text">{errorText}</p>
+                        <p onClick={close} className="edit_profile_cancel">cancel</p>
+                    </div>
+                </div>
+            </div>
+>>>>>>> d008819 (Profile)
         )
     }
     return <></>;
