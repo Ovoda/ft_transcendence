@@ -90,27 +90,10 @@ export class RelationService extends CrudService<RelationEntity>{
         return { ...relation, counterPart: this.getCounterPart(relation.users, currentUserId) }
     }
 
-	async getRelationFromTwoUsers(userId1: string, userId2: string) {
-		const relation1 = await this._repository
-		.createQueryBuilder("relation")
-        .select("relation")
-        .innerJoin("relation.users", "user", "user.id = :id", {id: userId1})
-        .getMany();
-
-		const relation2 = await this._repository
-		.createQueryBuilder("relation")
-        .select("relation")
-        .innerJoin("relation.users", "user", "user.id = :id", {id: userId2})
-        .getMany();
-
-		let relation: RelationEntity;
-		for (let i = 0; i < relation1.length; i++){
-			for (let j = 0; j < relation2.length; j++) {
-				if (relation1[i].id === relation2[j].id){
-					relation = relation1[i];
-				}
-			}
-		}
-		return relation;
-	}
+    async getRelationFromTwoUsers(userId1: string, userId2: string) {
+        const user = await this.userService.findOneById(userId1, { relations: ["relations"] });
+        const relationFound = user.relations.find(
+            (relation: RelationEntity) => relation.users[0].id === userId2 || relation.users[1].id === userId2);
+        return relationFound;
+    }
 }

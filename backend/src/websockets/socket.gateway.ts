@@ -102,8 +102,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 
         const user = await this.userService.findOne({
             where: {
-                //login: body.login,
-				id: body.userId,
+                id: body.userId,
             },
             relations: ["roles"]
         });
@@ -115,16 +114,14 @@ export class SocketGateway implements OnGatewayDisconnect {
         if (role.role === RoleTypeEnum.MUTE) return;
         if (role.role === RoleTypeEnum.BANNED) return;
 
-		body.avatar = user.avatar;
-		body.login = user.login;
+        body.avatar = user.avatar;
+        body.username = user.username;
         this.server.to(body.role.chatGroup.id).emit("ServerGroupMessage", body);
         await this.chatRoleService.uploadRoleFromExpiration(body.role.id);
         return await this.chatRoleService.postMessageFromRole(body.role.user.id, body.role.id, {
             content: body.content,
-            //login: body.login,
-            //avatar: body.avatar,
             date: body.date,
-			userId: body.userId,
+            userId: body.userId,
         });
     }
 
@@ -141,21 +138,19 @@ export class SocketGateway implements OnGatewayDisconnect {
 
         const register = await this.chatMessageService.save({
             content: body.content,
-            //login: body.login,
             date: body.date,
             prev_message: relation.lastMessage,
-            //avatar: body.avatar,
-			userId: body.userId,
+            userId: body.userId,
         });
 
-		const newDm: Message = {
-			id: register.id,
-			content: body.content,
-            login: body.login,
+        const newDm: Message = {
+            id: register.id,
+            content: body.content,
+            username: body.username,
             date: body.date,
             prev_message: relation.lastMessage,
             avatar: body.avatar,
-		}
+        }
 
         this.server.to(body.relation.id).emit("ServerMessage", {
             ...newDm,
@@ -251,7 +246,11 @@ export class SocketGateway implements OnGatewayDisconnect {
         this.server.to(event.socket.id).emit("UpdateUserRoles", message);
     }
 
-    public updateRelations(userId: string) {
+    public updateRelations(userId: string | null = null) {
+        if (!userId) {
+            this.server.emit("UpdateUserRelations", userId);
+            return;
+        }
         const event = this.events.find((event: ClientSocket) => event.userId === userId);
         if (event) {
             this.server.to(event.socket.id).emit("UpdateUserRelations", userId);

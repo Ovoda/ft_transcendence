@@ -57,7 +57,7 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		const user = await this.userService.findOneById(msg.userId);
 		const message: Message = {
 			id: msg.id,
-			login: user.login,
+			username: user.username,
 			avatar: user.avatar,
 			content: msg.content,
 			date: msg.date,
@@ -66,14 +66,8 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		return message;
 	}
 
-	private async filterBlockedMessages(userId1: string, userId2: string) {
-		const relation = await this.relationService.getRelationFromTwoUsers(userId1, userId2);
-		if (relation){
-			if (relation.status === RelationTypeEnum.BLOCKED){
-				return true;
-			}
-		}
-		return false;
+	private filterBlockedMessages(blockedUserIds: string[], messageUserId: string) {
+		return blockedUserIds.includes(messageUserId);
 	}
 
 	async getManyMessagesFromId(getterId: string, messageId: string, limit?: number) {
@@ -85,8 +79,25 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 		if (!message) {
 			return messages;
 		}
-		let valid = await this.filterBlockedMessages(getterId, message.userId);
-		if (!valid){
+
+		const user = await this.userService.findOneById(getterId, { relations: ["relations"] });
+
+		const blockedRelations = user.relations.filter((relation: RelationEntity) => {
+			relation.status === RelationTypeEnum.BLOCKED
+		});
+
+		const blockedUsers = blockedRelations.map((relation: RelationEntity) => {
+			if (relation.users[0].id === getterId) {
+				return relation.users[1].id;
+			} else if (relation.users[1].id === getterId) {
+				return relation.users[0].id;
+			}
+		});
+
+		console.log(blockedUsers);
+
+		let valid = await this.filterBlockedMessages(blockedUsers, message.userId);
+		if (!valid) {
 			messages.push(msg);
 		}
 		let lim: number;
@@ -94,16 +105,14 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 			return messages;
 		} else {
 			lim = (!limit) ? 20 : limit;
-			for (let i = 0; i < lim - 1; i++) {
-				if (!msg.prev_message) {
-					break;
-				}
+			for (let i = 0; i < lim - 1;) {
+				if (!msg.prev_message) break;
+
 				let tmp = await this.findOneById(msg.prev_message);
 				const tmpmsg = await this.buildMessageFromEntity(tmp);
-				let bool = await this.filterBlockedMessages(getterId, tmp.userId);
-				if (bool){
-					i--;
-				} else {
+
+				if (!this.filterBlockedMessages(blockedUsers, tmp.userId)) {
+					i++;
 					messages.push(tmpmsg);
 				}
 				msg = tmpmsg;
@@ -120,10 +129,8 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 	async postMessage(userId: string, dto: CreateChatMessageDto) {
 		const newMessage = await this.save({
 			content: dto.content,
-			//login: dto.login,
 			date: dto.date,
 			prev_message: dto.prevMessage,
-			//avatar: dto.avatar,
 			userId: userId,
 		});
 		return newMessage;

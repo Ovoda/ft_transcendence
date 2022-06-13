@@ -3,9 +3,9 @@ import RelationEntity from "src/relation/entities/relation.entity";
 
 export default class ClientGroupMessageDto {
     content: string;
-    login: string;
+    username: string;
     avatar: string;
-	userId: string;
+    userId: string;
     date: string;
     role: ChatRoleEntity;
 } 

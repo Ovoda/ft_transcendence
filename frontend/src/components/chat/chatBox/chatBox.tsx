@@ -80,7 +80,7 @@ export default function ChatBox() {
 								<div key={index} className="message">
 									<img src={message.avatar} alt="" />
 									<div className="message_content">
-										<p>{message.login} <span>{
+										<p>{message.username} <span>{
 											translateMessageDate(message.date)
 										}</span></p>
 										<p className="message_text">{message.content}</p>
