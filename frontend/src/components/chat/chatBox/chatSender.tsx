@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent, MouseEvent, useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import './ChatSender.scss';
+import './chatSender.scss';
 import { Store } from "src/app/store";
 import TextInput from "assets/TextInput/TextInput";
 import Button from "assets/Button/Button";

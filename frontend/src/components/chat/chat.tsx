@@ -1,8 +1,8 @@
 import { Store } from "../../app/store";
 import { useSelector } from "react-redux";
-import "./Chat.scss";
+import "./chat.scss";
 import DmPicker from './chatSelector/dmPicker';
-import ChatBox from "./chatBox/ChatBox";
+import ChatBox from "./chatBox/chatBox";
 export default function Chat() {
 
 	/** Global data */
