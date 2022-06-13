@@ -9,8 +9,8 @@ import RelationEntity from "src/relation/entities/relation.entity";
  */
 export default class ClientDmDto {
     content: string;
-    // login: string;
-    // avatar: string;
+    login: string;
+    avatar: string;
 	userId: string;
     date: string;
     relation: RelationEntity;

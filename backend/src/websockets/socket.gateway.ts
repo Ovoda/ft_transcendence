@@ -15,6 +15,7 @@ import { RoleTypeEnum } from "src/chat/types/role.type";
 import { forwardRef, Inject } from "@nestjs/common";
 import { ChatGroupEntity } from "src/chat/entities/chatGroup.entity";
 import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
+import { Message } from "src/chat/interfaces/message.interface";
 
 /**
  * This class is a websocket gateway.
@@ -114,6 +115,8 @@ export class SocketGateway implements OnGatewayDisconnect {
         if (role.role === RoleTypeEnum.MUTE) return;
         if (role.role === RoleTypeEnum.BANNED) return;
 
+		body.avatar = user.avatar;
+		body.login = user.login;
         this.server.to(body.role.chatGroup.id).emit("ServerGroupMessage", body);
         await this.chatRoleService.uploadRoleFromExpiration(body.role.id);
         return await this.chatRoleService.postMessageFromRole(body.role.user.id, body.role.id, {
@@ -136,7 +139,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 
         const relation = await this.relationService.findOneById(body.relation.id);
 
-        const newDm = await this.chatMessageService.save({
+        const register = await this.chatMessageService.save({
             content: body.content,
             //login: body.login,
             date: body.date,
@@ -144,6 +147,15 @@ export class SocketGateway implements OnGatewayDisconnect {
             //avatar: body.avatar,
 			userId: body.userId,
         });
+
+		const newDm: Message = {
+			id: register.id,
+			content: body.content,
+            login: body.login,
+            date: body.date,
+            prev_message: relation.lastMessage,
+            avatar: body.avatar,
+		}
 
         this.server.to(body.relation.id).emit("ServerMessage", {
             ...newDm,
