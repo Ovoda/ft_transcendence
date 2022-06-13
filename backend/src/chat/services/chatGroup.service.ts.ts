@@ -135,14 +135,14 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 		return obj;
 	}
 
-	async postChatGroupMessage(dto: CreateChatMessageDto, room_id: string) {
-		const room = await this.findOneById(room_id);
-		dto.prevMessage = room.lastMessage;
-		const message = await this.chatMessageService.postMessage(dto);
-		return await this.updateById(room_id, {
-			lastMessage: message.id,
-		})
-	}
+	// async postChatGroupMessage(dto: CreateChatMessageDto, room_id: string) {
+	// 	const room = await this.findOneById(room_id);
+	// 	dto.prevMessage = room.lastMessage;
+	// 	const message = await this.chatMessageService.postMessage(dto);
+	// 	return await this.updateById(room_id, {
+	// 		lastMessage: message.id,
+	// 	})
+	// }
 
 	async createPassword(userId: string, roomId: string, createPassword: CreatePasswordDto) {
 		const role = await this.chatRoleService.findOneById(createPassword.roleId, { relations: ['user'] });

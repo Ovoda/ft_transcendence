@@ -28,17 +28,19 @@ export default function ChatSender() {
 		if (chat.currentRelation) {
 			mainSocket?.sendDm({
 				content: newMessage,
-				login: user.login,
+				//login: user.login,
 				date: time,
-				avatar: user.avatar,
+				//avatar: user.avatar,
+				userId: user.id,
 				relation: chat.currentRelation as UserRelation,
 			});
 		} else if (chat.currentRole) {
 			mainSocket?.sendGroupMessage({
 				content: newMessage,
-				login: user.login,
+				//login: user.login,
 				date: time,
-				avatar: user.avatar,
+				//avatar: user.avatar,
+				userId: user.id,
 				role: chat.currentRole as UserRole,
 			});
 		}
