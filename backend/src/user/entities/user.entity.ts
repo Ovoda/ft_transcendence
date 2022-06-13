@@ -18,9 +18,6 @@ export class UserEntity {
 	avatar: string;
 
 	@Column({ nullable: true })
-	imageId?: string;
-
-	@Column({ nullable: true })
 	@Exclude()
 	tfaSecret?: string;
 
