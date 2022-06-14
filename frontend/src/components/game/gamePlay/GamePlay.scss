@@ -9,6 +9,15 @@
 		justify-content: center;
 	}
 
+	#game_choosen_options {
+		display: flex;
+		justify-content: space-between;
+
+		font-size: 1.6rem;
+		color: white;
+		width: 50%;
+	}
+
 	#score_container {
 		display: flex;
 		color: white;

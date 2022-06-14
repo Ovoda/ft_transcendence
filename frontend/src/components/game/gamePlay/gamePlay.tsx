@@ -272,6 +272,10 @@ function GamePlay() {
 						<h2 className="score_player2">{gameplay.playerRight.score}   {gameplay.playerRight.login}</h2>
 					</div>
 					<canvas ref={canvaRef} height={gameCanvas.height} width={gameCanvas.width} id="canvas"></canvas>
+					<div id="game_choosen_options">
+						<p>{gameplay.fast ? "fast" : "slow"}</p>
+						<p>{gameplay.longGame ? "long game" : "short game"}</p>
+					</div>
 					<ul id="dark_button">
 						<p>Dark Mode</p>
 						<SwitchButton value={darkModeActivated} setValue={setDarkModeActivated} />

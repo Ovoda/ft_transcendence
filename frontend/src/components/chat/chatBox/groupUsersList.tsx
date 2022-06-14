@@ -4,7 +4,7 @@ import UserData from "features/user/interfaces/user.interface";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAllUsers, updateUserRole } from "services/api.service";
-import { getGroup } from "services/group.api.service";
+import { getGroup, kickFromGroup } from "services/group.api.service";
 import { Store } from "src/app/store";
 import Group from "src/shared/interfaces/group.interface";
 import UserRole from "src/shared/interfaces/role.interface";
@@ -44,6 +44,11 @@ export default function GroupUserList() {
         return userRole?.role === RoleTypeEnum.BANNED;
     }
 
+    async function handleKick(role: UserRole) {
+        await kickFromGroup(role.chatGroup.id, role.id);
+        return false;
+    }
+
     return (
         <div className="group_users_list" >
             {
@@ -67,6 +72,7 @@ export default function GroupUserList() {
                                         <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.BANNED) }}>Ban</Button>
                                 }
                                 <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.ADMIN) }}>Admin</Button>
+                                <Button onClick={async () => { return await handleKick(role) }}>Kick</Button>
                             </div>
                         )
                     }

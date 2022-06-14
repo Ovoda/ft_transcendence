@@ -219,7 +219,12 @@ export class SocketGateway implements OnGatewayDisconnect {
         })
     }
 
-    public updateRoles(newRole: RoleTypeEnum | null, groupName: string, userId: string) {
+    public updateRoles(newRole: RoleTypeEnum | null, groupName: string, userId: string | null = null) {
+
+        if (!userId) {
+            this.server.emit("UpdateUserRoles", userId);
+        }
+
         const event = this.events.find((event: ClientSocket) => event.userId === userId);
 
         if (!newRole) {

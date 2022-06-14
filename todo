@@ -1,7 +1,7 @@
 - DONE: edit profile username 
 - DONE : add user picture
-- block people also hide messages in groups
-- fix: password window shows up even when password not required
+- DONE block people also hide messages in groups
+- DONE : fix: password window shows up even when password not required
 - add kick in groups
 - DONE: delete chat group for owner
 - add validation for every dto

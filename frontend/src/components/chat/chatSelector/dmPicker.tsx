@@ -42,7 +42,6 @@ export default function DmPicker() {
 
 		const updatedRole = await getRole(role.id);
 		const group = updatedRole.data.chatGroup;
-		console.log(group);
 
 		const { messages } = await getMessages(group.lastMessage, updatedRole.data.id);
 
