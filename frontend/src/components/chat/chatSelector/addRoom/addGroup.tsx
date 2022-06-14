@@ -35,6 +35,11 @@ export default function AddGroup({ className, swap }: Props) {
     const dispatch = useDispatch();
 
     function addUserToRoom(userId: string) {
+
+        if (users.includes(userId)) {
+            return;
+        }
+
         setUsers((users: string[]) => {
             return [...users, userId];
         });
@@ -112,7 +117,7 @@ export default function AddGroup({ className, swap }: Props) {
 
             {
                 step === 1 &&
-                <UsersList type={UserListTypeEnum.GROUP} onClick={addUserToRoom} />
+                <UsersList type={UserListTypeEnum.GROUP} onClick={addUserToRoom} addedUsers={users} />
             }
 
             <div id="room_creation_modal_nav">

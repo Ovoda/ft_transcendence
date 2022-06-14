@@ -79,7 +79,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		return roles;
 	}
 
-	public cleanGroup(group: ChatGroupEntity){
+	public cleanGroup(group: ChatGroupEntity) {
 		const gp: Group = {
 			groupAvatar: group.groupAvatar,
 			id: group.id,
@@ -136,7 +136,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		if (role.role === RoleTypeEnum.BANNED) {
 			throw new UserUnauthorized("User is banned from this room");
 		}
-		return await this.chatMessageService.getManyMessagesFromId(userId, message_id, onScroll,limit);
+		return await this.chatMessageService.getManyMessagesFromId(userId, message_id, onScroll, limit);
 	}
 
 	/**
@@ -256,11 +256,12 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 		await this.chatGroupService.save(chatGroup);
 
 		/** Emit event to client */
-		this.socketGateway.updateRoles(RoleTypeEnum.BANNED, chatGroup.name, userIdCaller);
+		this.socketGateway.updateRoles(RoleTypeEnum.BANNED, chatGroup.name, null);
 	}
 
 	async getAllRolesFromUserId(userId: string) {
-		return (await this.findMany({ where: { id: userId } })).items;
+		const user = await this.userService.findOneById(userId);
+		return (await this.findMany({ where: { user: user } })).items;
 	}
 
 	async getRole(roleId: string, currentUserId: string) {

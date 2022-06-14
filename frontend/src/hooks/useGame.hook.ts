@@ -236,15 +236,10 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		const updateScoreCallback = (data: UpdateBallDto) => {
 
-			console.log("SCORE TO WIN: ", gameplay.longGame);
-
 			let scoreToWin = shortGameScoreToWin;
 			if (gameplay.longGame) {
 				scoreToWin = longGameScoreToWin;
 			}
-
-			console.log("SCORE TO WIN: ", scoreToWin);
-
 
 			let newVelocity: number[] = setRandomBallSpeed();
 			let newPosition: number[] = setInitalBallPosition(gameCanvas.width, gameCanvas.height);
@@ -313,24 +308,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 	useEffect(() => {
 
-		//window.addEventListener("keydown",
-		//	(event: KeyboardEvent) => handleKeyPressed({
-		//		event,
-		//		setGameplay,
-		//		gameplay,
-		//	})
-		//);
-		//window.addEventListener("keyup",
-		//	(event: KeyboardEvent) => handleKeyUnpressed({
-		//		event,
-		//		setGameplay,
-		//		gameplay,
-		//	})
-		//);
-
-
 		const keydownCallback = (event: KeyboardEvent) => {
-			console.log("log");
 			handleKeyPressed({ event, setGameplay, gameplay });
 		}
 

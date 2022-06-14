@@ -59,7 +59,7 @@ function App() {
       <Notification />
       <Navbar />
       <TfaRegistration />
-      {/* <Chat /> */}
+      <Chat />
       <EditProfile />
       <UserSettings
         settingsWindowState={uiState.openedSettings}

@@ -172,7 +172,7 @@ export class ChatController {
 	@Patch('/group/kick/:groupId/:roleId')
 	@HttpCode(200)
 	async kickUserFromRoom(
-		@Request() req,
+		@Request() req: JwtRequest,
 		@Param('groupId') groupId: string,
 		@Param('roleId') roleId: string,
 	) {

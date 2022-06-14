@@ -73,11 +73,21 @@ export async function deleteGroup(groupId: string, roleId: string) {
  */
 export async function checkGroupProtection(groupId: string) {
     try {
-		console.log("here");
+        console.log("here");
         const ret = await api.get(`/chat/group/protected/${groupId}`);
-		console.log("checkGroupPro:", ret.data);
+        console.log("checkGroupPro:", ret.data);
         return { isProtected: ret.data, error: "" }
     } catch (error: any) {
         return { response: null, error: error.response.data.message }
+    }
+}
+
+export async function kickFromGroup(groupId: string, roleId: string) {
+    try {
+        const response = await api.patch(`/chat/group/kick/${groupId}/${roleId}`);
+        return { response: response.data, error: "" };
+    } catch (error: any) {
+        console.log(error.response);
+        return { response: null, error: error.response.message.data };
     }
 }
