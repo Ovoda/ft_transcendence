@@ -260,7 +260,7 @@ export class ChatRoleService extends CrudService<ChatRoleEntity>{
 	}
 
 	async getAllRolesFromUserId(userId: string) {
-		return (await this.findMany({ where: { user: userId } })).items;
+		return (await this.findMany({ where: { id: userId } })).items;
 	}
 
 	async getRole(roleId: string, currentUserId: string) {
