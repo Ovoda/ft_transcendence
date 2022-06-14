@@ -79,8 +79,6 @@ export function getNewBallPos(gameplay: Gameplay, gamestatus: GameStatus, height
 		y: -1,
 	};
 
-	console.log("STATUS of FAST IN new Ball Pos: ", gameplay.fast);
-	//console.log("Old speed: ", gameplay.ball.velocity);
 	if (wallVerticalCollision(gameplay, width)) {
 		return (newPos);
 	}
@@ -92,17 +90,14 @@ export function getNewBallPos(gameplay: Gameplay, gamestatus: GameStatus, height
 		if (gameplay.ball.velocity.y !== 0)
 			gameplay.ball.velocity.y /= 100;
 		gameplay.ball.velocity.x = (- gameplay.ball.velocity.x) * 1.1;
-		//console.log(gameplay.ball.velocity);
 	}
 	else if (playerRightCollision(gameplay)) {
 		gameplay.ball.velocity.y = (gameplay.ball.position.y - (gameplay.playerRight.position.y + (gameplay.playerRight.height / 2)));
 		if (gameplay.ball.velocity.y !== 0)
 			gameplay.ball.velocity.y /= 100;
 		gameplay.ball.velocity.x = (- gameplay.ball.velocity.x) * 1.1;
-		//console.log(gameplay.ball.velocity);
 	}
 	newPos.x = gameplay.ball.position.x + gameplay.ball.velocity.x;
 	newPos.y = gameplay.ball.position.y + gameplay.ball.velocity.y;
-	//console.log("New speed: ", gameplay.ball.velocity);
 	return (newPos)
 }

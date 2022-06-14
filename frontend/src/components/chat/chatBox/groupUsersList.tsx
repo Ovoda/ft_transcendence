@@ -1,12 +1,10 @@
 import Button from "assets/Button/Button";
 import { RoleTypeEnum } from "enums/roleType.enum";
-import UserData from "features/user/interfaces/user.interface";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAllUsers, updateUserRole } from "services/api.service";
+import { updateUserRole } from "services/api.service";
 import { getGroup, kickFromGroup } from "services/group.api.service";
 import { Store } from "src/app/store";
-import Group from "src/shared/interfaces/group.interface";
 import UserRole from "src/shared/interfaces/role.interface";
 import './groupUsersList.scss';
 
@@ -21,7 +19,7 @@ export default function GroupUserList() {
 
     useEffect(() => {
         async function fetchAllUsers() {
-            const { group, error } = await getGroup(chat.currentRole?.chatGroup.id as string);
+            const { group } = await getGroup(chat.currentRole?.chatGroup.id as string);
             if (!group) return;
             setUsers(group.users);
         }
@@ -76,6 +74,7 @@ export default function GroupUserList() {
                             </div>
                         )
                     }
+                    return true;
                 })
             }
         </div >

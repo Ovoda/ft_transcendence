@@ -60,7 +60,7 @@ function App() {
 			<Notification />
 			<Navbar />
 			<TfaRegistration />
-			<Chat />
+			{/* <Chat /> */}
 			<PrivateGameModal />
 			<EditProfile />
 			<UserSettings
