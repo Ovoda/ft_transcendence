@@ -7,8 +7,8 @@ import { updateUserData } from "features/user/user.slice";
 import './editProfile.scss';
 import { closeEditProfile } from "features/uiState/uiState.slice";
 import { Store } from "src/app/store";
-import UpdateAvatar from "./updateUserAvatar";
 import UpdateUserAvatar from "./updateUserAvatar";
+import close from 'images/close.png';
 
 export default function EditProfile() {
 
@@ -23,7 +23,10 @@ export default function EditProfile() {
 	const [errorText, setErrorText] = useState<string>("");
 
 	async function handleProfileUpdate() {
-		if (!username || username === "") return false;
+		if (!username || username === "") {
+			setErrorText("Username cannot be empty");
+			return false;
+		}
 
 		const { newUser, error } = await updateUser({ username });
 		if (error) {
@@ -39,23 +42,19 @@ export default function EditProfile() {
 		setErrorText("");
 	}, [username]);
 
-	function close() {
-		dispatch(closeEditProfile());
-	}
-
 	if (uiState.showEditProfile) {
 		return (
 			<div id="edit_profile_container">
 				<div id="edit_profile">
-					<h2>Set profile</h2>
-					<TextInput type="text" text={username} setText={setUsername} placeholder="username" />
-					<p className="error_text">{errorText}</p>
-					<UpdateUserAvatar />
-					<Button onClick={handleProfileUpdate}>Update</Button>
 					{
 						user.username &&
-						< p onClick={close} className="edit_profile_cancel">cancel</p>
+						<img id="close_button_img" onClick={() => dispatch(dispatch(closeEditProfile()))} src={close} alt="Close modal icon" />
 					}
+					<UpdateUserAvatar />
+					<h2>Set username</h2>
+					<TextInput type="text" text={username} setText={setUsername} placeholder="username" />
+					<p className="error_text">{errorText}</p>
+					<Button onClick={handleProfileUpdate}>Confirm</Button>
 				</div >
 			</div >
 		)

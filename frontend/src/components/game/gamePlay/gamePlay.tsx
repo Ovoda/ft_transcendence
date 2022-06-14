@@ -51,7 +51,6 @@ function GamePlay() {
 
 
 	/** Set game listeners (keyboard events & socket events) */
-
 	useGameListeners({
 		gameplay,
 		setGameplay,
@@ -256,7 +255,7 @@ function GamePlay() {
 				)}
 
 				{gameStatus.play === PlayStatusEnum.PENDING && (
-					<p>Waiting for a match...</p>
+					<p id="waiting_game_text">Waiting for a match...</p>
 				)}
 				{gameStatus.play === PlayStatusEnum.PAUSE && gameStatus.user !== UserStatusEnum.WATCHER && (
 					<Button onClick={() => resumeGame()}>Resume Game</Button>

@@ -8,6 +8,7 @@ import { toggleTfa } from "../../services/tfa.service";
 import UserData from "features/user/interfaces/user.interface";
 import EditProfile from "./editProfile";
 import { openEditProfile } from "features/uiState/uiState.slice";
+import Button from "assets/Button/Button";
 
 interface Props {
 	settingsWindowState: boolean;
@@ -48,23 +49,33 @@ export default function UserSettings({ settingsWindowState, setSettingsWindowAct
 		setTfaEnabled(userData.tfaEnabled);
 	}, []);
 
-	function handleOpenEditProfile() {
+	async function handleOpenEditProfile() {
 		dispatch(openEditProfile());
+		return false;
+	}
+
+	function userRatio() {
+		if (userData.victories === 0 && userData.defeats === 0) {
+			return 0;
+		} else {
+			return Math.round((userData.victories / (userData.victories + userData.defeats)) * 100)
+		}
 	}
 
 	return (
 		<div id="user_settings" className={windowClass}>
 			<div id="close_settings"><FaChevronRight onClick={() => setSettingsWindowAction()} /></div>
 			<img src={userData.avatar} alt={userData.username + "'s profile picture"} />
-			<p onClick={handleOpenEditProfile}>{userData.username}</p>
+			<p>{userData.username}</p>
+			<Button onClick={handleOpenEditProfile}>Edit profile</Button>
 			<div id="user_settings_stats">
-				<p>{Math.round((userData.victories / (userData.victories + userData.defeats)) * 100)}% win rate</p>
+				<p>{userRatio()}% win rate</p>
 				<p>{userData.victories} victories</p>
 				<p>{userData.defeats} defeats</p>
 			</div>
 			<div id="tfa_option">
 				<p>Two-factor authentication</p>
-				<SwitchButton value={tfaEnabled} setValue={setTfaEnabled} />
+				<SwitchButton value={userData.tfaEnabled} setValue={setTfaEnabled} />
 			</div>
 		</div>
 	);

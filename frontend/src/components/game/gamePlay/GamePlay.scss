@@ -32,6 +32,13 @@
 		justify-content: space-between;
 		margin: 10px;
 
+		text-align: center;
+
+		p#waiting_game_text {
+			font-size: 1.6rem;
+			color: white;
+		}
+
 		button {
 			margin: 1rem;
 		}

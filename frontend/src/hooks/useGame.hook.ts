@@ -38,9 +38,6 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 	const mainSocket = useContext(mainSocketContext);
 
 	useEffect(() => {
-
-
-
 		if (!mainSocket) return;
 
 		const gameStopCallback = (stopclient: string) => {

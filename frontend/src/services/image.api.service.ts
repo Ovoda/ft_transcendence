@@ -8,7 +8,6 @@ export async function updateUserAvatar(file: File) {
         const response = await api.post(`/images/user/upload`, data);
         return { imageUploaded: response.data, error: "" };
     } catch (error: any) {
-        console.log(error.response);
         return { imageUploaded: null, error: error.response.data.message };
     }
 }
