@@ -49,6 +49,9 @@ function GamePlay() {
 
 	}
 
+	function launchGame() {
+		requestAnimationFrame(animate);
+	}
 
 	/** Set game listeners (keyboard events & socket events) */
 	useGameListeners({
@@ -58,6 +61,7 @@ function GamePlay() {
 		setGameStatus,
 		gameCanvas,
 		setGameCanvas,
+		launchGame,
 	});
 
 	/**  stop playing the game **/
@@ -91,34 +95,34 @@ function GamePlay() {
 	}
 
 	/** Update ball object */
-	useEffect(() => {
-		if (gameStatus.play === PlayStatusEnum.ON) {
-			requestAnimationFrame(animate);
-			if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-				let newPos: Position;
-				newPos = getNewBallPos(gameplay, gameStatus, gameCanvas.height, gameCanvas.width);
-				if (newPos.y < 0 || newPos.x < 0) {
-					mainSocket?.emit("resetGame", { posX: gameplay.playerLeft.score, posY: gameplay.playerRight.score } as UpdateBallDto);
-				}
-				else {
-					setTimeout(() => {
-						mainSocket?.emit("animateGame", { posX: newPos.x, posY: newPos.y } as UpdateBallDto);
-					}, 1);
-				}
-			}
-		}
-	}, [gameplay.ball]);
+	// useEffect(() => {
+	// 	if (gameStatus.play === PlayStatusEnum.ON) {
+	// 		requestAnimationFrame(animate);
+	// 		if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
+	// 			let newPos: Position;
+	// 			newPos = getNewBallPos(gameplay, gameStatus, gameCanvas.height, gameCanvas.width);
+	// 			if (newPos.y < 0 || newPos.x < 0) {
+	// 				mainSocket?.emit("resetGame", { posX: gameplay.playerLeft.score, posY: gameplay.playerRight.score } as UpdateBallDto);
+	// 			}
+	// 			else {
+	// 				setTimeout(() => {
+	// 					mainSocket?.emit("animateGame", { posX: newPos.x, posY: newPos.y } as UpdateBallDto);
+	// 				}, 1);
+	// 			}
+	// 		}
+	// 	}
+	// }, [gameplay.ball]);
 
 	/** Update players */
 	useEffect(() => {
 		if (gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER) {
-			requestAnimationFrame(animate);
+			// requestAnimationFrame(animate);
 		}
 	}, [gameplay.playerLeft]);
 
 	useEffect(() => {
 		if (gameStatus.play === PlayStatusEnum.ON && gameStatus.user !== UserStatusEnum.WATCHER) {
-			requestAnimationFrame(animate);
+			// requestAnimationFrame(animate);
 		}
 	}, [gameplay.playerRight]);
 
@@ -146,7 +150,7 @@ function GamePlay() {
 			}
 			mainSocket?.emit("movePlayer", newPos);
 		}
-	});
+	}, [gameplay]);
 
 	mainSocket?.on("gameStatus", (fullRoom: any) => {
 		if (fullRoom === false) {
@@ -179,7 +183,7 @@ function GamePlay() {
 			}
 			mainSocket?.emit("movePlayer", newPos);
 		}
-	});
+	}, [gameplay]);
 
 
 	useEffect(() => {
@@ -202,17 +206,30 @@ function GamePlay() {
 
 	/** Render game */
 	function animate() {
+		console.log(gameStatus.play);
+
 		if (gameStatus.play !== PlayStatusEnum.OFF) {
+			console.log("hello");
+
 			gameCanvas.context = canvaRef.current?.getContext('2d');
 			gameCanvas.context?.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 			if (!gameCanvas.context) { return; }
 			gameCanvas.context.fillStyle = gameCanvas.background_color;
 			gameCanvas.context?.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+			gameplay.ball.position = getNewBallPos(gameplay, gameStatus, gameCanvas.height, gameCanvas.width);
+
 			drawBall(gameCanvas, gameplay.ball);
-			drawPlayer(gameCanvas, gameplay.playerLeft);
-			drawPlayer(gameCanvas, gameplay.playerRight);
+			// drawPlayer(gameCanvas, gameplay.playerLeft);
+			// drawPlayer(gameCanvas, gameplay.playerRight);
+
+			setTimeout(() => {
+				requestAnimationFrame(animate);
+			}, 10);
 		}
 	}
+
+
 
 	useEffect(() => {
 

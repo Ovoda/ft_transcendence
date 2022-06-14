@@ -25,9 +25,10 @@ interface Props {
 	gameStatus: GameStatus;
 	setGameCanvas: Dispatch<SetStateAction<GameCanvas>>,
 	gameCanvas: GameCanvas;
+	launchGame: any;
 }
 
-export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameStatus, gameCanvas, setGameCanvas }: Props) {
+export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameStatus, gameCanvas, setGameCanvas, launchGame }: Props) {
 
 	/** Tools */
 	const dispatch = useDispatch();
@@ -93,20 +94,20 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			})
 		}
 
-		const updateBallCallback = (data: UpdateBallDto) => {
-			setGameplay((gameplay: Gameplay) => {
-				return {
-					...gameplay,
-					ball: {
-						...gameplay.ball,
-						position: {
-							x: data.posX,
-							y: data.posY,
-						}
-					}
-				}
-			})
-		}
+		// const updateBallCallback = (data: UpdateBallDto) => {
+		// 	setGameplay((gameplay: Gameplay) => {
+		// 		return {
+		// 			...gameplay,
+		// 			ball: {
+		// 				...gameplay.ball,
+		// 				position: {
+		// 					x: data.posX,
+		// 					y: data.posY,
+		// 				}
+		// 			}
+		// 		}
+		// 	})
+		// }
 
 		const leftLoginCallback = (data: string) => {
 			setGameplay((gameplay: Gameplay) => {
@@ -135,7 +136,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		mainSocket.on("setLogin", setLoginCallback);
 		mainSocket.on("leftLogin", leftLoginCallback);
 		mainSocket.on("rightLogin", rightLoginCallback);
-		mainSocket.on("updateBall", updateBallCallback);
+		// mainSocket.on("updateBall", updateBallCallback);
 		mainSocket.on("updateRightPlayer", updateRightPlayerCallback);
 		mainSocket.on("updateLeftPlayer", updateLeftPlayerCallback);
 
@@ -144,7 +145,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			mainSocket.off("setLogin", setLoginCallback);
 			mainSocket.off("leftLogin", leftLoginCallback);
 			mainSocket.off("rightLogin", rightLoginCallback);
-			mainSocket.off("updateBall", updateBallCallback);
+			// mainSocket.off("updateBall", updateBallCallback);
 			mainSocket.off("updateRightPlayer", updateRightPlayerCallback);
 			mainSocket.off("updateLeftPlayer", updateLeftPlayerCallback);
 		});
@@ -185,20 +186,9 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 	useEffect(() => {
 		if (!mainSocket) return;
 
-		const gameStatusCallback = (fullRoom: any) => {
-			if (fullRoom === false) {
-				setGameStatus((gameStatus: GameStatus) => {
-					return { ...gameStatus, play: PlayStatusEnum.PENDING };
-				})
-			} else {
-				setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
-				if (gameStatus.user === UserStatusEnum.PLAYER_LEFT as UserStatusEnum) {
-					mainSocket.emit("animateGame", {
-						posX: gameplay.ball.position.x,
-						posY: gameplay.ball.position.y
-					} as UpdateBallDto);
-				}
-			}
+		const gameStartCallback = () => {
+			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
+			launchGame();
 		}
 
 		const setSideCallback = (data: string) => {
@@ -294,12 +284,12 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 			}
 		}
 
-		mainSocket.on("gameStatus", gameStatusCallback);
+		mainSocket.on("gameStart", gameStartCallback);
 		mainSocket.on("setSide", setSideCallback);
 		mainSocket.on("updateScore", updateScoreCallback);
 
 		return (() => {
-			mainSocket.off("gameStatus", gameStatusCallback);
+			mainSocket.off("gameStatus", gameStartCallback);
 			mainSocket.off("setSide", setSideCallback);
 			mainSocket.off("updateScore", updateScoreCallback);
 		})
