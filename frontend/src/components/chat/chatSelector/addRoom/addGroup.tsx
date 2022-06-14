@@ -11,6 +11,7 @@ import UpdateAvatar from "src/components/user/updateUserAvatar";
 import { uploadGroupAvatar } from "services/image.api.service";
 import Group from "src/shared/interfaces/group.interface";
 import { setRoles } from "features/roles/roles.slice";
+import CreateRoomDto from "services/interfaces/CreateRoom.dto";
 
 interface Props {
     className: string;
@@ -53,11 +54,19 @@ export default function AddGroup({ className, swap }: Props) {
             return false;
         }
 
-        const { data, error }: { data: Group | null, error: string } = await createRoom({
-            name: groupName,
-            ids: users,
-            password: password,
-        });
+		let dto: CreateRoomDto = (password !== "") ?
+			{
+				name: groupName,
+				ids: users,
+				password: password
+			} :
+			{
+				name: groupName,
+				ids: users
+			};
+
+
+        const { data, error }:{ data: Group | null, error: string } = await createRoom(dto);
 
         if (error) {
             setErrorText(error);
