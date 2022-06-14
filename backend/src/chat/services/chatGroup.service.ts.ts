@@ -40,13 +40,21 @@ export class ChatGroupService extends CrudService<ChatGroupEntity>{
 
 	async createGroup(dto: CreateGroupDto, roles: ChatRoleEntity[]) {
 
-		const password = await this.chatPasswordService.encryptPassword(dto.password);
+		let chat: ChatGroupEntity;
+		if (dto.password){
+			const password = await this.chatPasswordService.encryptPassword(dto.password);
 
-		const chat = await this.save({
-			name: dto.name,
-			users: roles,
-			password,
-		});
+			chat = await this.save({
+				name: dto.name,
+				users: roles,
+				password,
+			});
+		} else {
+			chat = await this.save({
+				name: dto.name,
+				users:roles,
+			});
+		}
 
 		for (let i = 0; i < roles.length; i++) {
 			await this.chatRoleService.updateById(roles[i].id, {
