@@ -1,6 +1,6 @@
 import Button from "assets/Button/Button";
 import UserData from "features/user/interfaces/user.interface";
-import { MouseEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAllUsers } from "services/api.service";
 import { BlockAddButtons } from "../addRoom/blockAddButtons";
 import './usersList.scss';
