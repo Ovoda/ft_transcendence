@@ -43,6 +43,8 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		const gameStopCallback = (stopclient: string) => {
 			const Result = stopclient === mainSocket.socket.id ? ResultStatusEnum.LOOSE : ResultStatusEnum.WIN;
 			gameStatus.play = PlayStatusEnum.OFF;
+			gameplay.playerLeft.score = 0;
+			gameplay.playerRight.score = 0;
 			setGameStatus({ ...gameStatus, play: PlayStatusEnum.OFF, user: UserStatusEnum.UNASSIGNED, result: Result });
 			mainSocket.emit("deleteRoom");
 		}
@@ -325,10 +327,6 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		mainSocket.on("GameAlert", (message: string) => {
 			dispatch(setNotification(message));
-		});
-
-		mainSocket.on("PlayingRequest", (data: any) => {
-			console.log("Game request received");
 		});
 
 		/** Keyboard event listeners cleanup */

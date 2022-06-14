@@ -5,7 +5,7 @@ import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
 import { UpdateStatsDto } from "../dtos/updateStats.dto";
 import { GameEntity } from "../entities/game.entity";
-import { GameGateway } from "../gateways/game.gateway";
+//import { GameGateway } from "../gateways/game.gateway";
 
 @Injectable()
 export class GameService extends CrudService<GameEntity>{
@@ -14,8 +14,8 @@ export class GameService extends CrudService<GameEntity>{
 		protected readonly _repository: Repository<GameEntity>,
 		protected readonly userService: UserService,
 
-		@Inject(forwardRef(() => GameGateway))
-		protected readonly gameGateway: GameGateway,
+		//@Inject(forwardRef(() => GameGateway))
+		//protected readonly gameGateway: GameGateway,
 		protected readonly _log: Logger,
 	) {
 		super(_repository, _log);
