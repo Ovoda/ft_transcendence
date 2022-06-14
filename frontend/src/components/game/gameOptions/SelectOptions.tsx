@@ -1,19 +1,19 @@
 import Button from "assets/Button/Button";
 import SwitchButton from "assets/SwitchButton/SwitchButton";
 import { closeGameOptions } from "features/uiState/uiState.slice";
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import ClientSocket from "services/websocket.service";
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
-import GamePlay from "../gamePlay/gamePlay";
 import { setInitialBallState } from "../gamePlay/interfaces/ball.interface";
 import GameCanvas from "../gamePlay/interfaces/gameCanvas.interface";
 import Gameplay from "../gamePlay/interfaces/gameplay.interface";
 import { setInitialPlayerLeftState, setInitialPlayerRightState } from "../gamePlay/interfaces/player.interface";
 import SetUserDto from "../gamePlay/interfaces/SetUser.dto";
 import "./selectOptions.scss"
+import close from 'images/close.png';
 
 interface Props {
 	setGameplay: Dispatch<SetStateAction<Gameplay>>;
@@ -35,7 +35,6 @@ export default function SelectOptions({ setGameplay, gameplay, gameCanvas }: Pro
 	const dispatch = useDispatch();
 
 	async function launchPlaying() {
-		//console.log("LAUNCHING MOFO: ", fastModeActivated);
 		setGameplay((gameplay: Gameplay) => {
 			return {
 				...gameplay,
@@ -60,6 +59,7 @@ export default function SelectOptions({ setGameplay, gameplay, gameCanvas }: Pro
 			<div id="game_options_list_container">
 				<div id="game_options_list">
 					<h2>Game Options</h2>
+					<img id="close_button_img" onClick={() => dispatch(dispatch(closeGameOptions()))} src={close} alt="Close modal icon" />
 					<div className="game_option_item">
 						<p>Slow</p>
 						<SwitchButton value={fastModeActivated} setValue={setFastModeActivated} />
