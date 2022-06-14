@@ -47,7 +47,6 @@ export default function JoinGroup({ className, swap }: Props) {
 
         async function fetchGroupProtection() {
             const { isProtected, error } = await checkGroupProtection(selectedGroup?.id as string);
-			console.log("isPro", isProtected, "error", error);
             if (!error && isProtected === false) {
                 handleJoinGroup();
             } else if (!error && isProtected) {
