@@ -107,6 +107,6 @@ export default class ClientSocket {
 	}
 
 	public playingRequest(data: any) {
-		this.socket.emit("PlayingRequest", data);
+		this.socket.emit("playingRequest", data);
 	}
 }

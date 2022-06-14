@@ -12,6 +12,8 @@ import RelationsReducer from '../features/relations/relations.slice';
 import RelationSlice from "features/relations/interfaces/relations.interface";
 import RolesSlice from "features/roles/interfaces/roles.interface";
 import RolesReducer from "features/roles/roles.slice";
+import GameReducer from "features/game/game.slice";
+import { GameOptions } from "features/game/interfaces/gameOptions.interface";
 
 export interface Store {
 	user: UserData;
@@ -20,6 +22,7 @@ export interface Store {
 	chat: Chat;
 	relations: RelationSlice,
 	roleSlice: RolesSlice,
+	game: GameOptions,
 }
 
 export default configureStore({
@@ -30,6 +33,7 @@ export default configureStore({
 		chat: ChatReducer,
 		relations: RelationsReducer,
 		roleSlice: RolesReducer,
+		game: GameReducer,
 	}
 })
 

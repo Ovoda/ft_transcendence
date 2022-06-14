@@ -16,59 +16,61 @@ import UserRelation from './shared/interfaces/userRelation';
 import UserRole from './shared/interfaces/role.interface';
 import Notification from './components/notification/notification';
 import EditProfile from './components/user/editProfile';
+import PrivateGameModal from './components/game/privateGameModal/privateGameModal';
 
 function App() {
 
-  /** Global Data */
-  const { uiState, user, relations, roleSlice } = useSelector((store: Store) => store);
-  const mainSocket = useContext(mainSocketContext);
+	/** Global Data */
+	const { uiState, user, relations, roleSlice } = useSelector((store: Store) => store);
+	const mainSocket = useContext(mainSocketContext);
 
-  /** Tools */
-  const dispatch = useDispatch();
+	/** Tools */
+	const dispatch = useDispatch();
 
-  /** Hooks */
-  useFetchSession();
-  useWebsockets();
+	/** Hooks */
+	useFetchSession();
+	useWebsockets();
 
-  useEffect(() => {
-    if (roleSlice) {
-      roleSlice.roles.map((role: UserRole) => {
-        mainSocket?.leaveDm(role.chatGroup.id);
-        mainSocket?.joinDm(role.chatGroup.id);
-      });
-    }
-  }, [roleSlice.roles]);
+	useEffect(() => {
+		if (roleSlice) {
+			roleSlice.roles.map((role: UserRole) => {
+				mainSocket?.leaveDm(role.chatGroup.id);
+				mainSocket?.joinDm(role.chatGroup.id);
+			});
+		}
+	}, [roleSlice.roles]);
 
-  useEffect(() => {
-    if (relations) {
-      relations.friends.map((relation: UserRelation) => {
-        mainSocket?.leaveDm(relation.id);
-        mainSocket?.joinDm(relation.id);
-      });
-    }
-  }, [relations.friends]);
+	useEffect(() => {
+		if (relations) {
+			relations.friends.map((relation: UserRelation) => {
+				mainSocket?.leaveDm(relation.id);
+				mainSocket?.joinDm(relation.id);
+			});
+		}
+	}, [relations.friends]);
 
-  useEffect(() => {
-    if (user && user.login && !user.username) {
-      dispatch(openEditProfile());
-    }
-  }, [user]);
+	useEffect(() => {
+		if (user && user.login && !user.username) {
+			dispatch(openEditProfile());
+		}
+	}, [user]);
 
-  return (
-    <div className="App">
-      <Notification />
-      <Navbar />
-      <TfaRegistration />
-      <Chat />
-      <EditProfile />
-      <UserSettings
-        settingsWindowState={uiState.openedSettings}
-        setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
-      <header className="App-header">
-        {user.login !== "" && <Game />}
-      </header>
-    </div >
-  );
+	return (
+		<div className="App">
+			<Notification />
+			<Navbar />
+			<TfaRegistration />
+			<Chat />
+			<PrivateGameModal />
+			<EditProfile />
+			<UserSettings
+				settingsWindowState={uiState.openedSettings}
+				setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
+			<header className="App-header">
+				{user.login !== "" && <Game />}
+			</header>
+		</div >
+	);
 }
 
 export default App;

@@ -233,17 +233,12 @@ function GamePlay() {
 	}, [gameplay.fast]);
 
 
-	async function handleOptionsModal() {
-		dispatch(openGameOptions());
-		return false;
-	}
-
 	return (
 		<div className="gameplay">
 			<div className="game_buttons">
 				{gameStatus.play === PlayStatusEnum.OFF && (
 					<>
-						<Button onClick={() => handleOptionsModal()}>Start a Game</Button>
+						<Button onClick={async () => { dispatch(openGameOptions()); return false; }}>Start a Game</Button>
 						<SelectOptions setGameplay={setGameplay} gameplay={gameplay} gameCanvas={gameCanvas} />
 					</>
 				)}
