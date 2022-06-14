@@ -73,7 +73,7 @@ function playerRightCollision(gameplay: Gameplay) {
 	return false;
 }
 
-export function getNewBallPos(gameplay: Gameplay, gamestatus: GameStatus, height: number, width: number) {
+export function getNewBallPos(gameplay: Gameplay, height: number, width: number) {
 	let newPos: Position = {
 		x: -1,
 		y: -1,

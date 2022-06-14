@@ -44,7 +44,8 @@ export function setInitialBallRadius(windowWidth: number) {
 }
 export function setInitialBallState(windowWidth: number, windowHeight: number) {
 
-	let newVelocity: number[] = setRandomBallSpeed();
+	let newVelocity: number[] = [3, 3];
+	// let newVelocity: number[] = setRandomBallSpeed();
 	let newPosition: number[] = setInitalBallPosition(windowWidth, windowHeight);
 	let newRadius: number = setInitialBallRadius(windowWidth);
 

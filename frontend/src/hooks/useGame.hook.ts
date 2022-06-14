@@ -135,12 +135,12 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		}
 
 		mainSocket.on("gameStop", gameStopCallback);
-		mainSocket.on("setLogin", setLoginCallback);
-		mainSocket.on("leftLogin", leftLoginCallback);
-		mainSocket.on("rightLogin", rightLoginCallback);
+		// mainSocket.on("setLogin", setLoginCallback);
+		// mainSocket.on("leftLogin", leftLoginCallback);
+		// mainSocket.on("rightLogin", rightLoginCallback);
 		// mainSocket.on("updateBall", updateBallCallback);
-		mainSocket.on("updateRightPlayer", updateRightPlayerCallback);
-		mainSocket.on("updateLeftPlayer", updateLeftPlayerCallback);
+		// mainSocket.on("updateRightPlayer", updateRightPlayerCallback);
+		// mainSocket.on("updateLeftPlayer", updateLeftPlayerCallback);
 
 		return (() => {
 			mainSocket.off("gameStop", gameStopCallback);
@@ -189,6 +189,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 		if (!mainSocket) return;
 
 		const gameStartCallback = () => {
+			console.log("starting game");
 			setGameStatus({ ...gameStatus, play: PlayStatusEnum.ON });
 			launchGame();
 		}
@@ -288,7 +289,7 @@ export function useGameListeners({ gameplay, setGameplay, gameStatus, setGameSta
 
 		mainSocket.on("gameStart", gameStartCallback);
 		mainSocket.on("setSide", setSideCallback);
-		mainSocket.on("updateScore", updateScoreCallback);
+		// mainSocket.on("updateScore", updateScoreCallback);
 
 		return (() => {
 			mainSocket.off("gameStatus", gameStartCallback);

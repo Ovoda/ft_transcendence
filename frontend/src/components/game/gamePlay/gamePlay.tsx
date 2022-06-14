@@ -217,32 +217,30 @@ function GamePlay() {
 				elements_color: defaultElementsColor,
 			})
 		}
-		requestAnimationFrame(animate);
+		// requestAnimationFrame(animate);
 	}, [darkModeActivated]);
 
 	/** Render game */
 	function animate() {
-		console.log(gameStatus.play);
+		// if (gameStatus.play !== PlayStatusEnum.OFF) {
+		gameCanvas.context = canvaRef.current?.getContext('2d');
+		gameCanvas.context?.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+		if (!gameCanvas.context) { return; }
+		gameCanvas.context.fillStyle = gameCanvas.background_color;
+		gameCanvas.context?.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-		if (gameStatus.play !== PlayStatusEnum.OFF) {
-			console.log("hello");
+		gameplay.ball.position = getNewBallPos(gameplay, gameCanvas.height, gameCanvas.width);
 
-			gameCanvas.context = canvaRef.current?.getContext('2d');
-			gameCanvas.context?.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-			if (!gameCanvas.context) { return; }
-			gameCanvas.context.fillStyle = gameCanvas.background_color;
-			gameCanvas.context?.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+		drawBall(gameCanvas, gameplay.ball);
+		// drawPlayer(gameCanvas, gameplay.playerLeft);
+		// drawPlayer(gameCanvas, gameplay.playerRight);
 
-			gameplay.ball.position = getNewBallPos(gameplay, gameStatus, gameCanvas.height, gameCanvas.width);
+		setTimeout(() => {
+			console.log("frames requested");
+			requestAnimationFrame(animate);
 
-			drawBall(gameCanvas, gameplay.ball);
-			// drawPlayer(gameCanvas, gameplay.playerLeft);
-			// drawPlayer(gameCanvas, gameplay.playerRight);
-
-			setTimeout(() => {
-				requestAnimationFrame(animate);
-			}, 10);
-		}
+		}, 30);
+		// }
 	}
 
 	useEffect(() => {

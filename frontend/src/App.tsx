@@ -1,6 +1,5 @@
 import 'style/global.scss';
 import './App.scss';
-import Game from './components/game/game';
 import useFetchSession from './hooks/useFetchSession';
 import Navbar from './components/navbar';
 import UserSettings from './components/user/UserSettings';
@@ -17,6 +16,7 @@ import UserRole from './shared/interfaces/role.interface';
 import Notification from './components/notification/notification';
 import EditProfile from './components/user/editProfile';
 import PrivateGameModal from './components/game/privateGameModal/privateGameModal';
+import Game from './components/newGame/game';
 
 function App() {
 
@@ -67,7 +67,8 @@ function App() {
 				settingsWindowState={uiState.openedSettings}
 				setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
 			<header className="App-header">
-				{user.login !== "" && <Game />}
+				{/* {user.login !== "" && <Game />} */}
+				<Game />
 			</header>
 		</div >
 	);
