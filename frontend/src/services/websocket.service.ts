@@ -3,6 +3,7 @@ import Chat from "features/chat/interfaces/chat.interface";
 import { Socket, io } from "socket.io-client";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
+import UserRole from "src/shared/interfaces/role.interface";
 
 /**
  * @class ClientSocket
@@ -108,5 +109,9 @@ export default class ClientSocket {
 
 	public playingRequest(data: any) {
 		this.socket.emit("playingRequest", data);
+	}
+
+	public closingChat(userId: string) {
+		this.socket.emit("closingChat", userId);
 	}
 }
