@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-import { addMessage } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
-=======
 import { RoleTypeEnum } from "enums/roleType.enum";
 import { addMessage, closeChat } from "features/chat/chat.slice";
-import { toggleShowFriendRequest } from "features/game/game.slice";
->>>>>>> adding socket for event, closing chat with user id.
+//import { toggleShowFriendRequest } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
-import { setRoles } from "features/roles/roles.slice";
+import RolesSlice from "features/roles/interfaces/roles.interface";
+import { setRoles, updateCurrentRole } from "features/roles/roles.slice";
 import { setNotification } from "features/uiState/uiState.slice";
 import UserData from "features/user/interfaces/user.interface";
 import { updateUserData } from "features/user/user.slice";
@@ -93,6 +90,10 @@ export default function useWebsockets() {
 		}
 	}
 
+	// const updateRoles = (role: UserRole) => {
+	// 	dispatch(updateCurrentRole(role));
+	// }
+
 	useEffect(() => {
 		if (user.login !== "" && mainSocket) {
 			mainSocket.on("ServerMessage", serverMessageCallback);
@@ -100,13 +101,11 @@ export default function useWebsockets() {
 			mainSocket.on("UpdateUserRelations", reFetchRelations);
 			mainSocket.on("UpdateUserRoles", reFetchRoles);
 			mainSocket.on("playingRequest", displayPlayingRequest);
-<<<<<<< HEAD
 			mainSocket.on("UpdateUserData", updateUserDataCallback);
 			mainSocket.on("UserResponseDecline", userResponseDeclineCallback);
-=======
 			mainSocket.on("closingChat", chatCloseForUser);
+			mainSocket.on("updateRoles", reFetchRoles);
 
->>>>>>> adding socket for event, closing chat with user id.
 
 			return () => {
 				mainSocket.off("ServerMessage", serverMessageCallback);
@@ -114,11 +113,10 @@ export default function useWebsockets() {
 				mainSocket.off("UpdateUserRelations", reFetchRelations);
 				mainSocket.off("UpdateUserRoles", reFetchRoles);
 				mainSocket.off("playingRequest", displayPlayingRequest);
-<<<<<<< HEAD
 				mainSocket.off("UpdateUserData", updateUserDataCallback);
-=======
 				mainSocket.off("closingChat", chatCloseForUser);
->>>>>>> adding socket for event, closing chat with user id.
+				// mainSocket.off("updateRoles", updateRoles);
+
 			};
 		}
 

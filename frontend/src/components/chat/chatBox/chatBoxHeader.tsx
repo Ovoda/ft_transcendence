@@ -20,7 +20,7 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 
 
 	/** Global data */
-	const { chat, user } = useSelector((store: Store) => store);
+	const { chat, user, roleSlice } = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
 
 
@@ -53,13 +53,16 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 
 	async function handleLeaveGroup() {
 		if (!chat.currentRole) return false;
+		mainSocket?.closingChat(user.id);
 		await leaveGroup(chat.currentRole?.chatGroup.id, chat.currentRole.id);
+		mainSocket?.reloadRoles(user.id);
 		return false;
 	}
 
 	async function handleDeleteGroup() {
 		if (!chat.currentRole) return false;
 		await deleteGroup(chat.currentRole?.chatGroup.id, chat.currentRole.id);
+		mainSocket?.reloadRoles(user.id);
 		return false;
 	}
 
