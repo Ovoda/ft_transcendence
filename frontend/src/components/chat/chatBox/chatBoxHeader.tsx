@@ -95,15 +95,21 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 			<div className={"chat_box_header"}>
 				<p className="chat_box_header_title">{chat.currentRole.chatGroup.name}</p>
 				{
-					chat.currentRole?.role === RoleTypeEnum.OWNER &&
+					chat.currentRole?.role !== RoleTypeEnum.OWNER &&
+					<Button id="leave_group_button" onClick={handleLeaveGroup}>Leave</Button>
+				}
+				{	
+					(chat.currentRole?.role === RoleTypeEnum.OWNER) &&
 					<>
 						<Button id="delete_group_button" onClick={handleDeleteGroup}>Delete</Button>
-						<img onClick={handleOpenSettings} src={settings_image} alt="" />
 					</>
 				}
 				{
-					chat.currentRole?.role !== RoleTypeEnum.OWNER &&
-					<Button id="leave_group_button" onClick={handleLeaveGroup}>Leave</Button>
+					(chat.currentRole?.role === RoleTypeEnum.OWNER
+						|| chat.currentRole?.role === RoleTypeEnum.ADMIN) && 
+					<>
+						<img onClick={handleOpenSettings} src={settings_image} alt="" />
+					</>
 				}
 			</div>
 		);

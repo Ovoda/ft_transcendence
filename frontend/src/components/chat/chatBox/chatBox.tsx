@@ -60,14 +60,15 @@ export default function ChatBox() {
 			<ChatBoxHeader setOpenSettings={setOpenSettings} />
 			<div id="chat_messages_container" onScroll={handleScroll}>
 				{
-					chat.currentRole?.role === RoleTypeEnum.OWNER &&
+					(chat.currentRole?.role === RoleTypeEnum.OWNER
+						|| chat.currentRole?.role === RoleTypeEnum.ADMIN) &&
 					<div className={"chat_box_settings_container " + openSettings}>
 						<div className="chat_box_settings">
-							<div className="chat_box_settings_password">
+							{/* <div className="chat_box_settings_password">
 								<p>Set room password</p>
 								<TextInput text={roomPassword} setText={setRoomPassword} type="password" name="room_password" placeholder="Password" />
 								<Button onClick={async () => { return false }}>Next</Button>
-							</div>
+							</div> */}
 							<GroupUserList />
 						</div>
 					</div>

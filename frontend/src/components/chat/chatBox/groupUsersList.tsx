@@ -24,25 +24,25 @@ export default function GroupUserList() {
     const [fetchTrigger, setFetchTrigger] = useState<boolean>(false);
 
     const mainSocket: ClientSocket | null = useContext(mainSocketContext);
-
+	
     useEffect(() => {
-        async function fetchAllUsers() {
-            const { group } = await getGroup(chat.currentRole?.chatGroup.id as string);
-            if (!group) return;
-            setUsers(group.users);
-        }
-        fetchAllUsers();
+		async function fetchAllUsers() {
+			const { group } = await getGroup(chat.currentRole?.chatGroup.id as string);
+			if (!group) return;
+			setUsers(group.users);
+		}
+		fetchAllUsers();
     }, [fetchTrigger]);
 
     async function handleRoleChange(userId: string, newRole: RoleTypeEnum) {
         await updateUserRole(userId, chat.currentRole?.chatGroup.id as string, newRole);
         setFetchTrigger((trigger) => !trigger);
         if (newRole === RoleTypeEnum.BANNED){
-			console.log("ici");
-			console.log(userId);
 			mainSocket?.closingChat(userId);
-        //dispatch(closeChat());
 		}
+		mainSocket?.reloadRoles(userId);
+		// fetchAllUsers();
+		//window.location.reload();
         return false;
     }
 
@@ -56,6 +56,11 @@ export default function GroupUserList() {
         return userRole?.role === RoleTypeEnum.BANNED;
     }
 
+	function isAdmin(userRole: UserRole) {
+		if (!userRole) return false;
+		return userRole?.role === RoleTypeEnum.ADMIN;
+	}
+
     async function handleKick(role: UserRole) {
         await kickFromGroup(role.chatGroup.id, role.id);
 		mainSocket?.reloadRoles(role);
@@ -67,7 +72,7 @@ export default function GroupUserList() {
             {
                 users &&
                 users.map((role: UserRole, index: number) => {
-                    if (role.user.id !== user.id) {
+                    if (role.user.id !== user.id && role.role !== RoleTypeEnum.OWNER) {
                         return (
                             <div key={index} className="group_users_list_item">
                                 <img className="group_users_list_item_img" src={role.user.avatar} alt={role.user.username + "'s avatar"} />
@@ -84,7 +89,12 @@ export default function GroupUserList() {
                                         :
                                         <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.BANNED) }}>Ban</Button>
                                 }
-                                <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.ADMIN) }}>Admin</Button>
+								{
+									isAdmin(role) ? 
+										<Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Admin</Button>
+										:
+										<Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.ADMIN) }}>Admin</Button>
+								}
                                 <Button onClick={async () => { return await handleKick(role) }}>Kick</Button>
                             </div>
                         )
