@@ -1,10 +1,12 @@
 import Button from "assets/Button/Button";
 import { RoleTypeEnum } from "enums/roleType.enum";
 import { closeChat } from "features/chat/chat.slice";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserRole } from "services/api.service";
 import { getGroup, kickFromGroup } from "services/group.api.service";
+import ClientSocket from "services/websocket.service";
+import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
 import UserRole from "src/shared/interfaces/role.interface";
 import './groupUsersList.scss';
@@ -15,11 +17,13 @@ export default function GroupUserList() {
     const { chat, user } = useSelector((store: Store) => store);
 
     /** Tools */
-    const dispatch = useDispatch();
+    //const dispatch = useDispatch();
 
     /** Variables */
     const [users, setUsers] = useState<UserRole[]>([]);
     const [fetchTrigger, setFetchTrigger] = useState<boolean>(false);
+
+    const mainSocket: ClientSocket | null = useContext(mainSocketContext);
 
     useEffect(() => {
         async function fetchAllUsers() {
@@ -33,8 +37,12 @@ export default function GroupUserList() {
     async function handleRoleChange(userId: string, newRole: RoleTypeEnum) {
         await updateUserRole(userId, chat.currentRole?.chatGroup.id as string, newRole);
         setFetchTrigger((trigger) => !trigger);
-        if (chat.currentRole && chat.currentRole.role === RoleTypeEnum.BANNED)
-            dispatch(closeChat());
+        if (newRole === RoleTypeEnum.BANNED){
+			console.log("ici");
+			console.log(userId);
+			mainSocket?.closingChat(userId);
+        //dispatch(closeChat());
+		}
         return false;
     }
 
