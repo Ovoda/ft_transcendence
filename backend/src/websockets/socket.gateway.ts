@@ -238,10 +238,15 @@ export class SocketGateway implements OnGatewayDisconnect {
         })
     }
 
+	@SubscribeMessage("closingChat")
+	public closingChat(client: Socket, userId: string) {
+		this.server.emit("closingChat", userId);
+	}
 
     /**
      * GAME LISTENERS
      */
+
     @SubscribeMessage('joinGame')
     async handleJoinGame(client: Socket, data: JoinGameDto) {
         const event = this.events.find((event: ClientSocket) => event.socket.id === client.id);
@@ -408,6 +413,10 @@ export class SocketGateway implements OnGatewayDisconnect {
         client.leave(this.games[gameIndex].id);
         this.games[gameIndex].watchers = [...this.games[gameIndex].watchers.slice(0, watcherIndex), ...this.games[gameIndex].watchers.slice(watcherIndex + 1)];
     }
+
+	/*
+		GROUP LISTENERS
+	*/
 
     @SubscribeMessage('deleteRoom')
     async handleDeleteRoom(client: Socket) {
