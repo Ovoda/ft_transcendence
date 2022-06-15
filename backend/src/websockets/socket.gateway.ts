@@ -1043,6 +1043,11 @@ export class SocketGateway implements OnGatewayDisconnect {
         })
     }
 
+	@SubscribeMessage("updateRoles")
+	public dispatchNewRoles(client: Socket, groupId: string) {
+        this.server.emit("updateRoles");
+	}
+
     public updateRoles(newRole: RoleTypeEnum | null, groupName: string, userId: string) {
         const event = this.events.find((event: ClientSocket) => event.userId === userId);
 

@@ -1,5 +1,6 @@
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import Chat from "features/chat/interfaces/chat.interface";
+import RolesSlice from "features/roles/interfaces/roles.interface";
 import { Socket, io } from "socket.io-client";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
@@ -113,5 +114,9 @@ export default class ClientSocket {
 
 	public closingChat(userId: string) {
 		this.socket.emit("closingChat", userId);
+	}
+
+	public reloadRoles(data: any) {
+		this.socket.emit("updateRoles", data);
 	}
 }

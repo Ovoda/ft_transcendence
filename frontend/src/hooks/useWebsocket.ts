@@ -3,7 +3,8 @@ import { RoleTypeEnum } from "enums/roleType.enum";
 import { addMessage, closeChat } from "features/chat/chat.slice";
 //import { toggleShowFriendRequest } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
-import { setRoles } from "features/roles/roles.slice";
+import RolesSlice from "features/roles/interfaces/roles.interface";
+import { setRoles, updateCurrentRole } from "features/roles/roles.slice";
 import { setNotification } from "features/uiState/uiState.slice";
 import UserData from "features/user/interfaces/user.interface";
 import { updateUserData } from "features/user/user.slice";
@@ -89,6 +90,10 @@ export default function useWebsockets() {
 		}
 	}
 
+	// const updateRoles = (role: UserRole) => {
+	// 	dispatch(updateCurrentRole(role));
+	// }
+
 	useEffect(() => {
 		if (user.login !== "" && mainSocket) {
 			mainSocket.on("ServerMessage", serverMessageCallback);
@@ -99,6 +104,7 @@ export default function useWebsockets() {
 			mainSocket.on("UpdateUserData", updateUserDataCallback);
 			mainSocket.on("UserResponseDecline", userResponseDeclineCallback);
 			mainSocket.on("closingChat", chatCloseForUser);
+			mainSocket.on("updateRoles", reFetchRoles);
 
 
 			return () => {

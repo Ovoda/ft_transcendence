@@ -58,6 +58,7 @@ export default function GroupUserList() {
 
     async function handleKick(role: UserRole) {
         await kickFromGroup(role.chatGroup.id, role.id);
+		mainSocket?.reloadRoles(role);
         return false;
     }
 
