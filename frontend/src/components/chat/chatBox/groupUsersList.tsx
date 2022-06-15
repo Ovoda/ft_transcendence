@@ -1,7 +1,8 @@
 import Button from "assets/Button/Button";
 import { RoleTypeEnum } from "enums/roleType.enum";
+import { closeChat } from "features/chat/chat.slice";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateUserRole } from "services/api.service";
 import { getGroup, kickFromGroup } from "services/group.api.service";
 import { Store } from "src/app/store";
@@ -12,6 +13,9 @@ export default function GroupUserList() {
 
     /** Global data */
     const { chat, user } = useSelector((store: Store) => store);
+
+    /** Tools */
+    const dispatch = useDispatch();
 
     /** Variables */
     const [users, setUsers] = useState<UserRole[]>([]);
@@ -29,6 +33,8 @@ export default function GroupUserList() {
     async function handleRoleChange(userId: string, newRole: RoleTypeEnum) {
         await updateUserRole(userId, chat.currentRole?.chatGroup.id as string, newRole);
         setFetchTrigger((trigger) => !trigger);
+        if (chat.currentRole && chat.currentRole.role === RoleTypeEnum.BANNED)
+            dispatch(closeChat());
         return false;
     }
 
