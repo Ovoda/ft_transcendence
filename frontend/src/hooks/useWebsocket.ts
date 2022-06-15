@@ -115,8 +115,7 @@ export default function useWebsockets() {
 				mainSocket.off("playingRequest", displayPlayingRequest);
 				mainSocket.off("UpdateUserData", updateUserDataCallback);
 				mainSocket.off("closingChat", chatCloseForUser);
-				// mainSocket.off("updateRoles", updateRoles);
-
+				//mainSocket.off("updateRoles", updateRoles);
 			};
 		}
 
