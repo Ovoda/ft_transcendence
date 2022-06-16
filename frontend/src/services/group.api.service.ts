@@ -10,7 +10,6 @@ export async function getAllGroups() {
         const ret = await api.get("/chat/group/many");
         return { groups: ret.data, error: "" };
     } catch (error: any) {
-        console.log(error.response);
         return { groups: null, error: error.response.data.message };
     }
 }
@@ -51,7 +50,6 @@ export async function leaveGroup(groupId: string, roleId: string) {
         const response = await api.patch(`/chat/group/kick/${groupId}/${roleId}`);
         return { response: response.data, error: "" };
     } catch (error: any) {
-        console.log(error.response);
         return { response: null, error: error.response.message.data };
     }
 }
@@ -61,7 +59,6 @@ export async function deleteGroup(groupId: string, roleId: string) {
         const response = await api.delete(`/chat/group/${groupId}/${roleId}`);
         return { response: response.data, error: "" };
     } catch (error: any) {
-        console.log(error.response);
         return { response: null, error: error.response.message.data };
     }
 }
@@ -85,7 +82,6 @@ export async function kickFromGroup(groupId: string, roleId: string) {
         const response = await api.patch(`/chat/group/kick/${groupId}/${roleId}`);
         return { response: response.data, error: "" };
     } catch (error: any) {
-        console.log(error.response);
         return { response: null, error: error.response.message.data };
     }
 }

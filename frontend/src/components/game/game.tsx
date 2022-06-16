@@ -19,6 +19,7 @@ import close from 'images/close.png';
 import { useDispatch } from "react-redux";
 import { showChat } from "features/chat/chat.slice";
 import GameWatchDto from "./interfaces/gameWatch.dto";
+import { setGameIsPrivate, setRequestedUser, setRequestingUser } from "features/game/game.slice";
 
 let nbOfRound = 10;
 let ballSpeed = 6;
@@ -39,12 +40,12 @@ export default function Game() {
 		}
 	}, []);
 
-	let canvaWidth = Math.min(window.innerWidth * .7, 3000);
+	let canvaWidth = Math.min(window.innerWidth * .5, 3000);
 	let canvaHeight = canvaWidth * 2 / 3;
 
 	window.addEventListener("resize", () => {
 		const game_canva = document.getElementById("game_canva") as HTMLCanvasElement;
-		game_canva.width = Math.min(window.innerWidth * .7, 3000);
+		game_canva.width = Math.min(window.innerWidth * .5, 3000);
 		game_canva.height = game_canva.width * 2 / 3;
 		canvaWidth = game_canva.width;
 		canvaHeight = game_canva.height;
@@ -196,6 +197,7 @@ export default function Game() {
 		hideById("pause_game_button");
 		hideById("resume_game_button");
 		hideById("stop_watch_game_button");
+		dispatch(showChat(true));
 	}
 
 	function stopGame() {
@@ -307,6 +309,9 @@ export default function Game() {
 			showById("endgame_container", "flex");
 		}
 		dispatch(showChat(true));
+		dispatch(setGameIsPrivate(false));
+		dispatch(setRequestedUser(""));
+		dispatch(setRequestingUser(null));
 
 		const uiResult = document.getElementById("final_game_result") as HTMLTitleElement;
 		uiResult.innerText = scoreText;

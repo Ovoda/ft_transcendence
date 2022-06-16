@@ -11,12 +11,13 @@ import './chatBoxHeader.scss';
 import { openGameOptions } from "features/uiState/uiState.slice";
 import { closeChat, closeChatSettings, openChatSettings, showChat } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser } from "features/game/game.slice";
+import { hideById, showById } from "src/components/game/utils";
 
 
 export default function ChatBoxHeader() {
 
 	/** Global data */
-	const { chat, user } = useSelector((store: Store) => store);
+	const { chat, user, game } = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
 
 	/** Variables */
@@ -41,12 +42,14 @@ export default function ChatBoxHeader() {
 	}
 
 	async function handlePlayRequest() {
-		dispatch(setRequestedUser(chat.currentRelation?.counterPart.id));
-		dispatch(setRequestingUser(user.id));
-		dispatch(setGameIsPrivate(true));
+		dispatch(showChat(false));
+		hideById("start_game_button");
+		showById("pending_game_text");
 
-		dispatch(closeChat());
-		dispatch(openGameOptions());
+		mainSocket?.emit("playingRequest", {
+			userRequesting: user.id,
+			userRequested: chat.currentRelation?.counterPart.id,
+		});
 		return false;
 	}
 

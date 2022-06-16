@@ -2,7 +2,7 @@ import { addMessage, closeChat, showChat } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
 import { setRoles, updateCurrentRole } from "features/roles/roles.slice";
-import { setNotification } from "features/uiState/uiState.slice";
+import { openGameOptions, setNotification } from "features/uiState/uiState.slice";
 import UserData from "features/user/interfaces/user.interface";
 import { updateUserData } from "features/user/user.slice";
 import { useContext, useEffect } from "react";
@@ -62,7 +62,8 @@ export default function useWebsockets() {
 		if (user.id !== userRequesting.id) {
 			dispatch(setRequestingUser(userRequesting));
 			dispatch(showChat(false));
-			dispatch(setShowPrivateGameModal(true));
+			dispatch(setGameIsPrivate(true))
+			dispatch(openGameOptions());
 		}
 	}
 
@@ -75,8 +76,8 @@ export default function useWebsockets() {
 	const userResponseDeclineCallback = async () => {
 		dispatch(setRequestingUser(null));
 		dispatch(setRequestedUser(""));
-		dispatch(setShowPrivateGameModal(false));
 		dispatch(setGameIsPrivate(false));
+		dispatch(showChat(true));
 		hideById("pending_game_text");
 		showById("start_game_button");
 	}

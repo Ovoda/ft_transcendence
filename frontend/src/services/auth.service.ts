@@ -12,7 +12,6 @@ export async function logout() {
         await api.get("/auth/logout");
         window.location.reload();
     } catch (err: any) {
-        console.log(err.response);
     }
 }
 

@@ -51,8 +51,6 @@ export default function JoinGroup({ className, swap }: Props) {
                 handleJoinGroup();
             } else if (!error && isProtected) {
                 setGroupIsProtected(true);
-            } else {
-                console.log(error);
             }
         }
         fetchGroupProtection();

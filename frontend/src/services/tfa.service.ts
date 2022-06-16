@@ -50,7 +50,6 @@ export async function generateTfa({ dispatch }: GenerateTfaProps) {
         dispatch(updateQrCode(url));
         dispatch(openTfaRegistration());
     } catch (err: any) {
-        console.log(err.response);
     }
 }
 
@@ -63,6 +62,5 @@ export async function disableTfa({ dispatch }: DisableTfaProps) {
         await api.get("/auth/tfa/disable");
         dispatch(updateTfaEnabled(false));
     } catch (error: any) {
-        console.log(error.response);
     }
 }

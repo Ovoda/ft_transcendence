@@ -1,7 +1,7 @@
 import Button from "assets/Button/Button";
 import SwitchButton from "assets/SwitchButton/SwitchButton";
 import { closeGameOptions, openGameOptions } from "features/uiState/uiState.slice";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
@@ -9,7 +9,7 @@ import "./selectOptions.scss"
 import close from 'images/close.png';
 import { hideById, showById } from "../utils";
 import { closeChat, showChat } from "features/chat/chat.slice";
-import { setGameIsPrivate } from "features/game/game.slice";
+import { setGameIsPrivate, setShowPrivateGameModal } from "features/game/game.slice";
 
 
 export default function SelectOptions() {
@@ -31,14 +31,14 @@ export default function SelectOptions() {
 		hideById("start_game_button");
 		showById("pending_game_text");
 
-		if (game.gameIsPrivate) {
-			mainSocket?.emit("playingRequest", {
-				userRequesting: user.id,
-				userRequested: game.requestedUserId,
-			});
-		} else {
-			mainSocket?.emit("joinGame", { long: gameLength, hard: gameDifficulty, spin: gameSpin });
-		}
+		// if (game.gameIsPrivate) {
+		// 	mainSocket?.emit("playingRequest", {
+		// 		userRequesting: user.id,
+		// 		userRequested: game.requestedUserId,
+		// 	});
+		// } else {
+		mainSocket?.emit("joinGame", { long: gameLength, hard: gameDifficulty, spin: gameSpin });
+		// }
 		return false;
 	}
 
@@ -55,6 +55,23 @@ export default function SelectOptions() {
 		dispatch(showChat(true));
 	}
 
+	function respond(status: boolean) {
+		mainSocket?.emit("privateGameResponse",
+			{
+				userId: game.requestingUser?.id as string,
+				status: status,
+				hard: gameDifficulty,
+				long: gameLength,
+				spin: gameSpin,
+			});
+		dispatch(closeGameOptions());
+		if (!status) {
+			dispatch(showChat(true));
+		}
+
+		return false;
+	}
+
 	return (
 		<>
 			{
@@ -62,7 +79,11 @@ export default function SelectOptions() {
 				<div id="game_options_list_container">
 					<div id="game_options_list">
 						<h2>Game Options</h2>
-						<img id="close_button_img" onClick={cancelGame} src={close} alt="Close modal icon" />
+						{
+
+							(!game.requestingUser || game.requestingUser?.id === user.id) &&
+							<img id="close_button_img" onClick={cancelGame} src={close} alt="Close modal icon" />
+						}
 						<div className="game_option_item">
 							<p>Easy</p>
 							<SwitchButton value={gameDifficulty} setValue={setGameDifficulty} />
@@ -84,8 +105,21 @@ export default function SelectOptions() {
 							<p>Move down:  &#8595;</p>
 						</div>
 						<div>
-							<Button onClick={handleConfirmGame}>Confirm</Button>
+							{
+								(!game.requestingUser || game.requestingUser?.id === user.id) &&
+								<Button onClick={handleConfirmGame}>Confirm</Button>
+							}
 						</div>
+						{
+							(game.gameIsPrivate && game.requestingUser?.id !== user.id) &&
+							<div id="private_game_modal">
+								<h2>Game invitation from {game.requestingUser?.username}</h2>
+								<div id="private_game_modal_buttons">
+									<Button onClick={async () => respond(true)}>Accept</Button>
+									<Button onClick={async () => respond(false)}>Decline</Button>
+								</div>
+							</div>
+						}
 					</div>
 				</div>
 			}

@@ -68,4 +68,17 @@
 		}
 	}
 
+	#private_game_modal {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+		text-align: center;
+
+		#private_game_modal_buttons {
+			display: flex;
+			gap: 3rem;
+		}
+	}
+
 }

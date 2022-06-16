@@ -131,7 +131,6 @@ export async function deleteRelation(relationId: string) {
     try {
         const ret = await api.delete(`/relation/${relationId}`);
     } catch (err: any) {
-        console.log(err);
     }
 }
 
@@ -184,7 +183,6 @@ export async function updateUserRole(userId: string, groupId: string, newRole: R
         });
         return true;
     } catch (error: any) {
-        console.log(error.response);
         return false;
     }
 }
