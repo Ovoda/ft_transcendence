@@ -8,6 +8,7 @@ import { Store } from "src/app/store";
 import "./selectOptions.scss"
 import close from 'images/close.png';
 import { hideById, showById } from "../utils";
+import { closeChat, showChat } from "features/chat/chat.slice";
 
 
 export default function SelectOptions() {
@@ -35,6 +36,7 @@ export default function SelectOptions() {
 		} else {
 			mainSocket?.emit("joinGame", { long: gameLength, hard: gameDifficulty });
 		}
+		dispatch(showChat(false));
 		return false;
 	}
 

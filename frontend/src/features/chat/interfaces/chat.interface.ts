@@ -12,6 +12,7 @@ export default interface Chat {
 	currentRole: UserRole | null;
 	displayChatBox: boolean;
 	openSettings: boolean;
+	displayChat: boolean;
 	currentRelation: UserRelation | null;
 	currentLastMessage: string;
 	displayRoomCreationModal: boolean,

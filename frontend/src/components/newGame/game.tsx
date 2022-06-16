@@ -16,6 +16,8 @@ import Button from "assets/Button/Button";
 import GameStartDto from "./interfaces/gameStart.dto";
 import { hideById, showById } from "./utils";
 import close from 'images/close.png';
+import { useDispatch } from "react-redux";
+import { showChat } from "features/chat/chat.slice";
 import GameWatchDto from "./interfaces/gameWatch.dto";
 
 
@@ -28,6 +30,8 @@ export default function Game() {
 
 	/** Global data */
 	const mainSocket: ClientSocket | null = useContext(mainSocketContext);
+	const dispatch = useDispatch();
+
 
 	/** DOM Element */
 	let context: CanvasRenderingContext2D | null = null;
@@ -195,6 +199,7 @@ export default function Game() {
 		global.ball.vy = ballSpeed;
 		global.gameStatus = GameStatusEnum.ON;
 		hideById("pending_game_text");
+		hideById("start_game_button");
 		showById("game_canva");
 		showById("pause_game_button");
 		gameLoop();
@@ -295,7 +300,10 @@ export default function Game() {
 
 	function resetUi() {
 		hideById("endgame_container");
+		hideById("resume_game");
+		hideById("pause_game");
 		showById("start_game_button");
+		dispatch(showChat(false));
 	}
 
 	return (
