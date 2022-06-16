@@ -1,8 +1,5 @@
-import { addMessage, showChat } from "features/chat/chat.slice";
+import { addMessage, showChat, closeChat } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
-import { RoleTypeEnum } from "enums/roleType.enum";
-import { addMessage, closeChat } from "features/chat/chat.slice";
-//import { toggleShowFriendRequest } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
 import RolesSlice from "features/roles/interfaces/roles.interface";
 import { setRoles, updateCurrentRole } from "features/roles/roles.slice";
@@ -17,7 +14,6 @@ import { Store } from "src/app/store";
 import { hideById, showById } from "src/components/newGame/utils";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
-import UserRole from "src/shared/interfaces/role.interface";
 import UserRelation from "src/shared/interfaces/userRelation";
 
 export default function useWebsockets() {
