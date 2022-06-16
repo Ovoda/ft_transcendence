@@ -117,7 +117,7 @@ export default function useWebsockets() {
 				mainSocket.off("closingChat", chatCloseForUser);
 			};
 		}
-	}, [user, chat]);
+	}, [user, chat, roleSlice]);
 
 	useEffect(() => {
 		if (user.login !== "" && mainSocket) {
