@@ -11,6 +11,7 @@ const initialState: Chat = {
 	currentRelation: null,
 	currentLastMessage: "",
 	displayChatBox: false,
+	displayChat: true,
 	displayRoomCreationModal: false,
 };
 
@@ -48,6 +49,9 @@ const chat = createSlice({
 				messages: [],
 			};
 		},
+		showChat(state, action) {
+			return { ...state, displayChat: action.payload };
+		},
 		openChatRoomCreationModal(state) {
 			return { ...state, displayRoomCreationModal: true };
 		},
@@ -76,6 +80,7 @@ export const {
 	closeChat,
 	addMessage,
 	setMessages,
+	showChat,
 	addMessageFromBack,
 	openChatRoomCreationModal,
 	closeChatRoomCreationModal,

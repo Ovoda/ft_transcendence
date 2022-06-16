@@ -16,6 +16,8 @@ import Button from "assets/Button/Button";
 import GameStartDto from "./interfaces/gameStart.dto";
 import { hideById, showById } from "./utils";
 import close from 'images/close.png';
+import { useDispatch } from "react-redux";
+import { showChat } from "features/chat/chat.slice";
 
 
 let nbOfRound = 21;
@@ -27,6 +29,7 @@ export default function Game() {
 
     /** Global data */
     const mainSocket: ClientSocket | null = useContext(mainSocketContext);
+    const dispatch = useDispatch();
 
     /** DOM Element */
     let context: CanvasRenderingContext2D | null = null;
@@ -169,7 +172,6 @@ export default function Game() {
     }
 
     const gameStartCallback = ({ isRight, gameRoomId, hard, long, logins }: GameStartDto) => {
-        /** Start */
         global.scores = [0, 0];
         ballSpeed = 3;
         nbOfRound = 21;
@@ -273,7 +275,10 @@ export default function Game() {
 
     function resetUi() {
         hideById("endgame_container");
+        hideById("resume_game");
+        hideById("pause_game");
         showById("start_game_button");
+        dispatch(showChat(false));
     }
 
     return (

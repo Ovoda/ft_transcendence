@@ -11,9 +11,14 @@ export default function Chat() {
 	if (user.login === "") return <></>;
 
 	return (
-		<div id='chat'>
-			<DmPicker />
-			{chat.displayChatBox && <ChatBox />}
-		</div>
+		<>
+			{
+				chat.displayChat &&
+				<div id='chat'>
+					<DmPicker />
+					{chat.displayChatBox && <ChatBox />}
+				</div>
+			}
+		</>
 	);
 }

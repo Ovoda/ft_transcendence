@@ -99,7 +99,6 @@ export default function useWebsockets() {
 				mainSocket.off("UpdateUserData", updateUserDataCallback);
 			};
 		}
-
 	}, [user, chat]);
 
 	useEffect(() => {
