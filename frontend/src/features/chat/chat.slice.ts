@@ -11,7 +11,7 @@ const initialState: Chat = {
 	currentRelation: null,
 	currentLastMessage: "",
 	displayChatBox: false,
-	openSettings: false,
+	openGroupSettings: "",
 	displayChat: true,
 	displayRoomCreationModal: false,
 };
@@ -72,10 +72,10 @@ const chat = createSlice({
 			return { ...state, messages: array };
 		},
 		openChatSettings(state) {
-			return {... state, openSettings: true};
+			return { ...state, openGroupSettings: "chat_box_settings_container_open" };
 		},
 		closeChatSettings(state) {
-			return {... state, openSettings: false};
+			return { ...state, openGroupSettings: "" };
 		}
 	},
 });

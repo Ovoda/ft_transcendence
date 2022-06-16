@@ -1,10 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
-import { closeChat, openChatDm, openChatGroup, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
+import { closeChat, closeChatSettings, openChatDm, openChatGroup, openChatRoomCreationModal } from "../../../features/chat/chat.slice";
 import './dmPicker.scss';
 import "./RoomCreation.scss";
 import Button from "assets/Button/Button";
-import { getMessages, getRelation, getRole } from "services/api.service";
+import { api, getMessages, getRelation, getRole } from "services/api.service";
 import UserRelation from "src/shared/interfaces/userRelation";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import UserRole from "src/shared/interfaces/role.interface";
@@ -28,10 +28,15 @@ export default function DmPicker() {
 			return;
 		}
 		const updatedRelation = await getRelation(relation.id);
-		const { messages } = await getMessages(updatedRelation.data.lastMessage);
+		if (updatedRelation.data.lastMessage) {
+			const response = await api.get(`chat/many/message/dm/${updatedRelation.data.lastMessage}`);
+			if (response.data) {
+				dispatch(openChatDm({ messages: response.data.reverse(), relation: updatedRelation.data }));
+				return;
+			}
+		}
+		dispatch(openChatDm({ messages: [], relation: updatedRelation.data }));
 
-		if (messages)
-			dispatch(openChatDm({ messages: messages.reverse(), relation: updatedRelation.data }));
 	}
 
 	async function selectGroupRoom(role: UserRole) {
@@ -39,7 +44,6 @@ export default function DmPicker() {
 			dispatch(closeChat());
 			return;
 		}
-
 		const updatedRole = await getRole(role.id);
 		const group = updatedRole.data.chatGroup;
 

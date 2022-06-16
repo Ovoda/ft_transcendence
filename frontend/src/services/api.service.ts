@@ -41,7 +41,7 @@ export async function updateUser(updateUserDto: UpdateUserDto) {
 export async function getMessages(lastMessage: string, roleId: string = "") {
     if (!lastMessage) return { messages: [], error: "Last message is null" };
     try {
-        const url = (roleId === "") ? `chat/many/message/dm/${lastMessage}` : `chat/many/message/group/${roleId}/${lastMessage}`;
+        const url = (roleId === "") ? `chat/many/message/dm/${lastMessage}?onScroll=true` : `chat/many/message/group/${roleId}/${lastMessage}?onScroll=true`;
         const response = await api.get(url);
 
         return { messages: response.data, error: "" };

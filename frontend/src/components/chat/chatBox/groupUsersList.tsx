@@ -24,23 +24,25 @@ export default function GroupUserList() {
     const [fetchTrigger, setFetchTrigger] = useState<boolean>(false);
 
     const mainSocket: ClientSocket | null = useContext(mainSocketContext);
-	
+
     useEffect(() => {
-		async function fetchAllUsers() {
-			const { group } = await getGroup(chat.currentRole?.chatGroup.id as string);
-			if (!group) return;
-			setUsers(group.users);
-		}
-		fetchAllUsers();
-    }, [fetchTrigger]);
+        async function fetchAllUsers() {
+            const { group } = await getGroup(chat.currentRole?.chatGroup.id as string);
+            if (!group) return;
+            setUsers(group.users);
+        }
+        if (chat.currentRole) {
+            fetchAllUsers();
+        }
+    }, [fetchTrigger, chat.openGroupSettings, chat.currentRole]);
 
     async function handleRoleChange(userId: string, newRole: RoleTypeEnum) {
         await updateUserRole(userId, chat.currentRole?.chatGroup.id as string, newRole);
         setFetchTrigger((trigger) => !trigger);
-        if (newRole === RoleTypeEnum.BANNED){
-			mainSocket?.closingChat(userId);
-		}
-		mainSocket?.reloadRoles(userId);
+        if (newRole === RoleTypeEnum.BANNED) {
+            mainSocket?.closingChat(userId);
+        }
+        mainSocket?.reloadRoles(userId);
         return false;
     }
 
@@ -54,14 +56,15 @@ export default function GroupUserList() {
         return userRole?.role === RoleTypeEnum.BANNED;
     }
 
-	function isAdmin(userRole: UserRole) {
-		if (!userRole) return false;
-		return userRole?.role === RoleTypeEnum.ADMIN;
-	}
+    function isAdmin(userRole: UserRole) {
+        if (!userRole) return false;
+        return userRole?.role === RoleTypeEnum.ADMIN;
+    }
 
     async function handleKick(role: UserRole) {
         await kickFromGroup(role.chatGroup.id, role.id);
-		mainSocket?.reloadRoles(role);
+        setFetchTrigger((trigger) => !trigger);
+        mainSocket?.reloadRoles(role);
         return false;
     }
 
@@ -87,12 +90,12 @@ export default function GroupUserList() {
                                         :
                                         <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.BANNED) }}>Ban</Button>
                                 }
-								{
-									isAdmin(role) ? 
-										<Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Admin</Button>
-										:
-										<Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.ADMIN) }}>Admin</Button>
-								}
+                                {
+                                    isAdmin(role) ?
+                                        <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Admin</Button>
+                                        :
+                                        <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.ADMIN) }}>Admin</Button>
+                                }
                                 <Button onClick={async () => { return await handleKick(role) }}>Kick</Button>
                             </div>
                         )

@@ -22,12 +22,14 @@ export default function useLoadMessagesOnScroll({ firstMessage, setFirstMessage,
         async function fetchPreviousMessages() {
             if (chat.currentRelation) {
                 const { messages } = await getMessages(firstMessage);
-                if (messages)
+                if (messages) {
                     dispatch(addMessageFromBack(messages));
+                }
             } else if (chat.currentRole) {
                 const { messages } = await getMessages(firstMessage, chat.currentRole?.id);
-                if (messages)
+                if (messages) {
                     dispatch(addMessageFromBack(messages));
+                }
             }
         }
         if (scrolledToTop === true && firstMessage) {

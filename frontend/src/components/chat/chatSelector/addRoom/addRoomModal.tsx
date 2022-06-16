@@ -43,7 +43,7 @@ export default function AddRoomMenu({ menuType }: Props) {
                     <div id="room_creation_container">
                         {
                             menuType === RoomMenuType.FRIENDS &&
-                            <AddFriend className={pos} swap={swapCreation} />
+                            <AddFriend swap={swapCreation} />
                         }
                         {
                             menuType === RoomMenuType.GROUP &&

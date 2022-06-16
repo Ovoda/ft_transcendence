@@ -1,14 +1,13 @@
 import UsersList, { UserListTypeEnum } from "../lists/usersList";
 
 interface Props {
-    className: string;
     swap: () => void;
 }
 
-export default function AddFriend({ className, swap }: Props) {
+export default function AddFriend({ swap }: Props) {
 
     return (
-        <div className={"room_creation " + className}>
+        <div className={"room_creation "}>
             <h2>Manage relations</h2>
             <UsersList type={UserListTypeEnum.RELATIONS} />
         </div>

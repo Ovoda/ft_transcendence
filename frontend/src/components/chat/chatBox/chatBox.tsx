@@ -2,8 +2,6 @@ import React, { UIEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "src/app/store";
 import './chatBox.scss';
-import TextInput from "assets/TextInput/TextInput";
-import Button from "assets/Button/Button";
 import useLoadMessagesOnScroll from "src/hooks/useLoadMessagesOnScroll";
 import { translateMessageDate } from "services/utils.service";
 import GroupUserList from "./groupUsersList";
@@ -24,8 +22,6 @@ export default function ChatBox() {
 	const dispatch = useDispatch();
 
 	/** Variables */
-	const [openSettings, setOpenSettings] = useState<string>("");
-	const [roomPassword, setRoomPassword] = useState<string>("");
 	const [scrolledToTop, setScrolledToTop] = useState<boolean>(false);
 	const [firstMessage, setFirstMessage] = useState<string>("");
 
@@ -39,17 +35,6 @@ export default function ChatBox() {
 	}
 
 	useEffect(() => {
-		async function fetchPreviousMessages() {
-			const response = await api.get(`chat/many/message/dm/${firstMessage}`);
-			const messages = response.data;
-			dispatch(addMessageFromBack(messages));
-		}
-		if (scrolledToTop === true && firstMessage) {
-			fetchPreviousMessages();
-		}
-	}, [scrolledToTop]);
-
-	useEffect(() => {
 		if (chat.messages.length > 0) {
 			setFirstMessage(chat.messages[0].id as string);
 		}
@@ -57,18 +42,13 @@ export default function ChatBox() {
 
 	return (
 		<div className='chat_box'>
-			<ChatBoxHeader setOpenSettings={setOpenSettings} />
+			<ChatBoxHeader />
 			<div id="chat_messages_container" onScroll={handleScroll}>
 				{
 					(chat.currentRole?.role === RoleTypeEnum.OWNER
 						|| chat.currentRole?.role === RoleTypeEnum.ADMIN) &&
-					<div className={"chat_box_settings_container " + openSettings}>
+					<div className={"chat_box_settings_container " + chat.openGroupSettings}>
 						<div className="chat_box_settings">
-							{/* <div className="chat_box_settings_password">
-								<p>Set room password</p>
-								<TextInput text={roomPassword} setText={setRoomPassword} type="password" name="room_password" placeholder="Password" />
-								<Button onClick={async () => { return false }}>Next</Button>
-							</div> */}
 							<GroupUserList />
 						</div>
 					</div>

@@ -88,6 +88,7 @@ export class SocketGateway implements OnGatewayDisconnect {
                 this.server.to(game.socket1).emit('gameStop', game.socket2);
             }
         }
+
         this.server.to(game.id).emit('stopGame');
 
         let event = this.events.find((event: ClientSocket) => event.socket.id === game.socket1);
@@ -260,8 +261,6 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage('joinGame')
     async handleJoinGame(client: Socket, data: JoinGameDto) {
         const event = this.events.find((event: ClientSocket) => event.socket.id === client.id);
-
-
 
         if (!event) return;
 

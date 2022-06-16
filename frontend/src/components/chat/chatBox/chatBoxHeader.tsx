@@ -9,31 +9,29 @@ import settings_image from 'images/settings.png';
 import { deleteGroup, leaveGroup } from "services/group.api.service";
 import './chatBoxHeader.scss';
 import { openGameOptions } from "features/uiState/uiState.slice";
-import { closeChat } from "features/chat/chat.slice";
+import { closeChat, closeChatSettings, openChatSettings } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser } from "features/game/game.slice";
 
-interface Props {
-	setOpenSettings: Dispatch<SetStateAction<string>>;
-}
 
-export default function ChatBoxHeader({ setOpenSettings }: Props) {
-
+export default function ChatBoxHeader() {
 
 	/** Global data */
-	const { chat, user, roleSlice } = useSelector((store: Store) => store);
+	const { chat, user } = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
-
 
 	/** Variables */
 	const [currentCounterPartId, setCurrentCounterPartId] = useState<string>("");
-
 
 	/** Tools */
 	const dispatch = useDispatch();
 
 	/** Functions */
 	function handleOpenSettings() {
-		setOpenSettings((settings: string) => (settings === "") ? "chat_box_settings_container_open" : "");
+		if (chat.openGroupSettings === "") {
+			dispatch(openChatSettings());
+		} else {
+			dispatch(closeChatSettings());
+		}
 	}
 
 	async function handleWatchRequest() {
@@ -73,7 +71,6 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 		}
 	}, [chat.currentRelation]);
 
-
 	/** TSX */
 	if (chat.currentRelation) {
 		return (
@@ -98,7 +95,7 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 					chat.currentRole?.role !== RoleTypeEnum.OWNER &&
 					<Button id="leave_group_button" onClick={handleLeaveGroup}>Leave</Button>
 				}
-				{	
+				{
 					(chat.currentRole?.role === RoleTypeEnum.OWNER) &&
 					<>
 						<Button id="delete_group_button" onClick={handleDeleteGroup}>Delete</Button>
@@ -106,7 +103,7 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 				}
 				{
 					(chat.currentRole?.role === RoleTypeEnum.OWNER
-						|| chat.currentRole?.role === RoleTypeEnum.ADMIN) && 
+						|| chat.currentRole?.role === RoleTypeEnum.ADMIN) &&
 					<>
 						<img onClick={handleOpenSettings} src={settings_image} alt="" />
 					</>

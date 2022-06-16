@@ -71,13 +71,16 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 	}
 
 	async getManyMessagesFromId(getterId: string, messageId: string, onScroll: boolean, limit?: number) {
-		//let messages: ChatMessageEntity[] = [];
 		let message = await this.findOneById(messageId);
 		let msg = await this.buildMessageFromEntity(message);
 		let messages: Message[] = [];
 
-		if (!message) {
+		if (!message.prev_message && onScroll) {
 			return messages;
+		}
+
+		if (!message.prev_message) {
+			return [msg];
 		}
 
 		const user = await this.userService.findOneById(getterId, { relations: ["relations"] });
@@ -116,7 +119,7 @@ export class ChatMessageService extends CrudService<ChatMessageEntity>{
 				msg = tmpmsg;
 			}
 		}
-		return (onScroll && !messages[messages.length - 1].prev_message) ? [] : messages;
+		return messages;
 	}
 
 	/**
