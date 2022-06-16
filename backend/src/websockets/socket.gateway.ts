@@ -571,4 +571,4 @@ export class SocketGateway implements OnGatewayDisconnect {
 		}
 		this.server.to(groupId).emit(eventName);
 	}
-}
+w}
