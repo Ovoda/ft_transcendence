@@ -27,6 +27,7 @@ import SynchronizeGameDto from "./dtos/synchronizeGame.dto";
 import StopGameDto from "./dtos/stopGame.dto";
 import WatchingRequestDto from "./dtos/watchingRequest.dto";
 import GameWatchDto from "./dtos/gameWatch.dto";
+import e from "cors";
 
 /**
  * This class is a websocket gateway.
@@ -297,6 +298,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 			this.server.emit("FriendConnection", gameroom.user2);
 
 			client.join(gameroom.id);
+
 			this.server.to(gameroom.socket1).emit('gameStart', { isRight: true, gameRoomId: gameroom.id, hard: data.hard, long: data.long, logins: [gameroom.login1, gameroom.login2] });
 			this.server.to(gameroom.socket2).emit('gameStart', { isRight: false, gameRoomId: gameroom.id, hard: data.hard, long: data.long, logins: [gameroom.login1, gameroom.login2] });
 		}
@@ -341,7 +343,9 @@ export class SocketGateway implements OnGatewayDisconnect {
 		if (!game) { return; }
 
 		game.watchers.push(client.id);
+
 		this.userService.setUserAsWatching(watcher);
+
 		client.join(game.id);
 
 		let logins: GameWatchDto = {
@@ -355,11 +359,8 @@ export class SocketGateway implements OnGatewayDisconnect {
 
 	@SubscribeMessage('pauseGame')
 	handlePauseGame(client: Socket, gameRoomId: string) {
-		console.log("we are pauysonfib ubhrb", gameRoomId);
-
 		this.server.to(gameRoomId).emit('pauseGame');
 	}
-
 
 	@SubscribeMessage('resumeGame')
 	handleResumeGame(client: Socket, gameRoomId: string) {
@@ -402,6 +403,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 		this.server.to(room.socket2).emit("UpdateUserData");
 	}
 
+
 	@SubscribeMessage('stopWatching')
 	handleStopWatching(client: Socket) {
 		let watcherIndex: number;
@@ -441,6 +443,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 				this.server.emit("FriendConnection", game.user2);
 			}
 			_.remove(this.games, game);
+
 		}
 	}
 
@@ -504,7 +507,6 @@ export class SocketGateway implements OnGatewayDisconnect {
 		this.server.emit("FriendConnection", newGame.user1);
 		this.server.emit("FriendConnection", newGame.user2);
 
-		client.join(newGame.id);
 		this.server.to(newGame.socket1).emit('gameStart', { isRight: true, gameRoomId: newGame.id, hard: data.hard, long: data.long, logins: [newGame.login1, newGame.login2] });
 		this.server.to(newGame.socket2).emit('gameStart', { isRight: false, gameRoomId: newGame.id, hard: data.hard, long: data.long, logins: [newGame.login1, newGame.login2] });
 	}

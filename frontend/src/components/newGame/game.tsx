@@ -236,14 +236,18 @@ export default function Game() {
 
 	const pauseGameCallback = () => {
 		if (global.gameStatus === GameStatusEnum.PAUSE) return;
-		showById("resume_game_button");
+		if (!global.isWatching) {
+			showById("resume_game_button");
+		}
 		hideById("pause_game_button");
 		global.gameStatus = GameStatusEnum.PAUSE;
 	}
 
 	const resumeGameCallback = () => {
 		if (global.gameStatus === GameStatusEnum.ON) return;
-		showById("pause_game_button");
+		if (!global.isWatching) {
+			showById("pause_game_button");
+		}
 		hideById("resume_game_button");
 		global.gameStatus = GameStatusEnum.ON;
 		gameLoop();
@@ -265,6 +269,7 @@ export default function Game() {
 
 		hideById("game_canva");
 		hideById("pause_game_button");
+		showById("start_game_button");
 		if (!global.isWatching) {
 			showById("endgame_container", "flex");
 		}
@@ -286,6 +291,9 @@ export default function Game() {
 		global.isWatching = true;
 		global.gameStatus = GameStatusEnum.ON as GameStatusEnum;
 		showById("game_canva");
+		hideById("pause_game_button");
+		hideById("resume_game_button");
+		hideById("start_game_button");
 		gameLoop();
 	}
 
