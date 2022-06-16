@@ -1,8 +1,9 @@
 import { ApiProperty, ApiBody } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreatePasswordDto {
 	@IsNotEmpty()
+	@IsUUID()
 	roleId: string;
 
 	@IsNotEmpty()

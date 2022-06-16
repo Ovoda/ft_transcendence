@@ -19,7 +19,6 @@ import { Message } from "src/chat/interfaces/message.interface";
 import { GameRoom } from "src/game/types/gameRoom.interface";
 import { UpdateStatsDto } from "src/game/dtos/updateStats.dto";
 import { GameService } from "src/game/services/game.service";
-import { SocketAddress } from "net";
 import JoinGameDto from "./dtos/joinGame.dto";
 import SynchronizePlayerDto from "./dtos/synchronizePlayer.dto";
 import NewRoundDto from "./dtos/newRound.dto";

@@ -78,6 +78,11 @@ export default function SelectOptions() {
 							<SwitchButton value={gameSpin} setValue={setGameSpinning} />
 							<p>More fun</p>
 						</div>
+
+						<div className="game_option_item">
+							<p>Move up:  &#8593;</p>
+							<p>Move down:  &#8595;</p>
+						</div>
 						<div>
 							<Button onClick={handleConfirmGame}>Confirm</Button>
 						</div>
