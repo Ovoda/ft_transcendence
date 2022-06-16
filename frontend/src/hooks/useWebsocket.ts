@@ -120,7 +120,7 @@ export default function useWebsockets() {
 	}, [user, chat, roleSlice]);
 
 	useEffect(() => {
-		if (user.login !== "" && mainSocket) {
+		if (user.login !== "" && mainSocket) {	
 			mainSocket.init(user.id);
 		}
 	}, [user.login]);
