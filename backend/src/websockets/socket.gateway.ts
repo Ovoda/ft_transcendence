@@ -417,6 +417,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 
         if (!game) { return; }
 
+        this.server.to(game.id).emit("stopGame");
         client.leave(game.id);
         if (game.socket1 === client.id) {
             game.socket1 = null;
@@ -458,7 +459,6 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("privateGameResponse")
     async handlePrivateGameResponse(client: Socket, data: any) {
 
-        if (!data.status) { return };
 
         const event2 = this.events.find((event: ClientSocket) => {
             return event.socket.id === client.id;
@@ -469,6 +469,11 @@ export class SocketGateway implements OnGatewayDisconnect {
             return event.userId === data.userId;
         });
         const user1 = await this.userService.findOneById(event1.userId);
+
+        if (!data.status) {
+            this.server.to(event1.socket.id).emit("UserResponseDecline");
+            return;
+        };
 
         const newGame: GameRoom = {
             id: "game" + event1.socket.id,
@@ -492,11 +497,9 @@ export class SocketGateway implements OnGatewayDisconnect {
         this.server.emit("FriendConnection", newGame.user1);
         this.server.emit("FriendConnection", newGame.user2);
 
-        this.server.to(newGame.socket1).emit('setSide', "left");
-        this.server.to(newGame.socket2).emit('setSide', "right");
-        this.server.to(newGame.id).emit('rightLogin', newGame.login2);
-        this.server.to(newGame.id).emit('leftLogin', newGame.login1);
-        this.server.to(newGame.id).emit('gameStatus', true);
+        client.join(newGame.id);
+        this.server.to(newGame.socket1).emit('gameStart', { isRight: true, gameRoomId: newGame.id, hard: data.hard, long: data.long, logins: [newGame.login1, newGame.login2] });
+        this.server.to(newGame.socket2).emit('gameStart', { isRight: false, gameRoomId: newGame.id, hard: data.hard, long: data.long, logins: [newGame.login1, newGame.login2] });
     }
 
     async addGroup(group: ChatGroupEntity) {

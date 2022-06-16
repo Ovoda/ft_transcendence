@@ -1,5 +1,5 @@
 import { addMessage } from "features/chat/chat.slice";
-import { toggleShowFriendRequest } from "features/game/game.slice";
+import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
 import { setRoles } from "features/roles/roles.slice";
 import { setNotification } from "features/uiState/uiState.slice";
@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllRelations, getAllRoles, getUserData } from "services/api.service";
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
+import { hideById, showById } from "src/components/newGame/utils";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
 import UserRelation from "src/shared/interfaces/userRelation";
@@ -58,13 +59,25 @@ export default function useWebsockets() {
 	}
 
 	const displayPlayingRequest = (userRequesting: UserData) => {
-		dispatch(toggleShowFriendRequest(userRequesting));
+		if (user.id !== userRequesting.id) {
+			dispatch(setRequestingUser(userRequesting));
+			dispatch(setShowPrivateGameModal(true));
+		}
 	}
 
 	const updateUserDataCallback = async () => {
 		const { userData } = await getUserData();
 		if (!userData) return;
 		dispatch(updateUserData(userData));
+	}
+
+	const userResponseDeclineCallback = async () => {
+		dispatch(setRequestingUser(null));
+		dispatch(setRequestedUser(""));
+		dispatch(setShowPrivateGameModal(false));
+		dispatch(setGameIsPrivate(false));
+		hideById("pending_game_text");
+		showById("start_game_button");
 	}
 
 	useEffect(() => {
@@ -75,6 +88,7 @@ export default function useWebsockets() {
 			mainSocket.on("UpdateUserRoles", reFetchRoles);
 			mainSocket.on("playingRequest", displayPlayingRequest);
 			mainSocket.on("UpdateUserData", updateUserDataCallback);
+			mainSocket.on("UserResponseDecline", userResponseDeclineCallback);
 
 			return () => {
 				mainSocket.off("ServerMessage", serverMessageCallback);

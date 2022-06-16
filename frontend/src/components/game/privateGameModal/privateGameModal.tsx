@@ -1,5 +1,5 @@
 import Button from "assets/Button/Button";
-import { toggleShowFriendRequest } from "features/game/game.slice";
+import { setShowPrivateGameModal } from "features/game/game.slice";
 import UserData from "features/user/interfaces/user.interface";
 import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux"
@@ -19,16 +19,16 @@ export default function PrivateGameModal() {
 	const dispatch = useDispatch();
 
 	function respond(status: boolean) {
-		mainSocket?.emit("privateGameResponse", { userId: game?.showFriendRequest?.id as string, status: status });
-		dispatch(toggleShowFriendRequest(false));
+		mainSocket?.emit("privateGameResponse", { userId: game.requestingUser?.id as string, status: status });
+		dispatch(setShowPrivateGameModal(false));
 		return false;
 	}
 
-	if (game.showFriendRequest) {
+	if (game.showPrivateGameModal) {
 		return (
 			<div id="private_game_modal_container">
 				<div id="private_game_modal">
-					<h2>Game invitation from {game.showFriendRequest.username}</h2>
+					<h2>Game invitation from {game.requestingUser?.username}</h2>
 					<div id="private_game_modal_buttons">
 						<Button onClick={async () => respond(true)}>Accept</Button>
 						<Button onClick={async () => respond(false)}>Decline</Button>

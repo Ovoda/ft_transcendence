@@ -15,6 +15,7 @@
     overflow-x: hidden;
     overflow-y: visible;
     max-width: 100%;
+    min-width: 100px;
 
     &::-webkit-scrollbar {
         display: none;

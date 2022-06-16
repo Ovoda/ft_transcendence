@@ -10,7 +10,7 @@ import { deleteGroup, leaveGroup } from "services/group.api.service";
 import './chatBoxHeader.scss';
 import { openGameOptions } from "features/uiState/uiState.slice";
 import { closeChat } from "features/chat/chat.slice";
-import { setPlayingFriendRequest } from "features/game/game.slice";
+import { setGameIsPrivate, setRequestedUser, setRequestingUser } from "features/game/game.slice";
 
 interface Props {
 	setOpenSettings: Dispatch<SetStateAction<string>>;
@@ -42,7 +42,10 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 	}
 
 	async function handlePlayRequest() {
-		dispatch(setPlayingFriendRequest());
+		dispatch(setRequestedUser(chat.currentRelation?.counterPart.id));
+		dispatch(setRequestingUser(user.id));
+		dispatch(setGameIsPrivate(true));
+
 		dispatch(closeChat());
 		dispatch(openGameOptions());
 		return false;

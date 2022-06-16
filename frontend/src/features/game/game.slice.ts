@@ -2,39 +2,35 @@ import { createSlice } from "@reduxjs/toolkit";
 import { GameOptions } from "./interfaces/gameOptions.interface";
 
 const initialState: GameOptions = {
-	fastModeActivated: false,
-	longModeActivated: false,
-	playingFriendRequest: false,
-	showFriendRequest: null,
+	gameIsPrivate: false,
+	requestingUser: null,
+	requestedUserId: "",
+	showPrivateGameModal: false,
 };
 
 const game = createSlice({
 	name: "game",
 	initialState,
 	reducers: {
-		updateFastMode(state, action) {
-			return { ...state, fastModeActivated: action.payload }
+		setGameIsPrivate(state, action) {
+			return { ...state, gameIsPrivate: action.payload };
 		},
-		updateLongMode(state, action) {
-			return { ...state, longModeActivated: action.payload }
+		setRequestingUser(state, action) {
+			return { ...state, requestingUser: action.payload };
 		},
-		setPlayingFriendRequest(state) {
-			return { ...state, playingFriendRequest: true }
+		setRequestedUser(state, action) {
+			return { ...state, requestedUserId: action.payload };
 		},
-		unsetPlayingFriendRequest(state) {
-			return { ...state, playingFriendRequest: false }
-		},
-		toggleShowFriendRequest(state, action) {
-			return { ...state, showFriendRequest: action.payload };
+		setShowPrivateGameModal(state, action) {
+			return { ...state, showPrivateGameModal: action.payload };
 		}
 	}
 });
 
 export const {
-	updateFastMode,
-	updateLongMode,
-	setPlayingFriendRequest,
-	unsetPlayingFriendRequest,
-	toggleShowFriendRequest,
+	setGameIsPrivate,
+	setRequestingUser,
+	setRequestedUser,
+	setShowPrivateGameModal,
 } = game.actions;
 export default game.reducer;

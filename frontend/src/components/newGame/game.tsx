@@ -36,12 +36,12 @@ export default function Game() {
         }
     }, []);
 
-    let canvaWidth = Math.min(window.innerWidth * .9, 1000);
+    let canvaWidth = Math.min(window.innerWidth * .7, 700);
     let canvaHeight = canvaWidth * 2 / 3;
 
     window.addEventListener("resize", () => {
         const game_canva = document.getElementById("game_canva") as HTMLCanvasElement;
-        game_canva.width = Math.min(window.innerWidth * .9, 1000);
+        game_canva.width = Math.min(window.innerWidth * .7, 700);
         game_canva.height = game_canva.width * 2 / 3;
         canvaWidth = game_canva.width;
         canvaHeight = game_canva.height;
@@ -186,6 +186,7 @@ export default function Game() {
         global.ball.vy = ballSpeed;
         global.gameStatus = GameStatusEnum.ON;
         hideById("pending_game_text");
+        hideById("start_game_button");
         showById("game_canva");
         showById("pause_game_button");
         gameLoop();
@@ -235,10 +236,6 @@ export default function Game() {
     }
 
     const stopGameCallback = () => {
-        console.log("current right:", global.isCurrentRight);
-        console.log("scores[0] ", global.scores[0]);
-        console.log("scores[1] ", global.scores[1]);
-
         let scoreText = "Victory !";
         if (global.isCurrentRight && global.scores[1] > global.scores[0]) {
             scoreText = "Victory !";
@@ -254,11 +251,16 @@ export default function Game() {
 
         hideById("game_canva");
         hideById("pause_game_button");
-        // showById("start_game_button");
         showById("endgame_container", "flex");
 
-        const uiScores = document.getElementById("final_scores") as HTMLTitleElement;
-        uiScores.innerText = scoreText;
+        const uiResult = document.getElementById("final_game_result") as HTMLTitleElement;
+        uiResult.innerText = scoreText;
+
+        const uiScore = document.getElementById("final_scores") as HTMLTitleElement;
+        if (scoreText === "Victory !")
+            uiScore.innerText = `${global.scores[0]} - ${global.scores[1]}`;
+        else
+            uiScore.innerText = `${global.scores[1]} - ${global.scores[0]}`;
     }
 
     mainSocket?.on("gameStart", gameStartCallback);
@@ -288,7 +290,8 @@ export default function Game() {
 
             <div id="endgame_container" style={{ display: "none" }}>
                 <div id="endgame">
-                    <h2 id="final_scores"></h2>
+                    <h2 id="final_game_result"></h2>
+                    <p id="final_scores"></p>
                     <img id="close_button_img" onClick={resetUi} src={close} alt="Close modal icon" />
                     <div>
                     </div>
