@@ -19,7 +19,7 @@ export default function setGame(): {
 	let scores: number[] = [0, 0];
 
 	const ball: Ball = {
-		x: 600 / 2, y: 400 / 2, vy: 3, vx: 3, radius: 5
+		x: 600 / 2, y: 400 / 2, vy: 5, vx: 5, radius: 5
 	};
 	const players: Player[] = [{
 		x: 0,

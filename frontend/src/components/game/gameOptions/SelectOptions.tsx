@@ -24,6 +24,7 @@ export default function SelectOptions() {
 	/** Variables */
 	const [gameLength, setGameLength] = useState<boolean>(false);
 	const [gameDifficulty, setGameDifficulty] = useState<boolean>(false);
+	const [gameSpin, setGameSpinning] = useState<boolean>(false);
 
 	async function handleConfirmGame() {
 		dispatch(closeGameOptions());
@@ -36,7 +37,7 @@ export default function SelectOptions() {
 				userRequested: game.requestedUserId,
 			});
 		} else {
-			mainSocket?.emit("joinGame", { long: gameLength, hard: gameDifficulty });
+			mainSocket?.emit("joinGame", { long: gameLength, hard: gameDifficulty, spin: gameSpin });
 		}
 		return false;
 	}
@@ -44,6 +45,14 @@ export default function SelectOptions() {
 	function handleStartGame() {
 		dispatch(setGameIsPrivate(false));
 		dispatch(openGameOptions());
+		dispatch(showChat(false));
+		showById("stop_waiting_game_button");
+	}
+
+	function cancelGame() {
+		hideById("stop_waiting_game_button");
+		dispatch(closeGameOptions());
+		dispatch(showChat(true));
 	}
 
 	return (
@@ -53,16 +62,21 @@ export default function SelectOptions() {
 				<div id="game_options_list_container">
 					<div id="game_options_list">
 						<h2>Game Options</h2>
-						<img id="close_button_img" onClick={() => dispatch(dispatch(closeGameOptions()))} src={close} alt="Close modal icon" />
+						<img id="close_button_img" onClick={cancelGame} src={close} alt="Close modal icon" />
 						<div className="game_option_item">
 							<p>Easy</p>
 							<SwitchButton value={gameDifficulty} setValue={setGameDifficulty} />
 							<p>Hard</p>
 						</div>
 						<div className="game_option_item">
-							<p>21 pts</p>
+							<p>10 pts</p>
 							<SwitchButton value={gameLength} setValue={setGameLength} />
-							<p>42 pts</p>
+							<p>20 pts</p>
+						</div>
+						<div className="game_option_item">
+							<p>Fun</p>
+							<SwitchButton value={gameSpin} setValue={setGameSpinning} />
+							<p>More fun</p>
 						</div>
 						<div>
 							<Button onClick={handleConfirmGame}>Confirm</Button>

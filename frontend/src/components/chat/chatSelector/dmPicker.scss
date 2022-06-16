@@ -83,6 +83,21 @@
             animation: bounce-in 1s ease forwards;
             background-color: green;
         }
+
+        #friend_log_status.playing {
+            animation: bounce-in 1s ease forwards;
+            background-color: blue;
+        }
+
+        #friend_log_status.queuing {
+            animation: bounce-in 1s ease forwards;
+            background-color: orange;
+        }
+
+        #friend_log_status.watching {
+            animation: bounce-in 1s ease forwards;
+            background-color: purple;
+        }
     }
 
     .add_room_button {

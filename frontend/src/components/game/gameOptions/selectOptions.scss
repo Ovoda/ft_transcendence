@@ -46,9 +46,21 @@
 
 		.game_option_item {
 			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 70%;
 			gap: 1rem;
 			font-size: 1.8rem;
 			align-items: center;
+
+			.switch_button {
+				min-width: 5rem;
+			}
+
+			p {
+				width: 100%;
+				text-align: center;
+			}
 		}
 
 		button {

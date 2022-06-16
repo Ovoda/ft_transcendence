@@ -9,7 +9,7 @@ import settings_image from 'images/settings.png';
 import { deleteGroup, leaveGroup } from "services/group.api.service";
 import './chatBoxHeader.scss';
 import { openGameOptions } from "features/uiState/uiState.slice";
-import { closeChat, closeChatSettings, openChatSettings } from "features/chat/chat.slice";
+import { closeChat, closeChatSettings, openChatSettings, showChat } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser } from "features/game/game.slice";
 
 
@@ -36,6 +36,7 @@ export default function ChatBoxHeader() {
 
 	async function handleWatchRequest() {
 		mainSocket?.watchingRequest({ watched: currentCounterPartId, watcher: user.id, });
+		dispatch(showChat(false));
 		return false;
 	}
 

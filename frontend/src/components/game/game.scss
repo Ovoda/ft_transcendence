@@ -1,6 +1,10 @@
 canvas {
     border: 10px solid white;
-    // animation: 30s spin linear infinite;
+    margin: 1rem;
+}
+
+.game_canva_spin {
+    animation: 30s spin linear infinite;
 }
 
 @keyframes spin {

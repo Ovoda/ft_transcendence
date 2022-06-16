@@ -5,5 +5,6 @@ export default interface GameStartDto {
     gameRoomId: string;
     hard: boolean;
     long: boolean;
+    spin: boolean;
     logins: string[];
 }

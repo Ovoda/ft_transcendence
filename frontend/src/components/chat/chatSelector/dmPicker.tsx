@@ -59,6 +59,33 @@ export default function DmPicker() {
 		return false;
 	}
 
+	function displayCounterpartStatus(status: UserActivityStatusEnum) {
+		let color = "";
+
+		switch (status) {
+
+			case UserActivityStatusEnum.CONNECTED:
+				color = "connected";
+				break;
+
+			case UserActivityStatusEnum.PLAYING:
+				color = "playing";
+				break;
+
+			case UserActivityStatusEnum.WATCHING:
+				color = "watching";
+				break;
+
+			case UserActivityStatusEnum.QUEUING:
+				color = "queuing";
+				break;
+
+			default:
+				break;
+		}
+		return color;
+	}
+
 	return (
 		<div id="dm_picker">
 			{
@@ -68,8 +95,7 @@ export default function DmPicker() {
 						<img src={relation.counterPart.avatar} alt="" />
 						<p className="dm_picker_room_name">{relation.counterPart.username}</p>
 						<span id="friend_log_status"
-							className={relation.counterPart.activityStatus === UserActivityStatusEnum.CONNECTED
-								? "connected" : ""}>
+							className={displayCounterpartStatus(relation.counterPart.activityStatus)}>
 						</span>
 					</div>
 				)

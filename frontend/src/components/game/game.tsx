@@ -20,9 +20,8 @@ import { useDispatch } from "react-redux";
 import { showChat } from "features/chat/chat.slice";
 import GameWatchDto from "./interfaces/gameWatch.dto";
 
-
-let nbOfRound = 21;
-let ballSpeed = 3;
+let nbOfRound = 10;
+let ballSpeed = 6;
 let userLogins = ["", ""];
 
 export default function Game() {
@@ -40,12 +39,12 @@ export default function Game() {
 		}
 	}, []);
 
-	let canvaWidth = Math.min(window.innerWidth * .7, 700);
+	let canvaWidth = Math.min(window.innerWidth * .7, 3000);
 	let canvaHeight = canvaWidth * 2 / 3;
 
 	window.addEventListener("resize", () => {
 		const game_canva = document.getElementById("game_canva") as HTMLCanvasElement;
-		game_canva.width = Math.min(window.innerWidth * .7, 700);
+		game_canva.width = Math.min(window.innerWidth * .7, 3000);
 		game_canva.height = game_canva.width * 2 / 3;
 		canvaWidth = game_canva.width;
 		canvaHeight = game_canva.height;
@@ -115,7 +114,7 @@ export default function Game() {
 	async function gameLoop() {
 		if (global.gameStatus !== GameStatusEnum.ON as GameStatusEnum) return;
 		if (!context) return;
-		if (global.scores[0] >= nbOfRound || global.scores[1] >= nbOfRound) {
+		if ((global.scores[0] >= nbOfRound || global.scores[1] >= nbOfRound) && !global.isWatching) {
 			stopGame();
 			return;
 		};
@@ -160,6 +159,18 @@ export default function Game() {
 		}, 10);
 	}
 
+	function stopWaiting(event: MouseEvent<HTMLButtonElement>) {
+		const target = event?.target as HTMLButtonElement;
+		target.style.display = "none";
+
+		showById("start_game_button");
+		hideById("stop_waiting_game_button");
+		hideById("pending_game_text");
+		dispatch(showChat(true));
+
+		mainSocket?.emit("stopWaitingGame");
+	}
+
 	function pauseGame(event: MouseEvent<HTMLButtonElement>) {
 		const target = event.target as HTMLButtonElement;
 		target.style.display = "none";
@@ -191,26 +202,34 @@ export default function Game() {
 		mainSocket?.emit("stopGame", { gameRoomId: global.currentGameRoomId, scores: global.scores } as StopGameDto);
 	}
 
-	const gameStartCallback = ({ isRight, gameRoomId, hard, long, logins }: GameStartDto) => {
+	const gameStartCallback = ({ isRight, gameRoomId, hard, long, spin, logins }: GameStartDto) => {
 		/** Start */
+
+
 		global.scores = [0, 0];
 		global.isWatching = false;
-		ballSpeed = 3;
-		nbOfRound = 21;
+		if (spin) {
+			const canva = document.getElementById("game_canva") as HTMLCanvasElement;
+			canva.classList.add("game_canva_spin");
+		}
+
+		ballSpeed = 6;
+		nbOfRound = 10;
 		userLogins = logins;
 		global.isCurrentRight = isRight;
 		global.currentGameRoomId = gameRoomId;
 		if (hard) {
-			ballSpeed = 50;
+			ballSpeed = 15;
 		}
 		if (long) {
-			nbOfRound = 42;
+			nbOfRound = 20;
 		}
 		global.ball.vx = ballSpeed;
 		global.ball.vy = ballSpeed;
 		global.gameStatus = GameStatusEnum.ON;
 		hideById("pending_game_text");
 		hideById("start_game_button");
+		hideById("stop_waiting_game_button");
 		showById("game_canva");
 		showById("pause_game_button");
 		dispatch(showChat(false));
@@ -283,6 +302,7 @@ export default function Game() {
 		hideById("game_canva");
 		hideById("pause_game_button");
 		showById("start_game_button");
+		hideById("stop_watch_game_button");
 		if (!global.isWatching) {
 			showById("endgame_container", "flex");
 		}
@@ -339,6 +359,7 @@ export default function Game() {
 			<Button id="pause_game_button" style={{ display: "none" }} onClick={pauseGame}>Pause game</Button>
 			<Button id="resume_game_button" style={{ display: "none" }} onClick={resumeGame}>Resume game</Button>
 			<Button id="stop_watch_game_button" style={{ display: "none" }} onClick={stopWatch}>Stop watching</Button>
+			<Button id="stop_waiting_game_button" style={{ display: "none" }} onClick={stopWaiting}>Stop waiting</Button>
 
 			<div id="endgame_container" style={{ display: "none" }}>
 				<div id="endgame">

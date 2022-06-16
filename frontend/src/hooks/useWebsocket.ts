@@ -42,7 +42,7 @@ export default function useWebsockets() {
 		}
 	}
 
-	const reFetchRelations = async (userId: string) => {
+	const reFetchRelations = async () => {
 		const { userRelations } = await getAllRelations();
 		if (userRelations) {
 			dispatch(setRelations(userRelations));
