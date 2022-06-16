@@ -60,7 +60,7 @@ export async function generateTfa({ dispatch }: GenerateTfaProps) {
  */
 export async function disableTfa({ dispatch }: DisableTfaProps) {
     try {
-        const res = await api.get("/auth/tfa/disable");
+        await api.get("/auth/tfa/disable");
         dispatch(updateTfaEnabled(false));
     } catch (error: any) {
         console.log(error.response);

@@ -401,7 +401,6 @@ export class SocketGateway implements OnGatewayDisconnect {
         await Promise.all(room.watchers.map(async (watcher: string) => {
             const event = this.events.find((event: ClientSocket) => event.socket.id === watcher);
             if (!event) return;
-            console.log(event.userId);
             await this.userService.setUserAsConnected(event.userId);
         }));
 

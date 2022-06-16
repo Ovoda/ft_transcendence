@@ -21,11 +21,8 @@ export default function GroupList({ onClick }: Props) {
                 return;
             }
             setGroups(groups);
-            console.log(groups);
         }
         fetchAllGroups();
-        console.log(groups);
-
     }, []);
 
     return (

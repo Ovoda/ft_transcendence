@@ -28,7 +28,6 @@ export function updateBall(ball: Ball, players: Player[], ballSpeed: number): Ba
         ball.y = 200;
         ball.vx = ballSpeed * (ball.vx / Math.abs(ball.vx));
         ball.vy = ballSpeed * (ball.vy / Math.abs(ball.vy));
-        console.log(ret);
         return ret;
     }
 
