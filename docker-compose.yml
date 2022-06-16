@@ -10,3 +10,46 @@ services:
     restart: always
     ports:
       - "5432:5432"
+    networks:
+      - database
+
+  ## Server ##
+  nestjs:
+    container_name: server
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    image: nest
+    ports:
+      - "3001:3001"
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    links:
+      - "postgres"
+    networks:
+      - database
+      - webapp
+
+  ## Client ##
+  reactjs:
+    container_name: client
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    image: react
+    ports:
+      - "3000:3000"
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - webapp
+
+networks:
+  webapp:
+    driver: bridge
+  database:
+    driver: bridge
