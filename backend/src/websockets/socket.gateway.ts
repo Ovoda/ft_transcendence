@@ -423,7 +423,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 
 		if (!game) { return; }
 
-        //this.server.to(game.id).emit("stopGame");
+        this.server.to(game.id).emit("stopGame");
 		client.leave(game.id);
 		if (game.socket1 === client.id) {
 			game.socket1 = null;
@@ -465,7 +465,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 	@SubscribeMessage("privateGameResponse")
 	async handlePrivateGameResponse(client: Socket, data: any) {
 
-		if (!data.status) { return };
+		//if (!data.status) { return };
 
 		const event2 = this.events.find((event: ClientSocket) => {
 			return event.socket.id === client.id;
