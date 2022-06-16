@@ -240,10 +240,15 @@ export class SocketGateway implements OnGatewayDisconnect {
 		})
 	}
 
+	@SubscribeMessage("closingChat")
+	public closingChat(client: Socket, userId: string) {
+		this.server.emit("closingChat", userId);
+	}
 
 	/**
 	 * GAME LISTENERS
 	 */
+	
 	@SubscribeMessage('joinGame')
 	async handleJoinGame(client: Socket, data: JoinGameDto) {
 		const event = this.events.find((event: ClientSocket) => event.socket.id === client.id);
@@ -333,10 +338,6 @@ export class SocketGateway implements OnGatewayDisconnect {
 			return (game.user1 === watched || game.user2 === watched);
 		})
 
-		console.log("Watcher: ", watcher);
-		console.log("Watched: ", watched);
-		console.log("Game to watch: ", game);
-
 		if (!game) { return; }
 
 		game.watchers.push(client.id);
@@ -422,6 +423,7 @@ export class SocketGateway implements OnGatewayDisconnect {
 
 		if (!game) { return; }
 
+        //this.server.to(game.id).emit("stopGame");
 		client.leave(game.id);
 		if (game.socket1 === client.id) {
 			game.socket1 = null;
@@ -519,6 +521,11 @@ export class SocketGateway implements OnGatewayDisconnect {
 		})
 	}
 
+	@SubscribeMessage("updateRoles")
+	public dispatchNewRoles(client: Socket, groupId: string) {
+        this.server.emit("updateRoles");
+	}
+	
 	public updateRoles(newRole: RoleTypeEnum | null, groupName: string, userId: string) {
 		const event = this.events.find((event: ClientSocket) => event.userId === userId);
 

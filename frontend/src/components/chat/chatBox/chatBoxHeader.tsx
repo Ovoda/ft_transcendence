@@ -20,7 +20,7 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 
 
 	/** Global data */
-	const { chat, user } = useSelector((store: Store) => store);
+	const { chat, user, roleSlice } = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
 
 
@@ -53,13 +53,16 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 
 	async function handleLeaveGroup() {
 		if (!chat.currentRole) return false;
+		mainSocket?.closingChat(user.id);
 		await leaveGroup(chat.currentRole?.chatGroup.id, chat.currentRole.id);
+		mainSocket?.reloadRoles(user.id);
 		return false;
 	}
 
 	async function handleDeleteGroup() {
 		if (!chat.currentRole) return false;
 		await deleteGroup(chat.currentRole?.chatGroup.id, chat.currentRole.id);
+		mainSocket?.reloadRoles(user.id);
 		return false;
 	}
 
@@ -92,15 +95,21 @@ export default function ChatBoxHeader({ setOpenSettings }: Props) {
 			<div className={"chat_box_header"}>
 				<p className="chat_box_header_title">{chat.currentRole.chatGroup.name}</p>
 				{
-					chat.currentRole?.role === RoleTypeEnum.OWNER &&
+					chat.currentRole?.role !== RoleTypeEnum.OWNER &&
+					<Button id="leave_group_button" onClick={handleLeaveGroup}>Leave</Button>
+				}
+				{	
+					(chat.currentRole?.role === RoleTypeEnum.OWNER) &&
 					<>
 						<Button id="delete_group_button" onClick={handleDeleteGroup}>Delete</Button>
-						<img onClick={handleOpenSettings} src={settings_image} alt="" />
 					</>
 				}
 				{
-					chat.currentRole?.role !== RoleTypeEnum.OWNER &&
-					<Button id="leave_group_button" onClick={handleLeaveGroup}>Leave</Button>
+					(chat.currentRole?.role === RoleTypeEnum.OWNER
+						|| chat.currentRole?.role === RoleTypeEnum.ADMIN) && 
+					<>
+						<img onClick={handleOpenSettings} src={settings_image} alt="" />
+					</>
 				}
 			</div>
 		);

@@ -1,7 +1,10 @@
-import { addMessage } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
+import { RoleTypeEnum } from "enums/roleType.enum";
+import { addMessage, closeChat } from "features/chat/chat.slice";
+//import { toggleShowFriendRequest } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
-import { setRoles } from "features/roles/roles.slice";
+import RolesSlice from "features/roles/interfaces/roles.interface";
+import { setRoles, updateCurrentRole } from "features/roles/roles.slice";
 import { setNotification } from "features/uiState/uiState.slice";
 import UserData from "features/user/interfaces/user.interface";
 import { updateUserData } from "features/user/user.slice";
@@ -13,12 +16,13 @@ import { Store } from "src/app/store";
 import { hideById, showById } from "src/components/newGame/utils";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
+import UserRole from "src/shared/interfaces/role.interface";
 import UserRelation from "src/shared/interfaces/userRelation";
 
 export default function useWebsockets() {
 
 	/** Global data */
-	const { chat, user, relations } = useSelector((store: Store) => store);
+	const { chat, user, relations, roleSlice} = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
 
 	/** Tools */
@@ -80,6 +84,16 @@ export default function useWebsockets() {
 		showById("start_game_button");
 	}
 
+	const chatCloseForUser = (userId: string) => {
+		if (userId === user.id){
+			dispatch(closeChat());
+		}
+	}
+
+	// const updateRoles = (role: UserRole) => {
+	// 	dispatch(updateCurrentRole(role));
+	// }
+
 	useEffect(() => {
 		if (user.login !== "" && mainSocket) {
 			mainSocket.on("ServerMessage", serverMessageCallback);
@@ -89,6 +103,9 @@ export default function useWebsockets() {
 			mainSocket.on("playingRequest", displayPlayingRequest);
 			mainSocket.on("UpdateUserData", updateUserDataCallback);
 			mainSocket.on("UserResponseDecline", userResponseDeclineCallback);
+			mainSocket.on("closingChat", chatCloseForUser);
+			mainSocket.on("updateRoles", reFetchRoles);
+
 
 			return () => {
 				mainSocket.off("ServerMessage", serverMessageCallback);
@@ -97,9 +114,10 @@ export default function useWebsockets() {
 				mainSocket.off("UpdateUserRoles", reFetchRoles);
 				mainSocket.off("playingRequest", displayPlayingRequest);
 				mainSocket.off("UpdateUserData", updateUserDataCallback);
+				mainSocket.off("closingChat", chatCloseForUser);
 			};
 		}
-	}, [user, chat]);
+	}, [user, chat, roleSlice]);
 
 	useEffect(() => {
 		if (user.login !== "" && mainSocket) {
