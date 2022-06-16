@@ -269,6 +269,9 @@ export class SocketGateway implements OnGatewayDisconnect {
                 user1: user.id,
                 user2: null,
                 watchers: [],
+                hard: data.hard,
+                long: data.long,
+                spin: data.spin,
             }
             this.games.push(newGame);
 
@@ -484,8 +487,8 @@ export class SocketGateway implements OnGatewayDisconnect {
         await this.userService.setUserAsPlaying(newGame.user2);
         this.server.emit("UpdateUserRelations");
 
-        this.server.to(newGame.socket1).emit('gameStart', { isRight: true, gameRoomId: newGame.id, hard: data.hard, long: data.long, logins: [newGame.login1, newGame.login2] });
-        this.server.to(newGame.socket2).emit('gameStart', { isRight: false, gameRoomId: newGame.id, hard: data.hard, long: data.long, logins: [newGame.login1, newGame.login2] });
+        this.server.to(newGame.socket1).emit('gameStart', { isRight: true, gameRoomId: newGame.id, hard: data.hard, long: data.long, spin: data.spin, logins: [newGame.login1, newGame.login2] });
+        this.server.to(newGame.socket2).emit('gameStart', { isRight: false, gameRoomId: newGame.id, hard: data.hard, long: data.long, spin: data.spin, logins: [newGame.login1, newGame.login2] });
     }
 
     async addGroup(group: ChatGroupEntity) {

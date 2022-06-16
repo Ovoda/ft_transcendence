@@ -8,4 +8,7 @@ export class GameRoom {
 	socket1: string;
 	socket2: string;
 	watchers: string[];
+	hard?: boolean;
+	long?: boolean;
+	spin?: boolean;
 }

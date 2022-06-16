@@ -68,7 +68,10 @@ export default function TfaLogin() {
                     <input inputMode="decimal" {...digits[4]} />
                     <input inputMode="decimal" {...digits[5]} />
                 </div>
-                <p>{codeValidity ? "code valid" : "code invalid"}</p>
+                {
+                    codeValidity !== undefined &&
+                    <p>{codeValidity ? "code valid" : "code invalid"}</p>
+                }
             </div>
         </div >
     );

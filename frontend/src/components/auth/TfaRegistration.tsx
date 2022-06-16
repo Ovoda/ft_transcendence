@@ -10,6 +10,7 @@ import { closeTfaRegistration } from "../../features/uiState/uiState.slice";
 import { enableTfa } from "../../services/tfa.service";
 import { updateTfaEnabled } from "../../features/user/user.slice";
 import UserData from "../../features/user/interfaces/user.interface";
+import Button from "assets/Button/Button";
 
 
 export default function TfaRegistration() {
@@ -81,7 +82,7 @@ export default function TfaRegistration() {
                     <p>{codeValidity ? "code valid" : "code invalid"}</p>
                     {
                         (code[code.length - 1] === " " || code[code.length - 1] === undefined) &&
-                        < button onClick={cancelTfaRegistration}>close</button>
+                        <Button onClick={cancelTfaRegistration}>close</Button>
                     }
                 </div>
             </div >
