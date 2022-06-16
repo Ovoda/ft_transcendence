@@ -9,6 +9,7 @@ import "./selectOptions.scss"
 import close from 'images/close.png';
 import { hideById, showById } from "../utils";
 import { closeChat, showChat } from "features/chat/chat.slice";
+import { setGameIsPrivate } from "features/game/game.slice";
 
 
 export default function SelectOptions() {
@@ -28,6 +29,7 @@ export default function SelectOptions() {
 		dispatch(closeGameOptions());
 		hideById("start_game_button");
 		showById("pending_game_text");
+
 		if (game.gameIsPrivate) {
 			mainSocket?.emit("playingRequest", {
 				userRequesting: user.id,
@@ -36,8 +38,12 @@ export default function SelectOptions() {
 		} else {
 			mainSocket?.emit("joinGame", { long: gameLength, hard: gameDifficulty });
 		}
-		dispatch(showChat(false));
 		return false;
+	}
+
+	function handleStartGame() {
+		dispatch(setGameIsPrivate(false));
+		dispatch(openGameOptions());
 	}
 
 	return (
@@ -64,7 +70,7 @@ export default function SelectOptions() {
 					</div>
 				</div>
 			}
-			<Button id="start_game_button" onClick={() => { dispatch(openGameOptions()); }}>Start game</Button>
+			<Button id="start_game_button" onClick={handleStartGame}>Start game</Button>
 			<p id="pending_game_text" style={{ display: "none" }}>waiting for oponent</p>
 		</>
 	)

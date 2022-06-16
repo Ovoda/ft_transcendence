@@ -1,3 +1,4 @@
+import { addMessage, showChat } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
 import { RoleTypeEnum } from "enums/roleType.enum";
 import { addMessage, closeChat } from "features/chat/chat.slice";
@@ -22,7 +23,7 @@ import UserRelation from "src/shared/interfaces/userRelation";
 export default function useWebsockets() {
 
 	/** Global data */
-	const { chat, user, relations, roleSlice} = useSelector((store: Store) => store);
+	const { chat, user, relations, roleSlice } = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
 
 	/** Tools */
@@ -65,6 +66,7 @@ export default function useWebsockets() {
 	const displayPlayingRequest = (userRequesting: UserData) => {
 		if (user.id !== userRequesting.id) {
 			dispatch(setRequestingUser(userRequesting));
+			dispatch(showChat(false));
 			dispatch(setShowPrivateGameModal(true));
 		}
 	}
@@ -85,7 +87,7 @@ export default function useWebsockets() {
 	}
 
 	const chatCloseForUser = (userId: string) => {
-		if (userId === user.id){
+		if (userId === user.id) {
 			dispatch(closeChat());
 		}
 	}
@@ -120,7 +122,7 @@ export default function useWebsockets() {
 	}, [user, chat, roleSlice]);
 
 	useEffect(() => {
-		if (user.login !== "" && mainSocket) {	
+		if (user.login !== "" && mainSocket) {
 			mainSocket.init(user.id);
 		}
 	}, [user.login]);

@@ -1,5 +1,16 @@
 canvas {
     border: 10px solid white;
+    animation: 30s spin linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotateZ(0);
+    }
+
+    100% {
+        transform: rotateZ(360deg);
+    }
 }
 
 .hiddenCanva {
@@ -23,6 +34,7 @@ canvas {
     justify-content: center;
     align-items: center;
     font-weight: 300;
+    z-index: 100;
 
     #endgame {
         position: relative;
