@@ -18,9 +18,6 @@ export default function ChatBox() {
 	const { chat } = useSelector((store: Store) => store);
 	const messages = chat.messages;
 
-	/** Tools */
-	const dispatch = useDispatch();
-
 	/** Variables */
 	const [scrolledToTop, setScrolledToTop] = useState<boolean>(false);
 	const [firstMessage, setFirstMessage] = useState<string>("");

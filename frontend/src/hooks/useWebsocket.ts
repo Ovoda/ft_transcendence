@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllRelations, getAllRoles, getUserData } from "services/api.service";
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
-import { hideById, showById } from "src/components/newGame/utils";
+import { hideById, showById } from "src/components/game/utils";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
 import UserRelation from "src/shared/interfaces/userRelation";

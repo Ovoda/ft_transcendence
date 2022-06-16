@@ -15,9 +15,9 @@ import UserRelation from './shared/interfaces/userRelation';
 import UserRole from './shared/interfaces/role.interface';
 import Notification from './components/notification/notification';
 import EditProfile from './components/user/editProfile';
+import { GameContainer } from './components/game/gameContainer';
+import SelectOptions from './components/game/gameOptions/SelectOptions';
 import PrivateGameModal from './components/game/privateGameModal/privateGameModal';
-import { GameContainer } from './components/newGame/gameContainer';
-import SelectOptions from './components/newGame/gameOptions/SelectOptions';
 
 function App() {
 

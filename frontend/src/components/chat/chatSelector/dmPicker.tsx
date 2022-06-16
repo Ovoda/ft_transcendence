@@ -36,7 +36,6 @@ export default function DmPicker() {
 			}
 		}
 		dispatch(openChatDm({ messages: [], relation: updatedRelation.data }));
-
 	}
 
 	async function selectGroupRoom(role: UserRole) {

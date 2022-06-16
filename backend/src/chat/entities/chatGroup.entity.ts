@@ -1,4 +1,3 @@
-import { Exclude } from "class-transformer";
 import { Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ChatRoleEntity } from "./chatRole.entity";
 
@@ -10,14 +9,12 @@ export class ChatGroupEntity {
 	@Column()
 	name: string;
 
-	@Column({ nullable: true })
+	@Column({ default: "https://42.fr/wp-content/uploads/2021/08/42.jpg" })
 	groupAvatar?: string;
 
 	@Column({ nullable: true })
-	lastMessage: string; // uuid of the last message, needs to be updated each time a message is send in this room
+	lastMessage: string;
 
-	//@Exclude({ toPlainOnly: true })
-	// @Column({ select: false, nullable: true })
 	@Column({ nullable: true })
 	password?: string;
 

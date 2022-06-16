@@ -348,13 +348,14 @@ export class SocketGateway implements OnGatewayDisconnect {
             return (game.user1 === watched || game.user2 === watched);
         })
 
-        console.log("Watcher: ", watcher);
-        console.log("Watched: ", watched);
-        console.log("Game to watch: ", game);
+        console.log(game.watchers);
 
+        if (game.watchers.find((watcherId) => watcherId === client.id)) return;
         if (!game) { return; }
 
         game.watchers.push(client.id);
+        console.log("adding", client.id);
+
         this.userService.setUserAsWatching(watcher);
         client.join(game.id);
 
@@ -417,14 +418,9 @@ export class SocketGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('stopWatching')
     handleStopWatching(client: Socket) {
-        let watcherIndex: number;
-
-        const gameIndex = this.games.findIndex((game: GameRoom) => {
-            return watcherIndex = game.watchers.findIndex((watcher: string) => {
-                return watcher === client.id;
-            })
-        });
+        const gameIndex = this.games.findIndex((gameRoom: GameRoom) => gameRoom.watchers.includes(client.id));
         client.leave(this.games[gameIndex].id);
+        const watcherIndex = this.games[gameIndex].watchers.findIndex((watcher: string) => watcher === client.id);
         this.games[gameIndex].watchers = [...this.games[gameIndex].watchers.slice(0, watcherIndex), ...this.games[gameIndex].watchers.slice(watcherIndex + 1)];
     }
 

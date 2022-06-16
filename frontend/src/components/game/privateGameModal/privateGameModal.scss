@@ -1,45 +1,45 @@
 #private_game_modal_container {
 
-	position: fixed;
-	width: 100vw;
-	height: 100vh;
-	top: 0;
-	left: 0;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
 
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-	background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.8);
 
-	#private_game_modal {
-		background-color: white;
-		width: 350px;
+    #private_game_modal {
+        background-color: white;
+        width: 350px;
 
-		border-radius: 1rem;
+        border-radius: 1rem;
 
-		color: black;
+        color: black;
 
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
 
-		padding: 1rem;
+        padding: 1rem;
 
 
 
-		font-size: 1.6rem;
+        font-size: 1.6rem;
 
-		h2 {
-			font-size: 1.6rem;
-			font-weight: 300;
-		}
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 300;
+        }
 
-		#private_game_modal_buttons {
-			display: flex;
-			gap: 1rem;
-		}
-	}
+        #private_game_modal_buttons {
+            display: flex;
+            gap: 1rem;
+        }
+    }
 }

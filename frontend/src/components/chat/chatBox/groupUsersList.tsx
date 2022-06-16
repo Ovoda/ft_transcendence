@@ -77,26 +77,30 @@ export default function GroupUserList() {
                         return (
                             <div key={index} className="group_users_list_item">
                                 <img className="group_users_list_item_img" src={role.user.avatar} alt={role.user.username + "'s avatar"} />
-                                <p>{role.user.username}</p>
-                                {
-                                    isMuted(role) ?
-                                        <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Unmute</Button>
-                                        :
-                                        <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.MUTE) }}>Mute</Button>
-                                }
-                                {
-                                    isBanned(role) ?
-                                        <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Unban</Button>
-                                        :
-                                        <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.BANNED) }}>Ban</Button>
-                                }
-                                {
-                                    isAdmin(role) ?
-                                        <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Admin</Button>
-                                        :
-                                        <Button onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.ADMIN) }}>Admin</Button>
-                                }
-                                <Button onClick={async () => { return await handleKick(role) }}>Kick</Button>
+                                <div className="group_users_list_item_right">
+                                    <p id="group_users_list_item_right_username">{role.user.username}</p>
+                                    <div className="group_users_list_item_buttons">
+                                        {
+                                            isMuted(role) ?
+                                                <p className="mute_ison" onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Mute</p>
+                                                :
+                                                <p onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.MUTE) }}>Mute</p>
+                                        }
+                                        {
+                                            isBanned(role) ?
+                                                <p className="ban_ison" onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Ban</p>
+                                                :
+                                                <p onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.BANNED) }}>Ban</p>
+                                        }
+                                        <p onClick={async () => { return await handleKick(role) }}>Kick</p>
+                                        {
+                                            isAdmin(role) ?
+                                                <p className="admin_ison" onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.LAMBDA) }}>Admin</p>
+                                                :
+                                                <p onClick={async () => { return await handleRoleChange(role.user.id, RoleTypeEnum.ADMIN) }}>Admin</p>
+                                        }
+                                    </div>
+                                </div>
                             </div>
                         )
                     }
