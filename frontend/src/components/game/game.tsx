@@ -340,6 +340,7 @@ export default function Game() {
 	mainSocket?.on("stopGame", stopGameCallback);
 	mainSocket?.on("gameWatch", gameWatchCallback);
 
+
 	function resetUi() {
 		hideById("endgame_container");
 		hideById("resume_game");
