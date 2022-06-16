@@ -69,7 +69,7 @@ export class SocketGateway implements OnGatewayDisconnect {
      * Handles client disconnection, removes corressponding event from events array
      * @param socket 
      */
-    public handleDisconnect(@ConnectedSocket() socket: Socket) {
+    async handleDisconnect(@ConnectedSocket() socket: Socket) {
 
         this.removeClientSocket(socket);
 
@@ -88,7 +88,21 @@ export class SocketGateway implements OnGatewayDisconnect {
                 this.server.to(game.socket1).emit('gameStop', game.socket2);
             }
         }
-        this.handleDeleteRoom(socket);
+        this.server.to(game.id).emit('stopGame');
+
+        let event = this.events.find((event: ClientSocket) => event.socket.id === game.socket1);
+        if (event) {
+            event.socket.leave(game.id);
+        }
+        await this.userService.setUserAsConnected(game.user1);
+
+        event = this.events.find((event: ClientSocket) => event.socket.id === game.socket2);
+        if (event) {
+            event.socket.leave(game.id);
+        }
+        await this.userService.setUserAsConnected(game.user2);
+
+        _.remove(this.games, game);
     }
 
     /**
@@ -246,6 +260,9 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage('joinGame')
     async handleJoinGame(client: Socket, data: JoinGameDto) {
         const event = this.events.find((event: ClientSocket) => event.socket.id === client.id);
+
+
+
         if (!event) return;
 
         const user = await this.userService.findOneById(event.userId);
@@ -391,7 +408,6 @@ export class SocketGateway implements OnGatewayDisconnect {
 
         _.remove(this.games, room);
 
-
         if (updateStatsDto.winnerId !== null && updateStatsDto.loserId !== null) {
             await this.gameService.saveNewStats(updateStatsDto);
         }
@@ -411,34 +427,6 @@ export class SocketGateway implements OnGatewayDisconnect {
         });
         client.leave(this.games[gameIndex].id);
         this.games[gameIndex].watchers = [...this.games[gameIndex].watchers.slice(0, watcherIndex), ...this.games[gameIndex].watchers.slice(watcherIndex + 1)];
-    }
-
-    @SubscribeMessage('deleteRoom')
-    async handleDeleteRoom(client: Socket) {
-        const game = this.games.find((game: GameRoom) => {
-            return (game.socket1 === client.id || game.socket2 === client.id);
-        });
-
-        if (!game) { return; }
-
-        client.leave(game.id);
-        if (game.socket1 === client.id) {
-            game.socket1 = null;
-        } else if (game.socket2 === client.id) {
-            game.socket2 = null;
-        }
-
-        if (game.socket1 === null && game.socket2 === null) {
-            if (game.user1) {
-                await this.userService.setUserAsConnected(game.user1);
-                this.server.emit("FriendConnection", game.user1);
-            }
-            if (game.user2) {
-                await this.userService.setUserAsConnected(game.user2);
-                this.server.emit("FriendConnection", game.user2);
-            }
-            _.remove(this.games, game);
-        }
     }
 
     @SubscribeMessage("playingRequest")
@@ -462,8 +450,6 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("privateGameResponse")
     async handlePrivateGameResponse(client: Socket, data: any) {
 
-        if (!data.status) { return };
-
         const event2 = this.events.find((event: ClientSocket) => {
             return event.socket.id === client.id;
         });
@@ -475,6 +461,7 @@ export class SocketGateway implements OnGatewayDisconnect {
         const user1 = await this.userService.findOneById(event1.userId);
 
         if (!data.status) {
+            console.log("emitting");
             this.server.to(event1.socket.id).emit("UserResponseDecline");
             return;
         };

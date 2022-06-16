@@ -1,4 +1,4 @@
-import { addMessage } from "features/chat/chat.slice";
+import { addMessage, showChat } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
 import { setRoles } from "features/roles/roles.slice";
@@ -61,6 +61,7 @@ export default function useWebsockets() {
 	const displayPlayingRequest = (userRequesting: UserData) => {
 		if (user.id !== userRequesting.id) {
 			dispatch(setRequestingUser(userRequesting));
+			dispatch(showChat(false));
 			dispatch(setShowPrivateGameModal(true));
 		}
 	}

@@ -24,7 +24,6 @@ import GameWatchDto from "./interfaces/gameWatch.dto";
 let nbOfRound = 21;
 let ballSpeed = 3;
 let userLogins = ["", ""];
-let winner = false;
 
 export default function Game() {
 
@@ -202,6 +201,7 @@ export default function Game() {
 		hideById("start_game_button");
 		showById("game_canva");
 		showById("pause_game_button");
+		dispatch(showChat(false));
 		gameLoop();
 	}
 
@@ -250,6 +250,7 @@ export default function Game() {
 	}
 
 	const stopGameCallback = () => {
+		global.gameStatus = GameStatusEnum.OFF;
 		let scoreText = "Victory !";
 		if (global.isCurrentRight && global.scores[1] > global.scores[0]) {
 			scoreText = "Victory !";
@@ -268,6 +269,7 @@ export default function Game() {
 		if (!global.isWatching) {
 			showById("endgame_container", "flex");
 		}
+		dispatch(showChat(true));
 
 		const uiResult = document.getElementById("final_game_result") as HTMLTitleElement;
 		uiResult.innerText = scoreText;
@@ -303,7 +305,6 @@ export default function Game() {
 		hideById("resume_game");
 		hideById("pause_game");
 		showById("start_game_button");
-		dispatch(showChat(false));
 	}
 
 	return (
@@ -323,8 +324,6 @@ export default function Game() {
 					<h2 id="final_game_result"></h2>
 					<p id="final_scores"></p>
 					<img id="close_button_img" onClick={resetUi} src={close} alt="Close modal icon" />
-					<div>
-					</div>
 				</div>
 			</div>
 

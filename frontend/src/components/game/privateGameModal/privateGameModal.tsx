@@ -1,4 +1,5 @@
 import Button from "assets/Button/Button";
+import { showChat } from "features/chat/chat.slice";
 import { setShowPrivateGameModal } from "features/game/game.slice";
 import UserData from "features/user/interfaces/user.interface";
 import { useContext } from "react";
@@ -21,6 +22,7 @@ export default function PrivateGameModal() {
 	function respond(status: boolean) {
 		mainSocket?.emit("privateGameResponse", { userId: game.requestingUser?.id as string, status: status });
 		dispatch(setShowPrivateGameModal(false));
+		dispatch(showChat(true));
 		return false;
 	}
 
