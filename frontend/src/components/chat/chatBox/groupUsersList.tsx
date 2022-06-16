@@ -41,8 +41,6 @@ export default function GroupUserList() {
 			mainSocket?.closingChat(userId);
 		}
 		mainSocket?.reloadRoles(userId);
-		// fetchAllUsers();
-		//window.location.reload();
         return false;
     }
 
