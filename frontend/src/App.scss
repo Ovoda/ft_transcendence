@@ -14,3 +14,23 @@ body {
 html {
 	max-height: 100vh;
 }
+
+.app {
+	height: 100vh;
+	box-sizing: border-box;
+	position: relative;
+}
+
+.game {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	padding: 1rem;
+
+	#pending_game_text {
+		color: white;
+		font-size: 1.8rem;
+	}
+
+}

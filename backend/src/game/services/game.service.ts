@@ -24,10 +24,12 @@ export class GameService extends CrudService<GameEntity>{
 	async saveNewStats(dto: UpdateStatsDto) {
 		const winner = await this.userService.findOneById(dto.winnerId);
 		const loser = await this.userService.findOneById(dto.loserId);
-		winner.victories = winner.victories + 1;
-		loser.defeats = loser.defeats + 1;
-		const uwin = await this.userService.save(winner);
-		const uloss = await this.userService.save(loser);
-		return [uwin, uloss];
+
+		await this.userService.updateById(winner.id, {
+			victories: winner.victories + 1,
+		});
+		await this.userService.updateById(loser.id, {
+			defeats: loser.defeats + 1,
+		});
 	}
 }

@@ -2,12 +2,13 @@ import React, { MouseEvent, ReactNode, useState } from "react";
 import './Button.scss';
 
 interface Props {
-    onClick: (event: MouseEvent<HTMLButtonElement>) => Promise<boolean>;
+    onClick: (event: MouseEvent<HTMLButtonElement>) => Promise<boolean> | any;
     id?: string;
     children: ReactNode;
+    style?: any;
 }
 
-export default function Button({ onClick, id = "", children }: Props) {
+export default function Button({ onClick, id = "", children, style }: Props) {
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -24,9 +25,9 @@ export default function Button({ onClick, id = "", children }: Props) {
         <>
             {
                 isLoading ?
-                    <button id={id} className="button">o</button>
+                    <button style={style} id={id} className="button">o</button>
                     :
-                    <button id={id} className="button" onClick={handleClick}> {children}</button>
+                    <button style={style} id={id} className="button" onClick={handleClick}> {children}</button>
             }
         </>
     )

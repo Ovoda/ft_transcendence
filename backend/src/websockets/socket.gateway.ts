@@ -21,7 +21,10 @@ import { UpdateStatsDto } from "src/game/dtos/updateStats.dto";
 import { GameService } from "src/game/services/game.service";
 import { SocketAddress } from "net";
 import JoinGameDto from "./dtos/joinGame.dto";
-import SynchronizeBallHitDto from "./dtos/synchronizeBallHit.dto";
+import SynchronizePlayerDto from "./dtos/synchronizePlayer.dto";
+import NewRoundDto from "./dtos/newRound.dto";
+import SynchronizeGameDto from "./dtos/synchronizeGame.dto";
+import StopGameDto from "./dtos/stopGame.dto";
 
 /**
  * This class is a websocket gateway.
@@ -159,8 +162,6 @@ export class SocketGateway implements OnGatewayDisconnect {
      * @param socket client's socket
      * @param body request content
      */
-
-
     @SubscribeMessage("ClientDm")
     public async sendDmMessage(socket: Socket, body: ClientDmDto) {
 
@@ -238,15 +239,18 @@ export class SocketGateway implements OnGatewayDisconnect {
     }
 
 
-
+    /**
+     * GAME LISTENERS
+     */
     @SubscribeMessage('joinGame')
     async handleJoinGame(client: Socket, data: JoinGameDto) {
-        console.log(data);
+        const event = this.events.find((event: ClientSocket) => event.socket.id === client.id);
+        if (!event) return;
 
-        //this.logger.log(`New Game Request from: ${client.id}, ${data.login}, ${data.id}`);
+        const user = await this.userService.findOneById(event.userId);
 
         const game = this.games.find((game: GameRoom) => {
-            return (game.user1 === data.userId || game.user2 === data.userId);
+            return (game.user1 === user.id || game.user2 === user.id);
         });
 
         if (game) {
@@ -260,25 +264,24 @@ export class SocketGateway implements OnGatewayDisconnect {
                 status: false,
                 socket1: client.id,
                 socket2: null,
-                login1: data.login,
+                login1: user.username,
                 login2: null,
-                user1: data.userId,
+                user1: user.id,
                 user2: null,
                 watchers: [],
             }
             this.games.push(newGame);
 
-            await this.userService.setUserAsQueuing(data.userId);
+            await this.userService.setUserAsQueuing(user.id);
 
             client.join(newGame.id);
             this.server.to(client.id).emit('setSide', "left");
             this.server.to(newGame.id).emit('gameStatus', false);
-        }
-        else {
+        } else {
             const gameroom: GameRoom = this.games[this.games.length - 1];
             gameroom.socket2 = client.id;
-            gameroom.user2 = data.userId;
-            gameroom.login2 = data.login;
+            gameroom.user2 = user.id;
+            gameroom.login2 = user.username;
             gameroom.status = true;
 
             await this.userService.setUserAsPlaying(gameroom.user1);
@@ -287,23 +290,36 @@ export class SocketGateway implements OnGatewayDisconnect {
             this.server.emit("FriendConnection", gameroom.user2);
 
             client.join(gameroom.id);
-
-            this.server.to(client.id).emit('setSide', "right");
-            // this.server.to(gameroom.socket1).emit('rightLogin', gameroom.login2);
-            // this.server.to(gameroom.socket2).emit('leftLogin', gameroom.login1);
-            this.server.to(gameroom.socket1).emit('gameStart', { isRight: true, gameRoomId: gameroom.id });
-            this.server.to(gameroom.socket2).emit('gameStart', { isRight: false, gameRoomId: gameroom.id });
+            this.server.to(gameroom.socket1).emit('gameStart', { isRight: true, gameRoomId: gameroom.id, hard: data.hard, long: data.long, logins: [gameroom.login1, gameroom.login2] });
+            this.server.to(gameroom.socket2).emit('gameStart', { isRight: false, gameRoomId: gameroom.id, hard: data.hard, long: data.long, logins: [gameroom.login1, gameroom.login2] });
         }
     }
 
-    @SubscribeMessage("synchronizeBallHit")
-    handleBallHitSync(client: Socket, data: SynchronizeBallHitDto) {
-        // console.log("tap", data.gameRoomId);
 
-        if (data.isRight) {
-            this.server.to(data.gameRoomId).emit("ballSync", { x: data.x, y: data.y });
+    /** GAME ANIMATIONS */
+    flag = true;
+
+    @SubscribeMessage("synchronizeGame")
+    handleBallHitSync(client: Socket, data: SynchronizeGameDto) {
+        if (this.flag) {
+            this.server.to(data.gameRoomId).emit("synchronizeGame", data);
         }
+        this.flag = !this.flag;
     }
+
+    @SubscribeMessage('updatePlayer')
+    handleArrow(client: Socket, data: SynchronizePlayerDto): void {
+        this.server.to(data.gameRoomId).emit('updatePlayer', data);
+    }
+
+    @SubscribeMessage('newRound')
+    handleResetScore(client: Socket, data: NewRoundDto) {
+        this.server.to(data.gameRoomId).emit('newRound', data);
+    }
+
+    /**
+     * GAME CONTROL
+     */
 
     @SubscribeMessage('WatchingRequest')
     handleWatchingRequest(client: Socket, data: string) {
@@ -331,68 +347,53 @@ export class SocketGateway implements OnGatewayDisconnect {
     }
 
 
-    @SubscribeMessage('pauseGameRequest')
-    handlePauseRequest(client: Socket) {
-        const index = this.games.findIndex((game: GameRoom) => {
-            return (game.socket1 === client.id || game.socket2 === client.id);
-        })
+    @SubscribeMessage('pauseGame')
+    handlePauseGame(client: Socket, gameRoomId: string) {
+        console.log("we are pauysonfib ubhrb", gameRoomId);
 
-        if (index < 0) { return; }
-
-        this.server.to(this.games[index].id).emit('pauseGame');
+        this.server.to(gameRoomId).emit('pauseGame');
     }
 
 
-    @SubscribeMessage('resumeGameRequest')
-    handleResumeRequest(client: Socket, data: any) {
-        const index = this.games.findIndex((game: GameRoom) => {
-            return (game.socket1 === client.id || game.socket2 === client.id);
-        })
-
-        if (index < 0) { return; }
-
-        this.server.to(this.games[index].id).emit("resumeGame", data);
-    }
-
-    @SubscribeMessage('resetGame')
-    handleResetScore(client: Socket, data: any) {
-        const index = this.games.findIndex((game: GameRoom) => {
-            return (game.socket1 === client.id || game.socket2 === client.id);
-        })
-
-        if (index < 0) { return; }
-
-        this.server.to(this.games[index].id).emit('updateScore', data);
+    @SubscribeMessage('resumeGame')
+    handleResumeGame(client: Socket, gameRoomId: string) {
+        this.server.to(gameRoomId).emit('resumeGame');
     }
 
 
-    @SubscribeMessage('animateGame')
-    handleAnimateGame(client: Socket, data: any) {
-        const index = this.games.findIndex((game: GameRoom) => {
-            return (game.socket1 === client.id || game.socket2 === client.id);
-        })
-        if (index >= 0 && this.games[index].socket1 === client.id) {
-            this.server.to(this.games[index].id).emit('updateBall', data);
+    @SubscribeMessage('stopGame')
+    async handleStopGame(client: Socket, stopGameDto: StopGameDto) {
+
+        const room = this.games.find((game: GameRoom) => game.id === stopGameDto.gameRoomId);
+        if (!room) {
+            console.log("ROOM NOT FOUND", stopGameDto);
+            return;
         }
-    }
 
-    @SubscribeMessage('leaveGame')
-    async handleLeaveGame(client: Socket, data: any) {
-
-        const game = this.games.find((game: GameRoom) => {
-            return game.socket1 === client.id || game.socket2 === client.id;
-        });
-
-        if (!game) { return; }
-
-        this.server.to(game.id).emit('gameStop', client.id);
         let updateStatsDto: UpdateStatsDto = {
-            winnerId: (data.posX > data.posY) ? game.user1 : game.user2,
-            loserId: (data.posX < data.posY) ? game.user1 : game.user2,
+            winnerId: (stopGameDto.scores[0] < stopGameDto.scores[1]) ? room.user1 : room.user2,
+            loserId: (stopGameDto.scores[0] > stopGameDto.scores[1]) ? room.user1 : room.user2,
         }
-        if (data.winnerId !== null && data.loserId !== null) {
-            return await this.gameService.saveNewStats(updateStatsDto);
+
+        this.server.to(stopGameDto.gameRoomId).emit('stopGame', client.id);
+
+        client.leave(room.id);
+        await this.userService.setUserAsConnected(room.user1);
+        this.server.emit("FriendConnection", room.user1);
+
+        client.leave(room.id);
+        await this.userService.setUserAsConnected(room.user2);
+        this.server.emit("FriendConnection", room.user2);
+
+        _.remove(this.games, room);
+
+
+        if (updateStatsDto.winnerId !== null && updateStatsDto.loserId !== null) {
+            await this.gameService.saveNewStats(updateStatsDto);
         }
+
+        this.server.to(room.socket1).emit("UpdateUserData");
+        this.server.to(room.socket2).emit("UpdateUserData");
     }
 
     @SubscribeMessage('stopWatching')
@@ -436,22 +437,6 @@ export class SocketGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('movePlayer')
-    handleArrow(client: Socket, data: number): void {
-        const game = this.games.find((game: GameRoom) => {
-            return (game.socket1 === client.id || game.socket2 === client.id);
-        })
-
-        if (!game) { return; }
-
-        if (game.socket1 === client.id) {
-            this.server.to(game.id).emit('updateLeftPlayer', data);
-        } else if (game.socket2 === client.id) {
-            this.server.to(game.id).emit('updateRightPlayer', data);
-        }
-    }
-
-
     @SubscribeMessage("playingRequest")
     async handlePlayingRequest(client: Socket, data: any) {
 
@@ -490,8 +475,8 @@ export class SocketGateway implements OnGatewayDisconnect {
             status: true,
             socket1: event1.socket.id,
             socket2: event2.socket.id,
-            login1: user1.login,
-            login2: user2.login,
+            login1: user1.username,
+            login2: user2.username,
             user1: user1.id,
             user2: user2.id,
             watchers: [],

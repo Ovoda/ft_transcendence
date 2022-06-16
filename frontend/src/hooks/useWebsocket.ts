@@ -4,15 +4,15 @@ import { setRelations } from "features/relations/relations.slice";
 import { setRoles } from "features/roles/roles.slice";
 import { setNotification } from "features/uiState/uiState.slice";
 import UserData from "features/user/interfaces/user.interface";
+import { updateUserData } from "features/user/user.slice";
 import { useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllRelations, getAllRoles } from "services/api.service";
+import { getAllRelations, getAllRoles, getUserData } from "services/api.service";
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
 import UserRelation from "src/shared/interfaces/userRelation";
-
 
 export default function useWebsockets() {
 
@@ -61,6 +61,12 @@ export default function useWebsockets() {
 		dispatch(toggleShowFriendRequest(userRequesting));
 	}
 
+	const updateUserDataCallback = async () => {
+		const { userData } = await getUserData();
+		if (!userData) return;
+		dispatch(updateUserData(userData));
+	}
+
 	useEffect(() => {
 		if (user.login !== "" && mainSocket) {
 			mainSocket.on("ServerMessage", serverMessageCallback);
@@ -68,7 +74,7 @@ export default function useWebsockets() {
 			mainSocket.on("UpdateUserRelations", reFetchRelations);
 			mainSocket.on("UpdateUserRoles", reFetchRoles);
 			mainSocket.on("playingRequest", displayPlayingRequest);
-
+			mainSocket.on("UpdateUserData", updateUserDataCallback);
 
 			return () => {
 				mainSocket.off("ServerMessage", serverMessageCallback);
@@ -76,6 +82,7 @@ export default function useWebsockets() {
 				mainSocket.off("UpdateUserRelations", reFetchRelations);
 				mainSocket.off("UpdateUserRoles", reFetchRoles);
 				mainSocket.off("playingRequest", displayPlayingRequest);
+				mainSocket.off("UpdateUserData", updateUserDataCallback);
 			};
 		}
 

@@ -1,187 +1,300 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { MouseEvent, useCallback, useContext } from "react";
 import ClientSocket from "services/websocket.service";
 import { mainSocketContext } from "src";
-import { Store } from "src/app/store";
-import SynchronizeBallHitDto from "./interfaces/synchronizeBallHit.dto";
+import { drawGame } from "./drawGame";
+import { BallHitEnum } from "./enums/ballHit.enum";
+import NewRoundDto from "./interfaces/newRound.dto";
+import SynchronizeBallHitDto from "./interfaces/synchronizeGame.dto";
+import SynchronizePlayerDto from "./interfaces/synchronizePlayer.dto";
+import { udpatePlayers, updateBall } from "./updateGame";
+import './game.scss';
+import SynchronizeGameDto from "./interfaces/synchronizeGame.dto";
+import { GameStatusEnum } from "./enums/gameStatus.enum";
+import StopGameDto from "./interfaces/stopGame.dto";
+import setGame from "./setGame";
+import Button from "assets/Button/Button";
+import GameStartDto from "./interfaces/gameStart.dto";
+import { hideById, showById } from "./utils";
+import close from 'images/close.png';
 
-interface Ball {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    radius: number;
-}
 
-interface Player {
-    x: number;
-    y: number;
-    velocity: number;
-    height: number;
-    width: number;
-    side: boolean;
-}
+let nbOfRound = 21;
+let ballSpeed = 3;
+let userLogins = ["", ""];
+let winner = false;
 
 export default function Game() {
 
-    const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+    /** Global data */
+    const mainSocket: ClientSocket | null = useContext(mainSocketContext);
+
+    /** DOM Element */
+    let context: CanvasRenderingContext2D | null = null;
     const canvaRef = useCallback((node: any) => {
         if (node !== null) {
-            setContext(node.getContext('2d'));
+            context = node.getContext('2d');
         }
     }, []);
 
-    const { user } = useSelector((store: Store) => store);
+    let canvaWidth = Math.min(window.innerWidth * .9, 1000);
+    let canvaHeight = canvaWidth * 2 / 3;
 
-    let isCurrentRight = false
-    let currentGameRoomId = "";
+    window.addEventListener("resize", () => {
+        const game_canva = document.getElementById("game_canva") as HTMLCanvasElement;
+        game_canva.width = Math.min(window.innerWidth * .9, 1000);
+        game_canva.height = game_canva.width * 2 / 3;
+        canvaWidth = game_canva.width;
+        canvaHeight = game_canva.height;
+    })
 
-    const mainSocket: ClientSocket | null = useContext(mainSocketContext);
+    let global = setGame();
 
-    const players = [
-        {
-            x: 0,
-            y: 200 - 80 / 2,
-            velocity: 10,
-            height: 80,
-            width: 10,
-            side: false,
-        },
-        {
-            x: 600 - 10,
-            y: 200 - 80 / 2,
-            velocity: 10,
-            height: 80,
-            width: 10,
-            side: true,
-        }
-    ];
-
-    /** BALL */
-    const ball: Ball = {
-        x: 100,
-        y: 100,
-        vy: 5,
-        vx: 6,
-        radius: 5
-    };
-
-    function moveBall() {
-        if ((ball.y <= 0 || ball.y >= 400) && (ball.x <= 0 || ball.x >= 600)) {
-            ball.vx = -ball.vx;
-            ball.vy = -ball.vy;
-            ball.x = ball.x + ball.vx;
-            ball.y = ball.y + ball.vy;
-            mainSocket?.emit("synchronizeBallHit",
-                { x: ball.x, y: ball.y, isRight: isCurrentRight, gameRoomId: currentGameRoomId } as SynchronizeBallHitDto);
-            return;
-        }
-
-        if (ball.x <= 0 || ball.x >= 600) {
-            ball.vx = -ball.vx;
-            ball.x = ball.x + ball.vx;
-            ball.y = ball.y + ball.vy;
-            mainSocket?.emit("synchronizeBallHit",
-                { x: ball.x, y: ball.y, isRight: isCurrentRight, gameRoomId: currentGameRoomId } as SynchronizeBallHitDto);
-            return;
-        }
-
-        if (ball.y <= 0 || ball.y >= 400) {
-            ball.vy = -ball.vy;
-            ball.x = ball.x + ball.vx;
-            ball.y = ball.y + ball.vy;
-            mainSocket?.emit("synchronizeBallHit",
-                { x: ball.x, y: ball.y, isRight: isCurrentRight, gameRoomId: currentGameRoomId } as SynchronizeBallHitDto);
-            return;
-        }
-
-        ball.x = ball.x + ball.vx;
-        ball.y = ball.y + ball.vy;
-    }
-
-    let goDown = false;
-    let goUp = false;
-
+    /** Variables */
     document.addEventListener("keydown", (event: KeyboardEvent) => {
-        if (event.key === "ArrowDown") {
-            goDown = true;
-            goUp = false;
+
+        if (event.key === "ArrowDown" && global.isCurrentRight) {
+            global.players[1].goDown = true;
+            global.players[1].goUp = false;
         }
-        if (event.key === "ArrowUp") {
-            goDown = false;
-            goUp = true;
+        if (event.key === "ArrowDown" && !global.isCurrentRight) {
+            global.players[0].goDown = true;
+            global.players[0].goUp = false;
+        }
+
+        if (event.key === "ArrowUp" && global.isCurrentRight) {
+            global.players[1].goDown = false;
+            global.players[1].goUp = true;
+        }
+        if (event.key === "ArrowUp" && !global.isCurrentRight) {
+            global.players[0].goDown = false;
+            global.players[0].goUp = true;
+        }
+
+        if (global.isCurrentRight) {
+            mainSocket?.emit("updatePlayer", {
+                newGoDown: global.players[1].goDown,
+                newGoUp: global.players[1].goUp,
+                updateRight: global.isCurrentRight,
+                gameRoomId: global.currentGameRoomId
+            } as SynchronizePlayerDto);
+        } else {
+            mainSocket?.emit("updatePlayer", {
+                newGoDown: global.players[0].goDown,
+                newGoUp: global.players[0].goUp,
+                updateRight: global.isCurrentRight,
+                gameRoomId: global.currentGameRoomId
+            } as SynchronizePlayerDto);
         }
     });
 
     document.addEventListener("keyup", (event: KeyboardEvent) => {
-        goDown = false;
-        goUp = false;
+        if (global.isCurrentRight) {
+            global.players[1].goDown = false;
+            global.players[1].goDown = false;
+        } else {
+            global.players[0].goDown = false;
+            global.players[0].goDown = false;
+        }
+
+        mainSocket?.emit("updatePlayer", {
+            newGoDown: false,
+            newGoUp: false,
+            updateRight: global.isCurrentRight,
+            gameRoomId: global.currentGameRoomId
+        } as SynchronizePlayerDto);
     });
 
     async function gameLoop() {
+        if (global.gameStatus !== GameStatusEnum.ON as GameStatusEnum) return;
         if (!context) return;
+        if (global.scores[0] >= nbOfRound || global.scores[1] >= nbOfRound) {
+            stopGame();
+            return;
+        };
 
-        if (goDown) {
-            players[0].y += players[0].velocity;
+        udpatePlayers(global.players);
+
+        switch (updateBall(global.ball, global.players, ballSpeed)) {
+            case BallHitEnum.OUT_LEFT:
+                if (global.isCurrentRight) {
+                    global.scores[1]++;
+                    mainSocket?.emit("newRound", { scores: global.scores, gameRoomId: global.currentGameRoomId } as NewRoundDto);
+                }
+                break;
+
+            case BallHitEnum.OUT_RIGHT:
+                if (global.isCurrentRight) {
+                    global.scores[0]++;
+                    mainSocket?.emit("newRound", { scores: global.scores, gameRoomId: global.currentGameRoomId } as NewRoundDto);
+                }
+                break;
+
+            default:
+                break;
         }
-        if (goUp) {
-            players[0].y -= players[0].velocity;
-        }
-
-        context.fillStyle = "white";
-        context.clearRect(0, 0, 600, 400);
-        context.fillRect(0, 0, 600, 400);
-
-        context.beginPath();
-        context.fillStyle = "black";
-        context.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
-        context.fill();
-        context.stroke();
-
-        context.fillStyle = "blue";
-        context.fillRect(players[0].x, players[0].y, players[0].width, players[0].height);
-        context.fillStyle = "red";
-        context.fillRect(players[1].x, players[1].y, players[1].width, players[1].height);
-
-        moveBall();
+        mainSocket?.emit("synchronizeGame", {
+            x: global.ball.x,
+            y: global.ball.y,
+            vx: global.ball.vx,
+            vy: global.ball.vy,
+            isRight: global.isCurrentRight,
+            gameRoomId: global.currentGameRoomId,
+            px: global.isCurrentRight ? global.players[1].x : global.players[0].x,
+            py: global.isCurrentRight ? global.players[1].y : global.players[0].y,
+        } as SynchronizeGameDto);
+        drawGame(context, global.ball, global.players, global.scores, canvaHeight, canvaWidth, userLogins);
 
         setTimeout(() => {
             requestAnimationFrame(gameLoop);
         }, 10);
     }
 
-    function startGame() {
-        mainSocket?.emit("joinGame", {
-            login: user.login,
-            userId: user.id,
-        });
+    function pauseGame(event: MouseEvent<HTMLButtonElement>) {
+        const target = event.target as HTMLButtonElement;
+        target.style.display = "none";
+        showById("resume_game_button");
+        mainSocket?.emit("pauseGame", global.currentGameRoomId);
     }
 
-    const gameStartCallback = ({ isRight, gameRoomId }: { isRight: boolean, gameRoomId: string }) => {
-        isCurrentRight = isRight;
-        currentGameRoomId = gameRoomId;
+    function resumeGame(event: MouseEvent<HTMLButtonElement>) {
+
+        const target = event.target as HTMLButtonElement;
+        target.style.display = "none";
+        showById("pause_game_button");
+        mainSocket?.emit("resumeGame", global.currentGameRoomId);
+    }
+
+    function stopGame() {
+        mainSocket?.emit("stopGame", { gameRoomId: global.currentGameRoomId, scores: global.scores } as StopGameDto);
+    }
+
+    const gameStartCallback = ({ isRight, gameRoomId, hard, long, logins }: GameStartDto) => {
+        /** Start */
+        global.scores = [0, 0];
+        ballSpeed = 3;
+        nbOfRound = 21;
+        userLogins = logins;
+        global.isCurrentRight = isRight;
+        global.currentGameRoomId = gameRoomId;
+        if (hard) {
+            ballSpeed = 50;
+        }
+        if (long) {
+            nbOfRound = 42;
+        }
+        global.ball.vx = ballSpeed;
+        global.ball.vy = ballSpeed;
+        global.gameStatus = GameStatusEnum.ON;
+        hideById("pending_game_text");
+        showById("game_canva");
+        showById("pause_game_button");
         gameLoop();
     }
 
-    const gameBallSyncCallback = ({ x, y }: { x: number, y: number }) => {
-        ball.x = x;
-        ball.y = y;
+    const gameBallSyncCallback = (data: SynchronizeBallHitDto) => {
+        global.ball.x = data.x;
+        global.ball.y = data.y;
+        global.ball.vx = data.vx;
+        global.ball.vy = data.vy;
+        if (data.isRight) {
+            global.players[1].x = data.px;
+            global.players[1].y = data.py;
+        } else {
+            global.players[0].x = data.px;
+            global.players[0].y = data.py;
+        }
     }
 
-    useEffect(() => {
-        mainSocket?.on("gameStart", gameStartCallback);
-        mainSocket?.on("ballSync", gameBallSyncCallback);
+    const updatePlayerCallback = ({ newGoDown, newGoUp, updateRight }: { newGoDown: boolean, newGoUp: boolean, updateRight: boolean }) => {
+        if (updateRight) {
+            global.players[1].goDown = newGoDown;
+            global.players[1].goUp = newGoUp;
+        } else {
+            global.players[0].goDown = newGoDown;
+            global.players[0].goUp = newGoUp;
+        }
+    }
 
-        return (() => {
-            mainSocket?.off("gameStart", gameStartCallback);
-            mainSocket?.off("ballSync", gameBallSyncCallback);
-        });
-    }, [context]);
+    const newRoundCallback = (data: NewRoundDto) => {
+        global.scores = data.scores;
+    }
+
+    const pauseGameCallback = () => {
+        if (global.gameStatus === GameStatusEnum.PAUSE) return;
+        showById("resume_game_button");
+        hideById("pause_game_button");
+        global.gameStatus = GameStatusEnum.PAUSE;
+    }
+
+    const resumeGameCallback = () => {
+        if (global.gameStatus === GameStatusEnum.ON) return;
+        showById("pause_game_button");
+        hideById("resume_game_button");
+        global.gameStatus = GameStatusEnum.ON;
+        gameLoop();
+    }
+
+    const stopGameCallback = () => {
+        console.log("current right:", global.isCurrentRight);
+        console.log("scores[0] ", global.scores[0]);
+        console.log("scores[1] ", global.scores[1]);
+
+        let scoreText = "Victory !";
+        if (global.isCurrentRight && global.scores[1] > global.scores[0]) {
+            scoreText = "Victory !";
+        } else if (global.isCurrentRight && global.scores[0] > global.scores[1]) {
+            scoreText = "Defeat !";
+        }
+
+        if (!global.isCurrentRight && global.scores[0] > global.scores[1]) {
+            scoreText = "Victory !";
+        } else if (!global.isCurrentRight && global.scores[1] > global.scores[0]) {
+            scoreText = "Defeat !";
+        }
+
+        hideById("game_canva");
+        hideById("pause_game_button");
+        // showById("start_game_button");
+        showById("endgame_container", "flex");
+
+        const uiScores = document.getElementById("final_scores") as HTMLTitleElement;
+        uiScores.innerText = scoreText;
+    }
+
+    mainSocket?.on("gameStart", gameStartCallback);
+    mainSocket?.on("synchronizeGame", gameBallSyncCallback);
+    mainSocket?.on("updatePlayer", updatePlayerCallback);
+    mainSocket?.on("pauseGame", pauseGameCallback);
+    mainSocket?.on("resumeGame", resumeGameCallback);
+    mainSocket?.on("newRound", newRoundCallback);
+    mainSocket?.on("stopGame", stopGameCallback);
+
+    function resetUi() {
+        hideById("endgame_container");
+        showById("start_game_button");
+    }
 
     return (
         <>
-            <button onClick={startGame}>start game</button>;
-            <canvas ref={canvaRef} height={400} width={600}></canvas>
+            <canvas
+                id="game_canva"
+                style={{ display: "none" }}
+                ref={canvaRef}
+                height={canvaHeight}
+                width={canvaWidth}>
+            </canvas>
+            <Button id="pause_game_button" style={{ display: "none" }} onClick={pauseGame}>Pause game</Button>
+            <Button id="resume_game_button" style={{ display: "none" }} onClick={resumeGame}>Resume game</Button>
+
+            <div id="endgame_container" style={{ display: "none" }}>
+                <div id="endgame">
+                    <h2 id="final_scores"></h2>
+                    <img id="close_button_img" onClick={resetUi} src={close} alt="Close modal icon" />
+                    <div>
+                    </div>
+                </div>
+            </div>
+
         </>
     )
 }

@@ -16,7 +16,8 @@ import UserRole from './shared/interfaces/role.interface';
 import Notification from './components/notification/notification';
 import EditProfile from './components/user/editProfile';
 import PrivateGameModal from './components/game/privateGameModal/privateGameModal';
-import Game from './components/newGame/game';
+import { GameContainer } from './components/newGame/gameContainer';
+import SelectOptions from './components/newGame/gameOptions/SelectOptions';
 
 function App() {
 
@@ -56,21 +57,25 @@ function App() {
 	}, [user]);
 
 	return (
-		<div className="App">
-			<Notification />
-			<Navbar />
-			<TfaRegistration />
-			{/* <Chat /> */}
-			<PrivateGameModal />
-			<EditProfile />
-			<UserSettings
-				settingsWindowState={uiState.openedSettings}
-				setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
-			<header className="App-header">
-				{/* {user.login !== "" && <Game />} */}
-				<Game />
-			</header>
-		</div >
+		<div className="app">
+			<div>
+				<Notification />
+				<Navbar />
+				<TfaRegistration />
+				{/* <Chat /> */}
+				<PrivateGameModal />
+				<EditProfile />
+				<UserSettings
+					settingsWindowState={uiState.openedSettings}
+					setSettingsWindowAction={() => dispatch(closeSettingWindow())} />
+			</div >
+			<div className="game">
+				<GameContainer />
+				{user.login !== "" &&
+					<SelectOptions />
+				}
+			</div>
+		</div>
 	);
 }
 
