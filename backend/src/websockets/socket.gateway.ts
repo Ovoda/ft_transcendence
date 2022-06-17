@@ -83,6 +83,12 @@ export class SocketGateway implements OnGatewayDisconnect {
 
         if (!game) { return; }
 
+        await Promise.all(game.watchers.map(async (watcher: string) => {
+            const event = this.events.find((event: ClientSocket) => event.socket.id === watcher);
+            if (!event) return;
+            await this.userService.setUserAsConnected(event.userId);
+        }));
+    
         const otherUserId = (game.user1 === event.userId) ? game.user2 : game.user1;
         this.server.to(game.id).emit('stopGame');
         await this.userService.setUserAsConnected(otherUserId);

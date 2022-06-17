@@ -10,6 +10,7 @@ import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import UserRole from "src/shared/interfaces/role.interface";
 import { useEffect, useState } from "react";
 import AddRoomMenu, { RoomMenuType } from "./addRoom/addRoomModal";
+import Group from "src/shared/interfaces/group.interface";
 
 export default function DmPicker() {
 
@@ -44,12 +45,21 @@ export default function DmPicker() {
 			return;
 		}
 		const updatedRole = await getRole(role.id);
-		const group = updatedRole.data.chatGroup;
+		const group: Group = updatedRole.data.chatGroup;
 
-		const { messages } = await getMessages(group.lastMessage, updatedRole.data.id);
+		if (group.lastMessage) {
+			const response = await api.get(`chat/many/message/group/${updatedRole.data.id}/${group.lastMessage}`);
+			if (response.data) {
+				dispatch(openChatGroup({ messages: response.data.reverse(), role: updatedRole.data}));
+				return;
+			}
+		}
+		dispatch(openChatGroup({ messages: [], role: updatedRole.data}));
 
-		if (messages)
-			dispatch(openChatGroup({ messages: messages.reverse(), role: updatedRole.data }));
+		// const { messages } = await getMessages(group.lastMessage, updatedRole.data.id);
+
+		// if (messages)
+		// 	dispatch(openChatGroup({ messages: messages.reverse(), role: updatedRole.data }));
 	}
 
 	/** Opens a modal to create rooms */

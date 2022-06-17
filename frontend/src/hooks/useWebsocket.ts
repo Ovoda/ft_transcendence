@@ -99,6 +99,7 @@ export default function useWebsockets() {
 		dispatch(setGameIsPrivate(false));
 		dispatch(showChat(true));
 		hideById("pending_game_text");
+		hideById("pending_game_button");
 		showById("start_game_button");
 	}
 
