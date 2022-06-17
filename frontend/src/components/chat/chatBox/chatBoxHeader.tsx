@@ -10,6 +10,7 @@ import { deleteGroup, leaveGroup } from "services/group.api.service";
 import './chatBoxHeader.scss';
 import { closeChatSettings, openChatSettings, showChat } from "features/chat/chat.slice";
 import { hideById, showById } from "src/components/game/utils";
+import { setRequestedUser } from "features/game/game.slice";
 
 export default function ChatBoxHeader() {
 
@@ -42,7 +43,9 @@ export default function ChatBoxHeader() {
 		dispatch(showChat(false));
 		hideById("start_game_button");
 		showById("pending_game_text");
+		showById("pending_game_button");
 
+		dispatch(setRequestedUser(chat.currentRelation?.counterPart.id));
 		mainSocket?.emit("playingRequest", {
 			userRequesting: user.id,
 			userRequested: chat.currentRelation?.counterPart.id,

@@ -65,6 +65,7 @@ export default function SelectOptions() {
 	}
 
 	function cancel() {
+		console.log(game);
 		mainSocket?.emit("cancelPrivateGame", game.requestedUserId as string);
 		hideById("pending_game_text");
 		hideById("pending_game_button");

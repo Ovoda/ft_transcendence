@@ -26,6 +26,7 @@ import SynchronizeGameDto from "./dtos/synchronizeGame.dto";
 import StopGameDto from "./dtos/stopGame.dto";
 import WatchingRequestDto from "./dtos/watchingRequest.dto";
 import GameWatchDto from "./dtos/gameWatch.dto";
+import { ChatGroupService } from "src/chat/services/chatGroup.service.ts";
 
 /**
  * This class is a websocket gateway.
@@ -54,6 +55,7 @@ export class SocketGateway implements OnGatewayDisconnect {
         private readonly relationService: RelationService,
         private readonly userService: UserService,
         private readonly gameService: GameService,
+        private readonly groupService: ChatGroupService,
     ) { }
 
     /** Websocket server */
@@ -453,8 +455,12 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("cancelPrivateGame")
     async cancelPrivateGame(client: Socket, requestedUserId: string) {
 
+        console.log("before", requestedUserId);
+
+
         if (!requestedUserId) return;
 
+        console.log("before", requestedUserId);
         const event = this.events.find((event: ClientSocket) => {
             return event.userId === requestedUserId;
         });
@@ -517,6 +523,20 @@ export class SocketGateway implements OnGatewayDisconnect {
 
         clients.map((client: ClientSocket) => {
             this.server.to(client.socket.id).emit("UpdateUserRoles");
+        })
+    }
+
+
+    async updateGroupImage(groupId: string) {
+        const group = await this.groupService.findOneById(groupId, {
+            relations: ["users"],
+        });
+
+        if (!group.users) return;
+        group.users.forEach((role: ChatRoleEntity) => {
+            const event = this.events.find((event: ClientSocket) => event.userId === role.user.id);
+            if (!event) return;
+            this.server.to(event.socket.id).emit("UpdateUserRoles");
         })
     }
 

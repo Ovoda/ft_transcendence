@@ -5,6 +5,7 @@ import { TfaGuard } from "src/auth/guards/tfa.auth.guard";
 import { JwtRequest } from "src/auth/interfaces/jwtRequest.interface";
 import { ChatRoleEntity } from "src/chat/entities/chatRole.entity";
 import { ChatRoleService } from "src/chat/services/chatRole.service";
+import { SocketGateway } from "src/websockets/socket.gateway";
 import { ImagesService } from "./images.service";
 import { editFileName, imageFileFilter } from "./utils/fileUpload.utils";
 
@@ -12,7 +13,9 @@ import { editFileName, imageFileFilter } from "./utils/fileUpload.utils";
 export class ImagesController {
 	constructor(
 		private readonly imagesService: ImagesService,
-		private readonly chatRoleService: ChatRoleService) { }
+		private readonly chatRoleService: ChatRoleService,
+		private readonly socketGateway: SocketGateway,
+	) { }
 
 	@UseGuards(TfaGuard)
 	@Post('/user/upload')
@@ -69,6 +72,7 @@ export class ImagesController {
 			root: './uploads',
 		}, request.user.id, groupId, role.id);
 
+		await this.socketGateway.updateGroupImage(role.chatGroup.id);
 		return response;
 	}
 

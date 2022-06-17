@@ -50,10 +50,13 @@ export default function useWebsockets() {
 		const counterParts = userRelations.map((relation: UserRelation) => relation.counterPart.id);
 
 		const checkPrivateGame = counterParts.find((id: string) => id === game.requestingUser?.id);
-		dispatch(closeGameOptions());
-		dispatch(setRequestedUser(""));
-		dispatch(setRequestingUser(null));
-		dispatch(showChat(true));
+
+		if (checkPrivateGame) {
+			dispatch(closeGameOptions());
+			dispatch(setRequestedUser(""));
+			dispatch(setRequestingUser(null));
+			dispatch(showChat(true));
+		}
 	}
 
 	const reFetchRoles = async (notification: any) => {
@@ -96,6 +99,8 @@ export default function useWebsockets() {
 	}
 
 	const cancelPrivateGameCallback = () => {
+		console.log("Yes");
+
 		dispatch(setRequestingUser(null));
 		dispatch(showChat(true));
 		dispatch(setGameIsPrivate(false))
