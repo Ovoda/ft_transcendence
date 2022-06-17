@@ -206,8 +206,6 @@ export default function Game() {
 
 	const gameStartCallback = ({ isRight, gameRoomId, hard, long, spin, logins }: GameStartDto) => {
 		/** Start */
-
-
 		global.scores = [0, 0];
 		global.isWatching = false;
 		if (spin) {
@@ -232,6 +230,7 @@ export default function Game() {
 		hideById("pending_game_text");
 		hideById("start_game_button");
 		hideById("stop_waiting_game_button");
+		hideById("pending_game_button");
 		showById("game_canva");
 		showById("pause_game_button");
 		dispatch(showChat(false));

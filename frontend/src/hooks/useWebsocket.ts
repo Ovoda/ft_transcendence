@@ -1,3 +1,4 @@
+import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import { addMessage, closeChat, showChat } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
@@ -11,6 +12,7 @@ import { getAllRelations, getAllRoles, getUserData } from "services/api.service"
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
 import { hideById, showById } from "src/components/game/utils";
+import CounterPart from "src/shared/interfaces/counterPart.interface";
 import Dm from "src/shared/interfaces/dm.interface";
 import GroupMessage from "src/shared/interfaces/groupMessage.interface";
 import UserRelation from "src/shared/interfaces/userRelation";
@@ -47,9 +49,17 @@ export default function useWebsockets() {
 		if (userRelations) {
 			dispatch(setRelations(userRelations));
 		}
-		const counterParts = userRelations.map((relation: UserRelation) => relation.counterPart.id);
+		const counterParts: CounterPart[] = userRelations.map((relation: UserRelation) => relation.counterPart);
 
-		const checkPrivateGame = counterParts.find((id: string) => id === game.requestingUser?.id);
+		const checkPrivateGame = counterParts.find((counterPart: CounterPart) => counterPart.id === game.requestingUser?.id);
+
+		if (checkPrivateGame?.activityStatus === UserActivityStatusEnum.PLAYING) {
+			dispatch(closeGameOptions());
+			dispatch(setRequestedUser(""));
+			dispatch(setRequestingUser(null));
+			dispatch(showChat(false));
+			return;
+		}
 
 		if (checkPrivateGame) {
 			dispatch(closeGameOptions());
@@ -99,8 +109,6 @@ export default function useWebsockets() {
 	}
 
 	const cancelPrivateGameCallback = () => {
-		console.log("Yes");
-
 		dispatch(setRequestingUser(null));
 		dispatch(showChat(true));
 		dispatch(setGameIsPrivate(false))

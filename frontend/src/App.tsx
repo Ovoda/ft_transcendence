@@ -17,7 +17,6 @@ import Notification from './components/notification/notification';
 import EditProfile from './components/user/editProfile';
 import { GameContainer } from './components/game/gameContainer';
 import SelectOptions from './components/game/gameOptions/SelectOptions';
-import PrivateGameModal from './components/game/privateGameModal/privateGameModal';
 
 function App() {
 
@@ -63,7 +62,6 @@ function App() {
 				<Navbar />
 				<TfaRegistration />
 				<Chat />
-				<PrivateGameModal />
 				<EditProfile />
 				<UserSettings
 					settingsWindowState={uiState.openedSettings}

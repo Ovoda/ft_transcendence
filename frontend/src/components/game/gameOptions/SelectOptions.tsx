@@ -15,7 +15,7 @@ import { setGameIsPrivate, setShowPrivateGameModal } from "features/game/game.sl
 export default function SelectOptions() {
 
 	/** Global data */
-	const { uiState, game, user } = useSelector((store: Store) => store);
+	const { uiState, game, user, chat } = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
 
 	/** Tools */
@@ -58,14 +58,15 @@ export default function SelectOptions() {
 				spin: gameSpin,
 			});
 		dispatch(closeGameOptions());
-		if (!status) {
+		if (status) {
+			dispatch(showChat(false));
+		} else {
 			dispatch(showChat(true));
 		}
 		return false;
 	}
 
 	function cancel() {
-		console.log(game);
 		mainSocket?.emit("cancelPrivateGame", game.requestedUserId as string);
 		hideById("pending_game_text");
 		hideById("pending_game_button");

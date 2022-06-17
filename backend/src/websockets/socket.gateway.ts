@@ -455,12 +455,8 @@ export class SocketGateway implements OnGatewayDisconnect {
     @SubscribeMessage("cancelPrivateGame")
     async cancelPrivateGame(client: Socket, requestedUserId: string) {
 
-        console.log("before", requestedUserId);
-
-
         if (!requestedUserId) return;
 
-        console.log("before", requestedUserId);
         const event = this.events.find((event: ClientSocket) => {
             return event.userId === requestedUserId;
         });
