@@ -8,7 +8,7 @@ import { api, getMessages, getRelation, getRole } from "services/api.service";
 import UserRelation from "src/shared/interfaces/userRelation";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
 import UserRole from "src/shared/interfaces/role.interface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddRoomMenu, { RoomMenuType } from "./addRoom/addRoomModal";
 
 export default function DmPicker() {
@@ -85,6 +85,23 @@ export default function DmPicker() {
 		}
 		return color;
 	}
+
+
+	useEffect(() => {
+		async function updateCurrentRelation() {
+			if (!chat.currentRelation) return;
+			const updatedRelation = await getRelation(chat.currentRelation.id);
+			if (updatedRelation.data.lastMessage) {
+				const response = await api.get(`chat/many/message/dm/${updatedRelation.data.lastMessage}`);
+				if (response.data) {
+					dispatch(openChatDm({ messages: response.data.reverse(), relation: updatedRelation.data }));
+					return;
+				}
+			}
+			dispatch(openChatDm({ messages: [], relation: updatedRelation.data }));
+		}
+		updateCurrentRelation();
+	}, [relations]);
 
 	return (
 		<div id="dm_picker">

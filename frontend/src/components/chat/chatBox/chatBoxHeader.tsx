@@ -1,23 +1,20 @@
 import Button from "assets/Button/Button";
 import { RoleTypeEnum } from "enums/roleType.enum";
 import { UserActivityStatusEnum } from "enums/userConnectionStatus.enum";
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { mainSocketContext } from "src";
 import { Store } from "src/app/store";
 import settings_image from 'images/settings.png';
 import { deleteGroup, leaveGroup } from "services/group.api.service";
 import './chatBoxHeader.scss';
-import { openGameOptions } from "features/uiState/uiState.slice";
-import { closeChat, closeChatSettings, openChatSettings, showChat } from "features/chat/chat.slice";
-import { setGameIsPrivate, setRequestedUser, setRequestingUser } from "features/game/game.slice";
+import { closeChatSettings, openChatSettings, showChat } from "features/chat/chat.slice";
 import { hideById, showById } from "src/components/game/utils";
-
 
 export default function ChatBoxHeader() {
 
 	/** Global data */
-	const { chat, user, game } = useSelector((store: Store) => store);
+	const { chat, user } = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
 
 	/** Variables */
@@ -91,6 +88,7 @@ export default function ChatBoxHeader() {
 			</div>
 		)
 	}
+
 	if (chat.currentRole) {
 		return (
 			<div className={"chat_box_header"}>

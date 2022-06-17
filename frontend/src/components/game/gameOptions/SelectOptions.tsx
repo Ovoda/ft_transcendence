@@ -31,14 +31,7 @@ export default function SelectOptions() {
 		hideById("start_game_button");
 		showById("pending_game_text");
 
-		// if (game.gameIsPrivate) {
-		// 	mainSocket?.emit("playingRequest", {
-		// 		userRequesting: user.id,
-		// 		userRequested: game.requestedUserId,
-		// 	});
-		// } else {
 		mainSocket?.emit("joinGame", { long: gameLength, hard: gameDifficulty, spin: gameSpin });
-		// }
 		return false;
 	}
 
@@ -68,7 +61,14 @@ export default function SelectOptions() {
 		if (!status) {
 			dispatch(showChat(true));
 		}
+		return false;
+	}
 
+	function cancel() {
+		mainSocket?.emit("cancelPrivateGame", game.requestedUserId as string);
+		hideById("pending_game_text");
+		hideById("pending_game_button");
+		showById("start_game_button");
 		return false;
 	}
 
@@ -125,6 +125,7 @@ export default function SelectOptions() {
 			}
 			<Button id="start_game_button" onClick={handleStartGame}>Start game</Button>
 			<p id="pending_game_text" style={{ display: "none" }}>waiting for oponent</p>
+			<Button id="pending_game_button" style={{ display: "none" }} onClick={() => cancel()}> Stop waiting </Button>
 		</>
 	)
 }

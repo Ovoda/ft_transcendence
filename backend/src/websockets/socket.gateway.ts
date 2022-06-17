@@ -332,8 +332,10 @@ export class SocketGateway implements OnGatewayDisconnect {
             return (game.user1 === watched || game.user2 === watched);
         })
 
-        if (game.watchers.find((watcherId) => watcherId === client.id)) return;
         if (!game) { return; }
+
+        if (game.watchers.find((watcherId) => watcherId === client.id)) return;
+
 
         game.watchers.push(client.id);
 
@@ -448,8 +450,23 @@ export class SocketGateway implements OnGatewayDisconnect {
         this.server.to(event_requested.socket.id).emit("playingRequest", user);
     }
 
+    @SubscribeMessage("cancelPrivateGame")
+    async cancelPrivateGame(client: Socket, requestedUserId: string) {
+
+        if (!requestedUserId) return;
+
+        const event = this.events.find((event: ClientSocket) => {
+            return event.userId === requestedUserId;
+        });
+
+        this.server.to(event.socket.id).emit("cancelPrivateGame");
+        this.server.to(client.id).emit("cancelPrivateGame");
+    }
+
     @SubscribeMessage("privateGameResponse")
     async handlePrivateGameResponse(client: Socket, data: any) {
+
+        if (!data.userId) return;
 
         const event2 = this.events.find((event: ClientSocket) => {
             return event.socket.id === client.id;

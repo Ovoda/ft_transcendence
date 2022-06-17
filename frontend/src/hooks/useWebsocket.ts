@@ -2,7 +2,7 @@ import { addMessage, closeChat, showChat } from "features/chat/chat.slice";
 import { setGameIsPrivate, setRequestedUser, setRequestingUser, setShowPrivateGameModal } from "features/game/game.slice";
 import { setRelations } from "features/relations/relations.slice";
 import { setRoles, updateCurrentRole } from "features/roles/roles.slice";
-import { openGameOptions, setNotification } from "features/uiState/uiState.slice";
+import { closeGameOptions, openGameOptions, setNotification } from "features/uiState/uiState.slice";
 import UserData from "features/user/interfaces/user.interface";
 import { updateUserData } from "features/user/user.slice";
 import { useContext, useEffect } from "react";
@@ -18,7 +18,7 @@ import UserRelation from "src/shared/interfaces/userRelation";
 export default function useWebsockets() {
 
 	/** Global data */
-	const { chat, user, relations, roleSlice } = useSelector((store: Store) => store);
+	const { chat, user, relations, game } = useSelector((store: Store) => store);
 	const mainSocket = useContext(mainSocketContext);
 
 	/** Tools */
@@ -47,6 +47,13 @@ export default function useWebsockets() {
 		if (userRelations) {
 			dispatch(setRelations(userRelations));
 		}
+		const counterParts = userRelations.map((relation: UserRelation) => relation.counterPart.id);
+
+		const checkPrivateGame = counterParts.find((id: string) => id === game.requestingUser?.id);
+		dispatch(closeGameOptions());
+		dispatch(setRequestedUser(""));
+		dispatch(setRequestingUser(null));
+		dispatch(showChat(true));
 	}
 
 	const reFetchRoles = async (notification: any) => {
@@ -88,6 +95,13 @@ export default function useWebsockets() {
 		}
 	}
 
+	const cancelPrivateGameCallback = () => {
+		dispatch(setRequestingUser(null));
+		dispatch(showChat(true));
+		dispatch(setGameIsPrivate(false))
+		dispatch(closeGameOptions());
+	}
+
 	useEffect(() => {
 		if (user.login !== "" && mainSocket) {
 			mainSocket.on("ServerMessage", serverMessageCallback);
@@ -99,6 +113,7 @@ export default function useWebsockets() {
 			mainSocket.on("UserResponseDecline", userResponseDeclineCallback);
 			mainSocket.on("closingChat", chatCloseForUser);
 			mainSocket.on("updateRoles", reFetchRoles);
+			mainSocket.on("cancelPrivateGame", cancelPrivateGameCallback);
 
 
 			return () => {
@@ -109,6 +124,8 @@ export default function useWebsockets() {
 				mainSocket.off("playingRequest", displayPlayingRequest);
 				mainSocket.off("UpdateUserData", updateUserDataCallback);
 				mainSocket.off("closingChat", chatCloseForUser);
+				mainSocket.off("updateRoles", reFetchRoles);
+				mainSocket.off("cancelPrivateGame", cancelPrivateGameCallback);
 			};
 		}
 	}, [user, chat]);
